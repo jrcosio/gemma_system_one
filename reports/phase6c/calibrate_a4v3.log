@@ -1,0 +1,74 @@
+{
+  "path": "runs/e4b_experiment/20260923T204945Z/calibration/calibration-20260924T143729Z.json",
+  "temperatures": {
+    "noul": 1.3780951784481992,
+    "choice": 1.4627574321691008,
+    "score": 1.0021728696794798
+  },
+  "calibrated": {
+    "noul": true,
+    "choice": true,
+    "score": true
+  },
+  "fits": {
+    "noul": {
+      "temperature": 1.3780951784481992,
+      "nll_before": 0.07792242950978584,
+      "nll_after": 0.07314863665747527,
+      "n": 515,
+      "calibrated": true
+    },
+    "choice": {
+      "temperature": 1.4627574321691008,
+      "nll_before": 0.4184799635988453,
+      "nll_after": 0.38361473434463084,
+      "n": 351,
+      "calibrated": true
+    },
+    "score": {
+      "temperature": 1.0021728696794798,
+      "nll_before": 0.30947922438898673,
+      "nll_after": 0.30947852778855195,
+      "n": 289,
+      "calibrated": true
+    }
+  },
+  "in_sample_before": {
+    "questions": 1155,
+    "mean_nll_all": 0.23935585651008795,
+    "noul": {
+      "n": 515,
+      "nll": 0.07792242950978585,
+      "accuracy": 0.9689320388349515
+    },
+    "choice": {
+      "n": 351,
+      "nll": 0.4184799635988453,
+      "accuracy": 0.8831908831908832
+    },
+    "score": {
+      "n": 289,
+      "nll": 0.3094792243889867,
+      "accuracy": 0.8650519031141869
+    }
+  },
+  "in_sample_after": {
+    "questions": 1155,
+    "mean_nll_all": 0.22663170023016943,
+    "noul": {
+      "n": 515,
+      "nll": 0.0731486367199052,
+      "accuracy": 0.9689320388349515
+    },
+    "choice": {
+      "n": 351,
+      "nll": 0.3836147336848765,
+      "accuracy": 0.8831908831908832
+    },
+    "score": {
+      "n": 289,
+      "nll": 0.30947852709931795,
+      "accuracy": 0.8650519031141869
+    }
+  }
+}

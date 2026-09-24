@@ -1,0 +1,5 @@
+data/pilot_v4 K3: other 10/131 K4: other 17/116 K5: other 21/125 K6: other 17/111
+data/pilot_v4_calib12 K3: other 3/51 K4: other 7/45 K5: other 4/50 K6: other 4/28
+data/pilot_v4_final13 K3: other 8/37 K4: other 3/31 K5: other 7/27 K6: other 5/43
+data/pilot_v4_kdiag11_K K3: other 2/43 K4: other 3/28 K5: other 5/41 K6: other 7/38
+data/pilot_v4_kdiag11_K8 K8: other 17/150

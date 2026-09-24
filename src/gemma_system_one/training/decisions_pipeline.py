@@ -770,6 +770,17 @@ def run_evaluate_decisions(
         cal_ext = (cal.get("external_dataset") or {}) if calibration is not None else {}
         if cal_ext.get("sha256") == ext_ds.sha256:
             raise ValueError("No se evalúa sobre el mismo conjunto con el que se ajustaron las temperaturas")
+        if cal_ext:
+            cal_ds = load_dataset(cal_ext["root"])
+            if cal_ds.sha256 != cal_ext["sha256"]:
+                raise ValueError("El conjunto de calibración externa cambió desde el ajuste")
+            cal_overlap = _external_leakage(cal_ds, ext_ds.examples)
+            if cal_overlap["errors"]:
+                raise ValueError(
+                    f"El dataset de evaluación comparte grupos o entradas con la calibración: "
+                    f"{cal_overlap['errors']}"
+                )
+            report["external_calibration_leakage"] = cal_overlap
         report["external_dataset"] = {"root": str(dataset), "sha256": ext_ds.sha256}
         report["external_leakage"] = _external_leakage(ctx.train_ds, ext_ds.examples)
         if report["external_leakage"]["errors"]:

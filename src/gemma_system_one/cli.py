@@ -335,7 +335,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--variant", choices=["main", "transfer"], default="main", help="mixed/vision: plantillas reservadas"
     )
-    p.add_argument("--generator-version", choices=["v1", "v2", "v3"], default="v3", help="Sólo mixed")
+    p.add_argument("--generator-version", choices=["v1", "v2", "v3", "v4"], default="v3", help="Sólo mixed")
     p.add_argument(
         "--vision-version", choices=["v1", "v2"], default="v2", help="Sólo vision; v2: estilos por partición"
     )

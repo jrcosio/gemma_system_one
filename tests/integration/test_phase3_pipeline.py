@@ -235,5 +235,15 @@ def test_external_calibration_set_is_bound_checked_and_never_reused_as_test(setu
         run_calibrate(init, "all", dataset=train_root)
     with pytest.raises(ValueError, match="mismo conjunto"):
         dp.run_evaluate_decisions(init, "all", dataset=cal_ds, calibration=Path(cal["path"]))
+    # Un conjunto mixto tiene otro sha256, pero contiene una pregunta usada para ajustar T.
+    overlap = tmp_path / "partial_overlap"
+    overlap.mkdir()
+    shared = load_dataset(cal_ds).examples[0]
+    fresh = load_dataset(other).examples[0]
+    (overlap / "examples.jsonl").write_text(
+        "\n".join(json.dumps(e.model_dump(mode="json")) for e in (shared, fresh)) + "\n"
+    )
+    with pytest.raises(ValueError, match="calibración"):
+        dp.run_evaluate_decisions(init, "all", dataset=overlap, calibration=Path(cal["path"]))
     rep = dp.run_evaluate_decisions(init, "all", dataset=other, calibration=Path(cal["path"]))
     assert rep["calibration"]["temperatures"] == cal["temperatures"] and "metrics_calibrated" in rep

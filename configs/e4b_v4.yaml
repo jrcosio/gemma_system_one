@@ -1,0 +1,25 @@
+# Fase 6c, A4v4: idéntico a e4b_experiment salvo el dataset (generador v4, sin la pista de K).
+# Protocolo predeclarado: reports/phase6c-protocol.md. No se ajusta ningún hiperparámetro.
+kind: decision_heads
+name: e4b_v4
+base_config: configs/e4b_text.yaml
+dataset: data/pilot_v4
+split_seed: 0
+primitives: [noul, choice, score]
+extraction:
+  # 1 fila por forward: representación independiente del lote (decisión 0002)
+  microbatch_rows: 1
+cache_dir: artifacts/cache/representations
+runs_dir: runs
+train:
+  epochs: 30  # tope; en v2 la mejor fue la última (10). Se elige por NLL de validación
+  lr: 0.001
+  weight_decay: 0.01
+  questions_per_step: 8
+  logit_chunk_rows: 4
+  seed: 0
+  threshold: 0.5
+  rps_lambda: 0.0
+  type_weights: {noul: 1.0, choice: 1.0, score: 1.0}
+  select_on: validation
+  feature_norm: standardize_train

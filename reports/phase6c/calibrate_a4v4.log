@@ -1,0 +1,75 @@
+Loading weights:   0%|          | 0/2076 [00:00<?, ?it/s]Loading weights:  61%|██████    | 1258/2076 [00:00<00:00, 12576.83it/s]Loading weights: 100%|██████████| 2076/2076 [00:00<00:00, 13614.34it/s]
+{
+  "path": "runs/e4b_v4/20260924T140932Z/calibration/calibration-20260924T143416Z.json",
+  "temperatures": {
+    "noul": 1.1497129541602924,
+    "choice": 1.1585110792029414,
+    "score": 1.2014047897443232
+  },
+  "calibrated": {
+    "noul": true,
+    "choice": true,
+    "score": true
+  },
+  "fits": {
+    "noul": {
+      "temperature": 1.1497129541602924,
+      "nll_before": 0.06896114424348566,
+      "nll_after": 0.06810473543357465,
+      "n": 515,
+      "calibrated": true
+    },
+    "choice": {
+      "temperature": 1.1585110792029414,
+      "nll_before": 0.3437787714242038,
+      "nll_after": 0.3399188714999946,
+      "n": 351,
+      "calibrated": true
+    },
+    "score": {
+      "temperature": 1.2014047897443232,
+      "nll_before": 0.36329838192182223,
+      "nll_after": 0.35748570855312506,
+      "n": 289,
+      "calibrated": true
+    }
+  },
+  "in_sample_before": {
+    "questions": 1155,
+    "mean_nll_all": 0.2261251692040669,
+    "noul": {
+      "n": 515,
+      "nll": 0.06896114424348566,
+      "accuracy": 0.9689320388349515
+    },
+    "choice": {
+      "n": 351,
+      "nll": 0.3437787714242037,
+      "accuracy": 0.8888888888888888
+    },
+    "score": {
+      "n": 289,
+      "nll": 0.36329838192182223,
+      "accuracy": 0.8581314878892734
+    }
+  },
+  "in_sample_after": {
+    "questions": 1155,
+    "mean_nll_all": 0.22311587234225078,
+    "noul": {
+      "n": 515,
+      "nll": 0.0681047353401781,
+      "accuracy": 0.9689320388349515
+    },
+    "choice": {
+      "n": 351,
+      "nll": 0.3399188705252027,
+      "accuracy": 0.8888888888888888
+    },
+    "score": {
+      "n": 289,
+      "nll": 0.3574857103832587,
+      "accuracy": 0.8581314878892734
+    }
+  }
+}

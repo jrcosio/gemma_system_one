@@ -14,7 +14,7 @@ Fecha: 2026-09-23. Mac M5 Pro con 48 GB, PyTorch/MPS en BF16 y cabezales CPU/FP3
    - En un holdout nuevo (885 preguntas, 295 grupos), E4B congelado con cabezales (A4) mejora la NLL calibrada frente a E2B congelado (A2): **−0,218 [−0,274; −0,168]**. También mejora frente al modelo servido hasta ahora, E2B + LoRA (B2): **−0,182 [−0,236; −0,133]**.
    - Cumple los límites de memoria (17,1 GB) y de latencia (p95 1540 ms ≤ 2 × 909 ms).
    - Por la regla R2, A4 pasa a ser el servicio de texto recomendado.
-2. **Más opciones: el evaluador compartido tolera K = 7–8 en accuracy, pero la NLL de B2 empeora.**
+2. **Más opciones: diagnóstico invalidado por una fuga de etiqueta en la construcción de K.**
    - Diagnóstico con 135 preguntas: Δaccuracy −0,030 en B2 y en A4.
    - ΔNLL: B2 +0,186 [+0,076; +0,310] y A4 +0,027 [−0,084; +0,137].
 3. **Optimización:**
@@ -104,10 +104,14 @@ Se evalúan las 135 preguntas `fault_type` del holdout con sus opciones original
 
 - **Accuracy por K original, B2:** K3 0,85 → 0,81; K4 0,79 → 0,76; K5 0,75 → 0,80; K6 0,89 → 0,77.
 - **Accuracy por K original, A4:** K3 0,96 → 0,96; K4 0,88 → 0,79; K5 0,95 → 0,90; K6 0,89 → 0,91.
-- **Lectura prevista** (Δaccuracy ≥ −0,05): se cumple en la estimación puntual de ambos, pero el IC de B2 no descarta pérdidas mayores.
-- **B2 pierde calibración** con más opciones: reparte masa entre distractores imposibles. A4 apenas cambia.
+- **Lectura prevista originalmente** (Δaccuracy ≥ −0,05): la estimación puntual cumplía el umbral, pero la revisión posterior invalida su interpretación por fuga de etiqueta en K.
+- **NLL observada:** aumenta más para B2 que para A4 en estos archivos; no permite atribuir la diferencia sólo al aumento de candidatos.
 - **Límites:** es una sola familia y los distractores son categorías; no son opciones largas ni de otras taxonomías.
 - **`compare`:** para este control se admite un número distinto de filas con `--allow-different-inputs` si la etiqueta semántica (`target_description`) coincide. Con el mismo K se sigue exigiendo el mismo índice. Test: `test_comparison_with_more_candidates_requires_same_semantic_label`.
+
+### Revisión posterior del diagnóstico de K (2026-09-24)
+
+La conclusión «tolera K = 7–8» queda retirada. `widen_fault_kind` sólo añade las dos opciones imposibles cuando la etiqueta es `other`; en los demás casos puede añadir categorías adicionales. En `data/pilot_v3_holdout6_faultK8`, las 135 preguntas resultantes tienen esta distribución: K5: 2 `other`; K6: 6 `other`; K7: 8 `other`; K8: 119 no `other`. Así, K < 8 revela la etiqueta `other` y K = 8 la excluye. Las métricas anteriores describen esos archivos, pero no prueban robustez al ampliar candidatos. Los archivos y sus hashes se conservan como evidencia histórica; una nueva prueba exigiría datos y protocolo nuevos.
 
 ## 3. Optimización
 

@@ -10,7 +10,7 @@ Fecha: 2026-09-24. Mac M5 Pro con 48 GB, MPS/BF16 y cabezales CPU/FP32. Sin comm
 Se cierran los pendientes metodológicos de la revisión de la fase 6:
 
 1. **A4 confirmado como servicio de texto (regla C).**
-   - Resultado: en un test final nuevo que no se usó para ninguna decisión (`pilot_v3_final8`, 888 preguntas, 296 grupos), A4 − B2 = **−0,146 [−0,186; −0,104]** de NLL calibrada.
+   - Resultado: en un test final nuevo (`pilot_v3_final8`, 888 preguntas, 296 grupos), A4 − B2 = **−0,146 [−0,186; −0,104]** de NLL calibrada. No se usó para ajustar pesos ni temperaturas; la regla C predeclarada sí usa este test para confirmar o revertir la recomendación.
    - Lectura: el holdout de la fase 6 queda como conjunto de selección; esta es la medida independiente posterior a la elección.
 2. **Calibración de A4: resuelta según el criterio declarado, pero de forma marginal.**
    - Datos: temperaturas ajustadas con 1200 preguntas externas (`pilot_v3_calib7`).
@@ -34,7 +34,7 @@ Se cierran los pendientes metodológicos de la revisión de la fase 6:
 - **`gso calibrate --split all --dataset <conjunto>`** (calibración externa):
   - exige que no haya grupos ni entradas compartidos con el dataset de entrenamiento;
   - el artefacto registra `split: external_calibration` y el sha256 del conjunto;
-  - `evaluate` rechaza evaluar sobre el mismo conjunto con esas temperaturas.
+  - Tras la revisión de 2026-09-24, `evaluate` rechaza también un conjunto distinto que comparta grupos o entradas con la calibración externa y comprueba su hash original.
   - Test: `tests/integration/test_phase3_pipeline.py::test_external_calibration_set_is_bound_checked_and_never_reused_as_test`.
 - **Datos:** `scripts/derive_phase6b_data.py` reutiliza `data/derive.exclude_overlap`.
 - **Servicio:** `configs/serve_e4b_text.yaml` (A4) y `configs/serve_text.yaml` (B2) usan ahora las calibraciones de `calib7`, como fijaba el protocolo.
@@ -67,6 +67,8 @@ Se cierran los pendientes metodológicos de la revisión de la fase 6:
 | B2 − A2 | −0,038 [−0,066; −0,012] | +0,012 [−0,007; +0,029] | −0,035 [−0,083; +0,004] | −0,055 [−0,096; −0,017] | −0,020 [−0,068; +0,031] |
 
 Las magnitudes son algo menores que en el holdout de selección (A4 − B2: −0,182 allí, −0,146 aquí), como cabe esperar tras seleccionar. El signo y la conclusión se mantienen.
+
+**Límite detectado en la revisión posterior:** el generador v3 de `fault_type` limita a cinco opciones los ejemplos cuya respuesta es `other`, aunque el sorteo de K pide seis. En `final8`, K6 en esa familia aparece 32 veces y ninguna tiene la etiqueta `other`. Esta pista estructural limita la interpretación fuera de estos datos sintéticos. Un análisis posterior, excluyendo las 141 preguntas `fault_type` y conservando los 296 grupos, da A4 − B2 = −0,131 con bootstrap por grupos [−0,175; −0,088] (1000 repeticiones, semilla 0). Es sensibilidad descriptiva hecha después de mirar el test, no una nueva prueba independiente ni una regla de selección. Los datasets v3 existentes se conservan para reproducibilidad.
 
 ### Variantes de calibración en `final8` (NLL media; sin decidir nada con ello)
 

@@ -8,10 +8,11 @@ dist/
 build/
 .env
 .env.*
-# Pesos, datos y artefactos locales
-artifacts/
-data/
-runs/
+# Pesos, datos y artefactos locales, sólo en la raíz: sin «/», «data/» ignoraba también el
+# paquete src/gemma_system_one/data/ (quedó fuera del commit 1b5ad45).
+/artifacts/
+/data/
+/runs/
 *.safetensors
 *.bin
 *.pt

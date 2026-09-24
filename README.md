@@ -121,7 +121,9 @@ uv run python scripts/profile_lora_step.py configs/e4b_text.yaml data/pilot_v3 o
 
 En el perfil de seis pasos de LoRA sobre E4B, la ejecución sin recomputación superó el presupuesto de 32 GiB y la ejecución con `train.recompute_layers: true` permaneció por debajo. No se ha medido un entrenamiento completo de E4B con LoRA.
 
-Fase 6b ([reports/phase6b-final.md](reports/phase6b-final.md)): en un test final nuevo, no usado para decidir, A4 − B2 = −0,146 [−0,186; −0,104]. El servicio queda confirmado y las calibraciones se ajustan con un conjunto externo de 1200 preguntas (`gso calibrate --split all --dataset data/pilot_v3_calib7`).
+Fase 6b ([reports/phase6b-final.md](reports/phase6b-final.md)): en un test final nuevo que no se usó para ajustar pesos ni temperaturas, A4 − B2 = −0,146 [−0,186; −0,104]. La regla C predeclarada usa ese test para confirmar A4. Las calibraciones se ajustan con un conjunto externo de 1200 preguntas (`gso calibrate --split all --dataset data/pilot_v3_calib7`). La revisión posterior detectó una fuga estructural de etiqueta en la familia sintética `fault_type`; véanse los límites del informe.
+
+Fase 6c ([reports/phase6c-final.md](reports/phase6c-final.md), decisión [0012](docs/decisions/0012-generator-v4-without-k-cue.md)): el generador `--generator-version v4` elimina esa pista (la respuesta `other` es igual de probable con cualquier K). Con datos v4, E4B + cabezales reentrenado equivale al servicio actual (−0,007 [−0,034; +0,024]; se mantiene A4v3 por la regla S) y mantiene la accuracy con K = 8 en la prueba emparejada sin fuga; E2B + cabezales no.
 
 ## Documentos
 

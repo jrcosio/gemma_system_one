@@ -1,16 +1,290 @@
-# Estado vigente — fase 6b cerrada: servicio A4 confirmado en un test independiente (2026-09-24, 05:08 UTC)
+# Estado vigente — fase 6c cerrada: generador v4 sin la pista de K (2026-09-24, 15:05 UTC)
 
-Sustituye a las secciones siguientes (relevo y revisión de la fase 6), que quedan como registro histórico. Resuelve sus pendientes 2 y 3 (medida independiente del servicio elegido y calibración de A4) y ejercita en MPS la corrección del perfilador (pendiente 4). El pendiente 1 (commit) sigue siendo decisión del usuario.
+Sustituye a las secciones siguientes (relevo y revisión de las fases 6/6b), que quedan como registro histórico. Resuelve su pendiente 1 (generador sin la pista de K y prueba válida de ampliación de candidatos). **Incluye, sin cambios, las correcciones de esa revisión**, que siguen sin commit: la guarda de solapes entre la calibración externa y el test en `decisions_pipeline.py` y su test, y las correcciones de los informes de las fases 6/6b y del README.
+
+## 1. Fase, rama y veredicto
+
+| Campo | Estado |
+|---|---|
+| Fase | **6c cerrada.** No hay fases posteriores en la spec §10; es la corrección de un fallo del piloto detectado en revisión. Informe: **`reports/phase6c-final.md`**. Protocolo `reports/phase6c-protocol.md`, sha256 `02d3ae6c…` (en `reports/phase6c/protocol.sha256`), escrito antes de generar los datos v4 y de entrenar |
+| Corrección | **Generador `support-mixed-v4`** (decisión 0012): 3 categorías distractoras que nunca son la respuesta; `other` sin relación con K. `derive.widen_fault_kind_by_facts` amplía a K = 8 sin mirar la etiqueta. v1–v3 siguen idénticos byte a byte |
+| Regla S (servicio) | En `pilot_v4_final13` (882 preguntas, 294 grupos), A4v4 − A4v3 = **−0,007 [−0,034; +0,024]**. El límite superior supera el margen de +0,02, así que **se mantiene A4v3** (`configs/serve_e4b_text.yaml` no cambia). En la práctica, equivalentes |
+| Más opciones | Prueba válida sin fuga: 150 preguntas, K 3–6 frente a K8. Δaccuracy: **A4v3 0,000 [−0,040; +0,033]** (tolera); **A4v4 −0,020 [−0,060; +0,020]** (no, por poco); **A2v4 −0,147 [−0,207; −0,087]** (se degrada). La NLL empeora en los tres; `other` es lo más difícil |
+| Otras | A4v4 − A2v4 = −0,149 [−0,195; −0,105]: la ventaja de E4B no dependía de la pista |
+| Rama / commit | Rama **`fases-0-6`**, HEAD **`1b5ad45`** (sobre `main` = `65d4250`). **Sin commit:** los cambios de la revisión de las fases 6/6b más los de esta fase (§4). Sin merge ni push |
+| Código | **`dca04dbdf2713ab3544ffdedad0f05f43c8e777bb8a755b224bdf854dee6bca7`** (81 ficheros), el mismo con el que se ejecutó todo; copia en `artifacts/source/` |
+| Pruebas | **291 CPU** (34,61 s) y **14 MPS/E2E reales** (129,61 s, 0 omitidos), con este código. Ruff, formato (131 ficheros), `uv lock --check` y `git diff --check` correctos |
+
+## 2. Procesos activos
+
+`pgrep -fl 'gso|pytest|uvicorn'` terminó con código 1 y `lsof -nP -iTCP:8000 -sTCP:LISTEN` también: **ningún proceso del proyecto** y el puerto libre. Sin entrenamientos, descargas ni servidores.
+
+## 3. Checkpoints, calibraciones y datos
+
+| Ruta | Uso |
+|---|---|
+| `runs/e4b_experiment/20260923T204945Z/checkpoint` + `calibration/calibration-20260924T045005Z.json` (`calib7`) | **A4v3, servicio de texto vigente** (sin cambios) |
+| `…/e4b_experiment/20260923T204945Z/calibration/calibration-20260924T143729Z.json` | Calibración de A4v3 con `calib12`, usada sólo en la evaluación de la 6c; el servicio no la usa |
+| `runs/e4b_v4/20260924T140932Z/checkpoint` + su `calibration/` (`calib12`) | **A4v4**, E4B + cabezales con datos v4; alternativa equivalente |
+| `runs/e2b_heads_v4/20260924T142144Z/checkpoint` + su `calibration/` | A2v4, E2B + cabezales con datos v4 |
+| `runs/pilot_lora_v3/20260923T012208Z/checkpoint` + `calibration-20260924T044408Z.json` | B2, E2B + LoRA (v3); opción de menor latencia |
+| `runs/pilot_ce_v3/…`, `runs/vision2_heads/…`, `runs/vision2_text_only/…` | A2, V2 y C2, sin cambios |
+| `data/pilot_v4`, `pilot_v4_calib12`, `pilot_v4_final13`, `pilot_v4_kdiag11{,_K,_K8}` | Datos v4; hashes en el informe. `final13` y `kdiag11*` **ya usados** |
+
+**Conjuntos ya usados, que no deben servir para decidir:** el test de `pilot_v3`, los tests de `vision_pilot_v1/v2`, `pilot_v3_holdout6*`, `pilot_v3_final8`, `pilot_v4_final13` y `pilot_v4_kdiag11*`. El test y la partición de calibración de `pilot_v4` siguen **sin leer**.
+
+## 4. Archivos sin commit sobre `1b5ad45`
+
+**De la revisión anterior**, sin tocar aquí:
+- `src/gemma_system_one/training/decisions_pipeline.py`;
+- `tests/integration/test_phase3_pipeline.py`;
+- `reports/phase6-e4b.md`, `reports/phase6b-final.md`.
+
+**De esta fase:**
+- **Nuevos:**
+  - `tests/unit/test_phase6c_generator_v4.py`;
+  - `scripts/derive_phase6c_data.py`;
+  - `configs/e4b_v4.yaml`, `configs/e2b_heads_v4.yaml`;
+  - `docs/decisions/0012-generator-v4-without-k-cue.md`;
+  - `reports/phase6c-protocol.md`, `reports/phase6c-final.md` y `reports/phase6c/` (logs, comparaciones, `other_by_k.txt`, `run_chain.sh`).
+- **Modificados:**
+  - `src/gemma_system_one/data/generate_mixed.py`: v4, `FAULT_DISTRACTOR_OPTIONS`, `_choice_fault_kind_v4`, `fault_categories`, `true_fault_category`;
+  - `src/gemma_system_one/data/derive.py`: `widen_fault_kind_by_facts`;
+  - `src/gemma_system_one/cli.py`: `--generator-version v4`;
+  - `README.md` y este STATUS.
+
+## 5. Decisiones
+
+- **0012:** generador v4 sin la pista de K; el servicio se mantiene en A4v3 por la regla S.
+- 0001–0011 siguen vigentes.
+
+## 6. Comandos exactos
+
+Lista completa en `reports/phase6c-final.md` («Comandos ejecutados»):
+- `pytest` del generador v4;
+- protocolo y su sha256;
+- `generate-data --generator-version v4 --seed 0`, `gso split` y `scripts/derive_phase6c_data.py`;
+- `validate-data` de los 5 conjuntos;
+- `reports/phase6c/run_chain.sh`: 2 entrenamientos, 3 calibraciones y 9 evaluaciones;
+- 5 `gso compare`;
+- `pytest` CPU y MPS/E2E.
+
+## 7. Fallos reproducibles
+
+- **Fallo corregido:** la pista de K en v3. Se reproduce con `pytest tests/unit/test_phase6c_generator_v4.py::test_v3_leaks_label_through_k_and_v4_does_not` (0 casos `other` con K = 6 en v3).
+- **Sin fallos de código nuevos.**
+- **Observación:** el swap creció 1,49 GB durante el entrenamiento de A4v4 (`runs/e4b_v4/20260924T140932Z/metrics.json`), sin superar el presupuesto de MPS y sin causa atribuida.
+
+## 8. Pendientes, en orden
+
+1. **Commit** de los cambios de la revisión y de la fase 6c en `fases-0-6`, a decidir por el usuario.
+2. **Integración:** fusión en `main` y push, también a decidir por el usuario. Queda por probar un clon limpio con `uv sync` y tests.
+3. **Revisión independiente de la fase 6c:**
+   - que v4 no introduce otra pista (p. ej., qué categorías acompañan a `other`);
+   - el diagnóstico de K por hechos;
+   - la aplicación de la regla S.
+4. **Opcionales, siempre con datos nuevos:**
+   - calibración de Choice más allá de una T global;
+   - mejorar la respuesta `other`, que es la más difícil (sobre todo con K alto);
+   - LoRA sobre E4B con `recompute_layers: true`;
+   - E4B con imagen;
+   - abstención.
+5. **Riesgos que se mantienen:**
+   - el timeout no interrumpe un forward MPS y la cola no limita las conexiones;
+   - el RSS muestreado no es el pico de MPS;
+   - datos sintéticos de una familia;
+   - V2 sin calibrar.
+
+### Privacidad
+
+- **Contenido:** sin secretos ni datos personales.
+- **Rutas:** las de `reports/phase6c/` están enmascaradas con `~`.
+- **Fuera de Git:** `reports/doctor/` sigue excluido por `.gitignore`.
+
+---
+
+# Registro histórico — relevo tras revisión independiente de fases 6/6b (2026-09-24, 13:44 UTC)
+
+Esta sección sustituye el dictamen del relevo anterior; las secciones siguientes conservan el historial. Se revisaron `AGENTS.md`, `README.md`, `docs/ESPECIFICACION.md`, `docs/AUDITORIA.md`, el diff de Git, el código, el protocolo y las predicciones reales. **Rama:** `fases-0-6`; **HEAD:** `1b5ad45` (sobre `65d4250`). La revisión permanece **sin commit**. La fase 6b conserva A4 como servicio de texto según la regla C, dentro de estos datos sintéticos; no se aprueba la afirmación de robustez a K=8 de la fase 6. No se ha demostrado generalización fuera de la familia sintética.
+
+**Relevo actual:** fase 6b revisada, sin fase nueva ni cambio de alcance. HEAD completo: `1b5ad45466748774f1f5adc255328ef654e251db`. Seis archivos modificados sin commit: `README.md`, `docs/STATUS.md`, `reports/phase6-e4b.md`, `reports/phase6b-final.md`, `src/gemma_system_one/training/decisions_pipeline.py` y `tests/integration/test_phase3_pipeline.py`; stash vacío. Esta última pasada de relevo sólo actualiza `docs/STATUS.md`. No se ha hecho merge ni push.
+
+**Decisiones vigentes:** 0001–0011 no cambian de arquitectura. Se mantiene PyTorch/MPS, Gemma 4 E2B/E4B, el contrato Noul/Choice/Score, A4 para el servicio textual conforme a R2 y regla C, y la calibración de `calib7` fijada por el protocolo 6b. La corrección de solapes es una guarda de evaluación dentro de ese contrato. Los datos v3 y sus hashes no se alteran; el experimento de K ampliado queda sin conclusión de robustez. Una prueba nueva requiere versión de datos y protocolo nuevos, sin seleccionar con `holdout6*` ni `final8`.
+
+**Comprobación de este relevo (comandos exactos adicionales):**
+
+```sh
+git branch --show-current
+git rev-parse HEAD
+git status --short
+git diff --stat
+git stash list
+pgrep -fl 'gso|pytest|uvicorn|profile_lora_step|measure_request_batching'
+lsof -nP -iTCP:8000 -sTCP:LISTEN
+git diff --check
+.venv/bin/python - <<'PY'
+from pathlib import Path
+paths = [
+'runs/e4b_experiment/20260923T204945Z/checkpoint',
+'runs/e4b_experiment/20260923T204945Z/calibration/calibration-20260924T045005Z.json',
+'runs/pilot_lora_v3/20260923T012208Z/checkpoint',
+'runs/pilot_lora_v3/20260923T012208Z/calibration/calibration-20260924T044408Z.json',
+'runs/pilot_ce_v3/20260923T005721Z/checkpoint',
+'runs/pilot_ce_v3/20260923T005721Z/calibration/calibration-20260924T044041Z.json',
+'runs/vision2_heads/20260923T161024Z/checkpoint',
+'runs/vision2_text_only/20260923T162937Z/checkpoint',
+]
+for path in paths:
+    print(path, Path(path).exists())
+PY
+```
+
+Resultados: rama y HEAD anteriores; los seis archivos de la lista, stash vacío, `git diff --check` correcto; las dos comprobaciones de procesos devolvieron código 1 sin salida. **Ningún entrenamiento, descarga o servidor sigue activo**. Las ocho rutas de checkpoints y calibraciones enumeradas más abajo existen; se comprobó existencia, no integridad de todos los archivos ni recarga de todos los modelos. A4 sí se recargó en MPS durante la revisión. El relevo usa rutas relativas y no incluye secretos ni datos personales.
+
+## Hallazgos y correcciones de esta revisión
+
+| Gravedad | Hallazgo / resultado |
+|---|---|
+| Alta, metodología | `src/gemma_system_one/data/derive.py::widen_fault_kind` usa la etiqueta para decidir cuántas opciones puede añadir. En `pilot_v3_holdout6_faultK8`, K5/K6/K7 son 2/6/8 casos `other` y los 119 K8 no son `other`. K revela la respuesta; el diagnóstico «tolera K=7–8» se retira de `reports/phase6-e4b.md`. No se reescriben datos históricos ni hashes. |
+| Media, fuga entre calibración y test | `run_evaluate_decisions` sólo rechazaba un dataset externo con el mismo sha256 que el de ajuste de temperaturas. Un conjunto con una pregunta compartida y otra nueva pasaba la guarda. Test de integración reproducido primero en rojo; el código ahora valida hash y solapes por grupo/entrada/imagen frente al conjunto de calibración. El mismo test pasa. Requiere conservar accesible el dataset de calibración, que ya está registrado en el artefacto. |
+| Media, límite de datos | El generador v3 de `fault_type` trunca a K5 los casos `other` que sortearon K6. En `final8`, 32 ejemplos `fault_type` con K6 son no `other`. Se conserva v3 por reproducibilidad; cualquier corrección de generación requiere nueva versión, datasets y protocolo antes de otro test. |
+| Baja, precisión del informe | `final8` no ajustó pesos ni temperaturas, pero **sí** se usó para la decisión de confirmación de la regla C. Corregidas las frases «no usado para ninguna decisión» en README e informe. |
+
+**Resultado principal comprobado:** 888 pares de predicciones de A4 y B2 con entradas idénticas, 296 grupos; A4 − B2 = −0,1456947 de NLL calibrada, IC bootstrap [−0,1859615; −0,1043155] en `reports/phase6b/final_compare_a4_minus_b2.json`. Un análisis *posterior* sin las 141 preguntas `fault_type` da −0,13094 [−0,17500; −0,08785] en 747 preguntas y 296 grupos. Es sensibilidad descriptiva, no nuevo test de selección. Las comprobaciones de solape exacto train/calib7, train/final8, calib7/final8 y holdout6_clean/final8 dan `errors: []`; hay, respectivamente, 9, 4, 3 y 0 pares de estados casi duplicados, que limitan independencia semántica.
+
+**Modelo real:** en esta revisión se recargó A4 desde el checkpoint local y se hicieron 8 forwards para una pregunta Noul, Choice y Score de `final8`: `Gemma4Model`, `mps:0`, BF16, base en eval, 0 parámetros base entrenables, sin `lm_head`, 8 logits finitos. La comparación adicional con las predicciones guardadas dio diferencia máxima de logits 0,0 en las tres preguntas. Esto verifica inferencia MPS real. También pasó `tests/mps/test_phase3_real.py::test_lora_on_real_e2b_mps` (1 passed, 11,77 s): gradientes finitos, base intacta y recarga LoRA, con pesos E2B reales. El perfil histórico `reports/phase6b/lora_step_e4b_recompute.json` registra seis pasos reales de E4B/MPS y 132 gradientes LoRA finitos por paso; no se repitió ese perfil en esta revisión. Los tests CPU no se presentan como prueba MPS.
+
+**Archivos modificados desde HEAD:** `src/gemma_system_one/training/decisions_pipeline.py`, `tests/integration/test_phase3_pipeline.py`, `reports/phase6-e4b.md`, `reports/phase6b-final.md`, `README.md` y este `docs/STATUS.md` (que ya estaba modificado por el relevo previo). No cambió backend, modelo, contrato público, pesos, datos ni configuración de servicio. La huella de 78 fuentes tras la corrección es `b51bab4c25a1cb3806056942589cdfd907004c4e9052c9f8959cc9941d496900` (`artifacts/source/…tar`); la huella anterior `a7f645…` corresponde al cierre de 6b.
+
+**Comandos de verificación ejecutados en esta revisión (desde la raíz):**
+
+```sh
+git status --short
+git diff --stat
+git diff -- src/gemma_system_one/training/decisions_pipeline.py tests/integration/test_phase3_pipeline.py
+shasum -a 256 -c reports/phase6b/protocol.sha256
+.venv/bin/pytest tests/integration/test_phase3_pipeline.py::test_external_calibration_set_is_bound_checked_and_never_reused_as_test -q
+# Antes de corregir: FALLÓ, DID NOT RAISE ValueError. Después: 1 passed in 3.20s.
+.venv/bin/pytest tests/unit tests/integration -q
+# 288 passed, 2 warnings, 33.87s (CPU y dobles de prueba)
+.venv/bin/pytest tests/mps/test_phase3_real.py::test_lora_on_real_e2b_mps -q -rs
+# 1 passed in 11.77s (E2B/MPS con pesos reales)
+.venv/bin/ruff check src/gemma_system_one/training/decisions_pipeline.py tests/integration/test_phase3_pipeline.py
+.venv/bin/ruff format --check src/gemma_system_one/training/decisions_pipeline.py tests/integration/test_phase3_pipeline.py
+uv lock --check
+git diff --check
+# Todos correctos.
+.venv/bin/python scripts/snapshot_source.py
+# b51bab4c25a1cb3806056942589cdfd907004c4e9052c9f8959cc9941d496900; 78 ficheros.
+pgrep -fl 'gso|pytest|uvicorn'
+lsof -nP -iTCP:8000 -sTCP:LISTEN
+# Ambos: código 1, sin salida; no hay entrenamiento ni servidor activo.
+```
+
+Comandos exactos de los recuentos y del smoke MPS, sin ficheros de salida:
+
+```sh
+.venv/bin/python - <<'PY'
+from collections import Counter
+from gemma_system_one.data.dataset import load_dataset
+from gemma_system_one.data.generate_mixed import FAULT_KIND_OPTIONS
+for root in ('data/pilot_v3_holdout6_faultK8', 'data/pilot_v3_final8'):
+    counts = Counter()
+    for ex in load_dataset(root).examples:
+        if ex.task_family != 'fault_type':
+            continue
+        label = ex.question.criteria[ex.target.class_id]
+        other = label in FAULT_KIND_OPTIONS[ex.language]['other']
+        counts[(len(ex.question.criteria), other)] += 1
+    print(root, sorted(counts.items()))
+PY
+# faultK8: ((5, True), 2), ((6, True), 6), ((7, True), 8), ((8, False), 119)
+# final8: ((3, False), 25), ((3, True), 4), ((4, False), 37), ((4, True), 8),
+#         ((5, False), 32), ((5, True), 3), ((6, False), 32)
+.venv/bin/python - <<'PY'
+from gemma_system_one.data.dataset import load_dataset
+from gemma_system_one.training.decisions_pipeline import _external_leakage
+pairs = [('data/pilot_v3', 'data/pilot_v3_calib7'), ('data/pilot_v3', 'data/pilot_v3_final8'), ('data/pilot_v3_calib7', 'data/pilot_v3_final8'), ('data/pilot_v3_holdout6_clean', 'data/pilot_v3_final8')]
+for a, b in pairs:
+    d = _external_leakage(load_dataset(a), load_dataset(b).examples)
+    print(a, b, d)
+PY
+# errors: [] en los cuatro pares; near_duplicate_states: 9, 4, 3, 0.
+.venv/bin/python - <<'PY'
+import json
+from pathlib import Path
+from gemma_system_one.metrics import compare_predictions
+ref = json.loads(Path('reports/phase6b/final_compare_a4_minus_b2.json').read_text())
+a = [json.loads(line) for line in Path(ref['a']).read_text().splitlines()]
+b = [json.loads(line) for line in Path(ref['b']).read_text().splitlines()]
+keep = lambda rows: [r for r in rows if r['task_family'] != 'fault_type']
+result = compare_predictions(keep(a), keep(b), reps=1000, seed=0)
+print(result['questions'], result['bootstrap']['groups'], result['same_inputs'], result['point']['b_minus_a.nll_all'], result['bootstrap']['intervals']['b_minus_a.nll_all'])
+PY
+# 747 296 True -0.13093669669246008 [-0.1750008002888237, -0.08785222366203808]
+.venv/bin/python - <<'PY'
+import json
+from pathlib import Path
+import torch
+from gemma_system_one.training.decisions_pipeline import prepare_evaluation
+checkpoint = Path('runs/e4b_experiment/20260923T204945Z/checkpoint')
+ctx = prepare_evaluation(checkpoint, use_cache=False)
+items = ctx.items_for('all', dataset=Path('data/pilot_v3_final8'))
+selected = [next(it for it in items if it.example.question.type == t) for t in ('noul', 'choice', 'score')]
+with torch.inference_mode():
+    logits, extraction = ctx.logits('all', selected)
+backbone = ctx.encoder.backbone.model
+saved = {r['id']: r['row_logits'] for r in map(json.loads, Path('runs/e4b_experiment/20260923T204945Z/evaluations/pilot_v3_final8-all-calibrated-20260924T050002Z-predictions.jsonl').read_text().splitlines())}
+diffs = [max(abs(float(a)-float(b)) for a, b in zip(z.tolist(), saved[it.example.id], strict=True)) for it, z in zip(selected, logits, strict=True)]
+print(type(backbone).__name__, next(backbone.parameters()).device, next(backbone.parameters()).dtype, 'eval', not backbone.training, 'trainable', sum(p.numel() for p in backbone.parameters() if p.requires_grad), 'lm_head', hasattr(backbone, 'lm_head'))
+print('rows', [len(it.rows) for it in selected], 'forwards', extraction['backbone_forwards'], 'finite', all(torch.isfinite(z).all().item() for z in logits), 'max_abs_diff', max(diffs))
+PY
+# Gemma4Model mps:0 torch.bfloat16 eval True trainable 0 lm_head False
+# rows [1, 4, 3] forwards 8 finite True max_abs_diff 0.0
+```
+
+No se inició entrenamiento largo, descarga ni servicio externo.
+
+**Procesos y artefactos para el relevo:** la última inspección no encontró `gso`, `pytest`, `uvicorn` ni oyente en TCP:8000. Checkpoint A4: `runs/e4b_experiment/20260923T204945Z/checkpoint`; calibración vigente A4: `runs/e4b_experiment/20260923T204945Z/calibration/calibration-20260924T045005Z.json`. B2: `runs/pilot_lora_v3/20260923T012208Z/checkpoint` y `calibration/calibration-20260924T044408Z.json` bajo esa ejecución. A2: `runs/pilot_ce_v3/20260923T005721Z/checkpoint` y `calibration/calibration-20260924T044041Z.json`. V2 y C2: `runs/vision2_heads/20260923T161024Z/checkpoint` y `runs/vision2_text_only/20260923T162937Z/checkpoint`. Los datasets `data/`, pesos `runs/` y tar `artifacts/` están excluidos de Git; no hay secretos nuevos en el diff.
+
+**Pendientes:** (1) diseñar, con datos/protocolo nuevos y sin reutilizar `final8` ni `holdout6*` para elegir, una versión del generador sin la pista de K y una prueba válida de ampliación de candidatos; (2) revisar en ejecución limpia el commit tras incorporar esta corrección; (3) los límites ya declarados del servicio y la calibración de Choice siguen vigentes. No se ha hecho commit, merge ni push en esta revisión.
+
+---
+
+# Relevo anterior — fases 0–6 completas y con commit (2026-09-24, 13:25 UTC)
+
+Sustituye a las secciones siguientes (relevo y revisión de la fase 6), que quedan como registro histórico. La fase 6b resolvió sus pendientes 2 y 3 (medida independiente del servicio elegido y calibración de A4) y ejercitó en MPS la corrección del perfilador (pendiente 4). El pendiente 1 (commit) está hecho: `1b5ad45`, en la rama `fases-0-6`.
+
+**Verificación del relevo** (sin cambiar código, datos ni alcance; sin lanzar trabajo pesado). Comandos exactos y resultados:
+
+```sh
+git branch --show-current; git log --oneline -3; git status --short; git stash list
+# fases-0-6; 1b5ad45 (Fases 0–6 …) sobre 65d4250; árbol limpio; stash vacío
+.venv/bin/python scripts/snapshot_source.py
+# a7f6450022aea2af933ee0583415420bcf25c92689d3ffb7d3e3ec148b39d682, 78 ficheros (igual que al cierre de 6b)
+pgrep -fl 'gso|pytest|uvicorn'; lsof -nP -iTCP:8000 -sTCP:LISTEN
+# ambos: código 1, sin salida. Ningún proceso del proyecto; puerto libre
+# existencia (no recarga) de los 8 manifiestos y calibraciones de §3: 8 ok
+```
+
+**Para el otro asistente:**
+- Tarea natural: revisión independiente de la fase 6b, con el prompt 2 de `PROMPTS.md`.
+- Puntos que conviene comprobar:
+  - la guarda de la calibración externa (`calibration.run_calibrate`, `EXTERNAL_SPLIT`, y el rechazo en `run_evaluate_decisions`);
+  - `scripts/derive_phase6b_data.py` (exclusiones);
+  - la aplicación de la regla C.
+- El commit es la referencia; basta con `git show --stat 1b5ad45`.
+- No usar `pilot_v3_final8` ni `pilot_v3_holdout6*` para decidir nada.
 
 ## 1. Fase, rama y veredicto
 
 | Campo | Estado |
 |---|---|
 | Fase | **6 completa, incluida la 6b.** No hay fases posteriores en la spec §10. Informes: `reports/phase6-e4b.md` (selección) y **`reports/phase6b-final.md`** (medida final). Protocolo `reports/phase6b-protocol.md`, sha256 `209e9259…` (en `reports/phase6b/protocol.sha256`), escrito antes de generar los datos y ejecutar los modelos |
-| Resultado | **Regla C:** en el test final nuevo `pilot_v3_final8` (888 preguntas, 296 grupos, no usado para decidir), A4 − B2 = **−0,146 [−0,186; −0,104]** de NLL calibrada, así que **A4 queda confirmado** como servicio de texto. A4 − A2 = −0,183 [−0,227; −0,141]; B2 − A2 = −0,038 [−0,066; −0,012] |
+| Resultado | **Regla C:** en el test final nuevo `pilot_v3_final8` (888 preguntas, 296 grupos, no usado para ajustar pesos ni temperaturas; sí usado en la regla C), A4 − B2 = **−0,146 [−0,186; −0,104]** de NLL calibrada, así que **A4 queda confirmado** como servicio de texto para esta tarea sintética. A4 − A2 = −0,183 [−0,227; −0,141]; B2 − A2 = −0,038 [−0,066; −0,012] |
 | Calibración | Temperaturas nuevas con 1200 preguntas externas (`pilot_v3_calib7`). NLL de A4 en `final8`: 0,2021 sin T, 0,2089 con T de 300 preguntas y **0,2010 con T de `calib7`**. Resuelto según el criterio declarado, de forma marginal: en Choice la T global sigue empeorando (0,279 → 0,296). En A2 y B2 mejora claramente |
 | Servicio | `configs/serve_e4b_text.yaml` (A4) y `configs/serve_text.yaml` (B2) apuntan ahora a las calibraciones de `calib7`. Benchmark de A4: 100 × 200, p50/p95 910/1546 ms, ráfaga válida y log con 112 peticiones |
-| Rama / commit | `main`, HEAD `65d425025dd654fb4814062dc42b245062f151b1`. **Fases 0–6 sin commit**; stash vacío. Git sólo muestra `README.md` modificado; el resto está sin seguimiento |
+| Rama / commit | **`fases-0-6`, commit `1b5ad45`** («Fases 0–6: evaluador Gemma 4…»), sobre `main` = `65d4250`. 298 ficheros (297 nuevos + `README.md`); árbol limpio tras el commit. **Sin fusionar en `main` ni push** (decisión del usuario). Fuera de Git por `.gitignore`: `data/`, `runs/`, `artifacts/`, `.venv/`, `*.safetensors` y `reports/doctor/` (el JSON de fase 0 con la ruta absoluta queda fuera). Antes del commit se buscaron rutas personales, correos y tokens: ninguno |
 | Referencia del árbol | `artifacts/tree/76a3562d….tar` (304 ficheros, generado antes de esta línea); anteriores `9f54e5ef…` y `e7b7a322…`. No sustituye a un commit |
 | Código | Actual **`a7f6450022aea2af933ee0583415420bcf25c92689d3ffb7d3e3ec148b39d682`** (78 ficheros), con copia en `artifacts/source/`. Calibraciones, evaluaciones y perfil se ejecutaron con `9c31e85b…`; el benchmark, con `a7f64500…` (sólo cambian los YAML de servicio) |
 | Pruebas | **288 CPU** (34,41 s) y **14 MPS/E2E reales** (128,30 s, 0 omitidos), con el código actual. Ruff, formato (128 ficheros), `uv lock --check` y `git diff --check` correctos |
@@ -75,7 +349,7 @@ No aparecieron fallos de código nuevos. Límite metodológico que persiste: una
 
 ## 8. Pendientes, en orden
 
-1. **Commit de las fases 0–6, a decidir por el usuario.** Sin él, `HEAD` no ejecuta el proyecto (hallazgo alto de la revisión). Excluir `data/`, `runs/`, `artifacts/` y credenciales.
+1. **Integración, a decidir por el usuario:** fusionar `fases-0-6` en `main` (`git checkout main && git merge fases-0-6`) y, si se quiere, hacer push. **No verificado:** un clon limpio del commit con `uv sync` y tests; no se ha probado.
 2. **Revisión independiente de la fase 6b:**
    - calibración externa y su guarda;
    - datos sin solapes (4 grupos excluidos de `final8`; 4 pares casi duplicados declarados);

@@ -1,0 +1,32 @@
+== train e4b_v4 14:09:32
+EXIT train_e4b_v4 0
+== train e2b_heads_v4 14:21:43
+EXIT train_e2b_heads_v4 0
+ckpt a4v4 runs/e4b_v4/20260924T140932Z/
+ckpt a2v4 runs/e2b_heads_v4/20260924T142144Z/
+ckpt a4v3 runs/e4b_experiment/20260923T204945Z/
+== calibrate a4v4 14:28:23
+EXIT calibrate_a4v4 0
+== calibrate a2v4 14:34:17
+EXIT calibrate_a2v4 0
+== calibrate a4v3 14:37:26
+EXIT calibrate_a4v3 0
+== eval a4v4 final13 14:37:29
+EXIT eval_final13_a4v4 0
+== eval a4v4 kdiag11_K 14:42:04
+EXIT eval_kdiag11_K_a4v4 0
+== eval a4v4 kdiag11_K8 14:43:39
+EXIT eval_kdiag11_K8_a4v4 0
+== eval a2v4 final13 14:46:47
+EXIT eval_final13_a2v4 0
+== eval a2v4 kdiag11_K 14:49:18
+EXIT eval_kdiag11_K_a2v4 0
+== eval a2v4 kdiag11_K8 14:50:09
+EXIT eval_kdiag11_K8_a2v4 0
+== eval a4v3 final13 14:51:50
+EXIT eval_final13_a4v3 0
+== eval a4v3 kdiag11_K 14:51:54
+EXIT eval_kdiag11_K_a4v3 0
+== eval a4v3 kdiag11_K8 14:51:57
+EXIT eval_kdiag11_K8_a4v3 0
+ALL DONE 14:51:59
