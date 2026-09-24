@@ -1,0 +1,31 @@
+Loading weights:   0%|          | 0/1951 [00:00<?, ?it/s]Loading weights:  61%|██████    | 1184/1951 [00:00<00:00, 11813.79it/s]Loading weights: 100%|██████████| 1951/1951 [00:00<00:00, 12544.46it/s]
+{
+ "config": "configs/e2b_text.yaml",
+ "repo_id": "google/gemma-4-E2B-it",
+ "revision": "3e22461f65e89153144f8adb70e3b8c2cc9845a7",
+ "hidden_size": 1536,
+ "device": "mps",
+ "dtype": "bfloat16",
+ "lora_targets": 50,
+ "lora_trainable_params": 1339392,
+ "code": {
+  "sha256": "c81b4b94f739e5eef20304f9ce74759a54a0bff5f50edf6133a5e001c0525d31",
+  "files": 76,
+  "archive": "artifacts/source/c81b4b94f739e5eef20304f9ce74759a54a0bff5f50edf6133a5e001c0525d31.tar"
+ },
+ "load_seconds": 4.93,
+ "median_step_seconds_excl_first": 4.782,
+ "rows_per_second_excl_first": 5.058,
+ "memory": {
+  "sampling": "instant\u00e1neas en puntos instrumentados; el pico real puede ser mayor",
+  "budget_bytes": 34359738368,
+  "peaks_sampled": {
+   "process_rss_bytes": 1691107328,
+   "mps_current_allocated_bytes": 10242153984,
+   "mps_driver_allocated_bytes": 23340974080,
+   "swap_used_bytes": 318308352
+  },
+  "over_budget": [],
+  "swap_delta_bytes": 0
+ }
+}

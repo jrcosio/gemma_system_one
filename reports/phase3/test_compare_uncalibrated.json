@@ -1,0 +1,77 @@
+{
+  "note": "b \u2212 a sin calibrar (nll_uncalibrated); secundaria",
+  "questions": 300,
+  "point": {
+    "a.nll_all": 0.4582738752549837,
+    "b.nll_all": 0.4004000820244137,
+    "b_minus_a.nll_all": -0.05787379323057016,
+    "b_minus_a.accuracy_all": 0.05333333333333334,
+    "b_minus_a.choice.nll": -0.12642302902547886,
+    "b_minus_a.choice.accuracy": 0.0784313725490196,
+    "b_minus_a.noul.nll": -0.0309836207668503,
+    "b_minus_a.noul.accuracy": 0.03361344537815126,
+    "b_minus_a.score.nll": -0.009872634649582481,
+    "b_minus_a.score.accuracy": 0.05063291139240506
+  },
+  "bootstrap": {
+    "method": "bootstrap percentil por grupo",
+    "reps": 1000,
+    "seed": 0,
+    "groups": 100,
+    "level": 0.95,
+    "intervals": {
+      "a.nll_all": [
+        0.34970510879868877,
+        0.5693840906300236
+      ],
+      "b.nll_all": [
+        0.29033177196627646,
+        0.5224638941473218
+      ],
+      "b_minus_a.nll_all": [
+        -0.11880858241399217,
+        0.007957477009366871
+      ],
+      "b_minus_a.accuracy_all": [
+        0.023333333333333334,
+        0.08333333333333333
+      ],
+      "b_minus_a.choice.nll": [
+        -0.26880173420675046,
+        0.007747532950626231
+      ],
+      "b_minus_a.choice.accuracy": [
+        0.010201504844361988,
+        0.15454779756326148
+      ],
+      "b_minus_a.noul.nll": [
+        -0.11424488412626246,
+        0.06949766928792812
+      ],
+      "b_minus_a.noul.accuracy": [
+        0.008333333333333333,
+        0.06722689075630252
+      ],
+      "b_minus_a.score.nll": [
+        -0.10913333082277388,
+        0.07755169312738676
+      ],
+      "b_minus_a.score.accuracy": [
+        0.01149098746081505,
+        0.10533428165007105
+      ]
+    },
+    "defined_reps": {
+      "a.nll_all": 1000,
+      "b.nll_all": 1000,
+      "b_minus_a.nll_all": 1000,
+      "b_minus_a.accuracy_all": 1000,
+      "b_minus_a.choice.nll": 1000,
+      "b_minus_a.choice.accuracy": 1000,
+      "b_minus_a.noul.nll": 1000,
+      "b_minus_a.noul.accuracy": 1000,
+      "b_minus_a.score.nll": 1000,
+      "b_minus_a.score.accuracy": 1000
+    }
+  }
+}

@@ -1,0 +1,21 @@
+# Fase 6: Gemma 4 E4B, sólo texto, misma ruta que e2b_text (Gemma4Model, BF16, SDPA, MPS).
+# Revisión verificada en el Hub el 2026-09-23 (no gated, licencia apache-2.0, model.safetensors
+# 15 992 595 884 bytes). config.json: hidden 2560, 42 capas (E2B: 1536, 35). Candidato posterior
+# de la spec §1, sólo tras el perfilado (reports/phase6-protocol.md).
+name: e4b_text
+model:
+  repo_id: google/gemma-4-E4B-it
+  revision: ee0ef6023621cff504d758262d4e04895a5af4a2
+  backbone_class: Gemma4Model
+  dtype: bfloat16
+  attn_implementation: sdpa
+runtime:
+  device: mps
+  allow_cpu_fallback: false
+  max_length: 512
+  memory_budget_gib: 32
+  seed: 0
+paths:
+  hf_cache: null
+  artifacts_dir: artifacts
+  reports_dir: reports

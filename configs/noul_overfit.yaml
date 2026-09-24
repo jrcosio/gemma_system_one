@@ -1,0 +1,22 @@
+# Puerta de fase 1: sobreajuste controlado de 32 ejemplos de entrenamiento.
+# Prueba de implementación (la ruta aprende), no un resultado de calidad.
+name: noul_overfit
+base_config: configs/e2b_text.yaml
+dataset: data/smoke_v1
+split_seed: 0
+primitive: noul
+extraction:
+  # 1 fila por forward: representación independiente del lote (decisión 0002)
+  microbatch_rows: 1
+cache_dir: artifacts/cache/representations
+runs_dir: runs
+train:
+  epochs: 200
+  lr: 0.01
+  weight_decay: 0.0
+  questions_per_step: 8
+  microbatch_rows: 4
+  seed: 0
+  threshold: 0.5
+  select_on: train
+  max_train_examples: 32

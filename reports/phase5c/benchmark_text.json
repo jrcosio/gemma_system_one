@@ -1,0 +1,120 @@
+{
+  "server_ready": {
+    "checkpoint_id": "lora_decision_heads:1415383de4f7dc30+cal:7722ede8d7b2",
+    "modality": "text",
+    "device": "mps",
+    "cold_start_seconds": 3.589,
+    "warmup": {
+      "seconds": 1.8434,
+      "usage": {
+        "questions": 1,
+        "expanded_rows": 1,
+        "backbone_forwards": 1,
+        "processed_input_tokens": 93,
+        "image_tokens": 0,
+        "padding_tokens": 0,
+        "generated_tokens": 0
+      }
+    },
+    "calibrated": {
+      "noul": true,
+      "choice": true,
+      "score": true
+    },
+    "max_length": 512
+  },
+  "server_identity": {
+    "instance_id": "3e90fa9cd4094b3ead020314fd795731",
+    "pid": 24744,
+    "code_sha256": "73a72fdccf27fb6c2f38af57fd273cff1cdd3d73b0ee6feac447a15a85d14c81"
+  },
+  "cold_start_seconds_client": 4.24,
+  "measured_requests": 100,
+  "warmup_requests": 5,
+  "status_counts": {
+    "200": 100
+  },
+  "http_latency_ms": {
+    "mean": 575.03,
+    "p50": 560.55,
+    "p95": 939.82,
+    "max": 1189.7
+  },
+  "server_timing_ms": {
+    "queue_wait": {
+      "mean": 0.04,
+      "p50": 0.04,
+      "p95": 0.04,
+      "max": 0.05
+    },
+    "forward_synchronized": {
+      "mean": 554.81,
+      "p50": 540.0,
+      "p95": 923.4,
+      "max": 1166.5
+    },
+    "engine_total": {
+      "mean": 573.52,
+      "p50": 558.83,
+      "p95": 938.26,
+      "max": 1188.15
+    },
+    "forward_wall": {
+      "mean": 573.18,
+      "p50": 558.44,
+      "p95": 937.89,
+      "max": 1187.8
+    },
+    "server_total": {
+      "mean": 573.92,
+      "p50": 559.27,
+      "p95": 938.74,
+      "max": 1188.59
+    }
+  },
+  "throughput": {
+    "requests_per_s": 1.739,
+    "questions_per_s": 5.217,
+    "rows_per_s": 13.581,
+    "tokens_per_s": 3279.8
+  },
+  "usage_totals": {
+    "questions": 300,
+    "expanded_rows": 781,
+    "backbone_forwards": 781,
+    "processed_input_tokens": 188609,
+    "image_tokens": 0,
+    "padding_tokens": 0,
+    "generated_tokens": 0
+  },
+  "server_rss_peak_bytes_sampled": 1423867904,
+  "burst": {
+    "concurrent_requests": 7,
+    "results": {
+      "503:queue_full": 2,
+      "200": 5
+    },
+    "valid": true
+  },
+  "note": "Secuencial salvo la ráfaga; RSS muestreado tras cada petición; memoria MPS no observable desde el cliente; identidad del servidor comprobada en cada respuesta",
+  "created_utc": "2026-09-23T20:10:06.487551+00:00",
+  "serve_config": "configs/serve_text.yaml",
+  "dataset": "data/pilot_v3",
+  "split": "validation",
+  "server_exit_code": -15,
+  "client_code": {
+    "source": {
+      "sha256": "73a72fdccf27fb6c2f38af57fd273cff1cdd3d73b0ee6feac447a15a85d14c81",
+      "files": 69,
+      "globs": [
+        "src/**/*.py",
+        "configs/*.yaml",
+        "scripts/*.py",
+        "pyproject.toml",
+        "uv.lock"
+      ],
+      "archive": "artifacts/source/73a72fdccf27fb6c2f38af57fd273cff1cdd3d73b0ee6feac447a15a85d14c81.tar"
+    }
+  },
+  "same_code_as_server": true
+}

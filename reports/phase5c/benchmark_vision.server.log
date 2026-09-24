@@ -1,0 +1,245 @@
+INFO:     Started server process [24942]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:62950 - "GET /health/ready HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:62950 - "GET /health/ready HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:62950 - "GET /health/ready HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:62950 - "GET /health/ready HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:62950 - "GET /health/ready HTTP/1.1" 503 Service Unavailable
+Loading weights:   0%|          | 0/1951 [00:00<?, ?it/s]Loading weights: 100%|██████████| 1951/1951 [00:00<00:00, 27420.18it/s]
+INFO:     127.0.0.1:62950 - "GET /health/ready HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:62950 - "GET /health/ready HTTP/1.1" 503 Service Unavailable
+INFO:     127.0.0.1:62950 - "GET /health/ready HTTP/1.1" 503 Service Unavailable
+2026-09-23 22:10:12,174 gso.api INFO modelo listo en 4.12 s
+INFO:     127.0.0.1:62950 - "GET /health/ready HTTP/1.1" 200 OK
+2026-09-23 22:10:13,952 gso.api INFO request_id=3047326b5f2643cc status=200 ms=1543.9 questions=3 rows=6 tokens=2651 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:16,227 gso.api INFO request_id=f3d5b60eca794e99 status=200 ms=2273.5 questions=3 rows=9 tokens=4046 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:17,745 gso.api INFO request_id=e6ab8b512c0a4a9c status=200 ms=1517.1 questions=3 rows=6 tokens=2683 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:19,479 gso.api INFO request_id=c1101fb6a0fa4359 status=200 ms=1733.2 questions=3 rows=7 tokens=2950 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:21,756 gso.api INFO request_id=bc7da6c927fa427d status=200 ms=2275.9 questions=3 rows=9 tokens=4068 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:23,297 gso.api INFO request_id=807739233b074621 status=200 ms=1540.0 questions=3 rows=6 tokens=2704 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:24,807 gso.api INFO request_id=8722c73a15db4b3d status=200 ms=1508.6 questions=3 rows=6 tokens=2666 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:26,549 gso.api INFO request_id=e6e2acb30f9d4c8a status=200 ms=1741.5 questions=3 rows=7 tokens=3034 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:29,072 gso.api INFO request_id=433b20933b384297 status=200 ms=2521.2 questions=3 rows=10 tokens=4429 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:32,630 gso.api INFO request_id=0e1501de1f414727 status=200 ms=3557.2 questions=3 rows=14 tokens=6475 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:33,856 gso.api INFO request_id=dab0dad8fb604b74 status=200 ms=1225.3 questions=3 rows=5 tokens=2056 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:36,143 gso.api INFO request_id=cd44037ef61c4d32 status=200 ms=2285.6 questions=3 rows=9 tokens=4141 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:38,624 gso.api INFO request_id=eb4e24d3229441e9 status=200 ms=2480.2 questions=3 rows=10 tokens=4429 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:39,328 gso.api INFO request_id=d4cd1823971d47ec status=200 ms=702.2 questions=3 rows=3 tokens=1134 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:42,342 gso.api INFO request_id=14b79da851e24bf7 status=200 ms=3013.3 questions=3 rows=12 tokens=5554 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:43,789 gso.api INFO request_id=ec2a7051514742ff status=200 ms=1446.0 questions=3 rows=6 tokens=2532 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:45,303 gso.api INFO request_id=c9a9e77402454584 status=200 ms=1512.6 questions=3 rows=6 tokens=2713 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:48,295 gso.api INFO request_id=5484da6840d34d39 status=200 ms=2991.3 questions=3 rows=12 tokens=5562 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:50,537 gso.api INFO request_id=32d4e9c8d1e24d9c status=200 ms=2240.2 questions=3 rows=9 tokens=4053 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:52,783 gso.api INFO request_id=d2d03133f48846ac status=200 ms=2245.1 questions=3 rows=9 tokens=4104 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:56,302 gso.api INFO request_id=2978fba5a5b14891 status=200 ms=3518.0 questions=3 rows=14 tokens=6431 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:56,995 gso.api INFO request_id=a6eb5ba7702e4f85 status=200 ms=692.0 questions=3 rows=3 tokens=1103 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:10:58,490 gso.api INFO request_id=9f40e955292a47c2 status=200 ms=1494.3 questions=3 rows=6 tokens=2708 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:00,978 gso.api INFO request_id=cdfd8bc9bce549e3 status=200 ms=2487.0 questions=3 rows=10 tokens=4535 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:03,660 gso.api INFO request_id=a5ed98f74b534b12 status=200 ms=2680.4 questions=3 rows=11 tokens=4842 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:06,138 gso.api INFO request_id=3f7f0078a49842f8 status=200 ms=2477.4 questions=3 rows=10 tokens=4451 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:08,371 gso.api INFO request_id=5d09c954d10e4987 status=200 ms=2231.1 questions=3 rows=9 tokens=4050 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:11,051 gso.api INFO request_id=cd1c121fe3e8423c status=200 ms=2679.3 questions=3 rows=11 tokens=4777 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:14,109 gso.api INFO request_id=fc4a7f522f2b44e2 status=200 ms=3056.8 questions=3 rows=12 tokens=5777 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:16,588 gso.api INFO request_id=28b973e2bebd40ea status=200 ms=2478.0 questions=3 rows=10 tokens=4463 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:18,086 gso.api INFO request_id=de905778cfcc4851 status=200 ms=1496.6 questions=3 rows=6 tokens=2706 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:19,573 gso.api INFO request_id=4dd919196dd1433c status=200 ms=1486.1 questions=3 rows=6 tokens=2709 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:21,854 gso.api INFO request_id=6fb863a5364e4ffc status=200 ms=2280.0 questions=3 rows=9 tokens=4279 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:23,545 gso.api INFO request_id=85ffb7a5d0f540b6 status=200 ms=1690.3 questions=3 rows=7 tokens=2888 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:25,520 gso.api INFO request_id=e7de3bd821a04955 status=200 ms=1973.5 questions=3 rows=8 tokens=3558 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:26,216 gso.api INFO request_id=80fc98e53b994409 status=200 ms=695.4 questions=3 rows=3 tokens=1123 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:29,464 gso.api INFO request_id=bd6cb77bca714934 status=200 ms=3246.6 questions=3 rows=13 tokens=6070 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:31,698 gso.api INFO request_id=8056ba4a8fd049af status=200 ms=2233.1 questions=3 rows=9 tokens=4064 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:33,174 gso.api INFO request_id=5e487c782bbc43ac status=200 ms=1474.8 questions=3 rows=6 tokens=2637 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:35,642 gso.api INFO request_id=425dd01208db4b4a status=200 ms=2467.3 questions=3 rows=10 tokens=4407 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:37,644 gso.api INFO request_id=7af3e424894f40d0 status=200 ms=2000.4 questions=3 rows=8 tokens=3613 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:39,142 gso.api INFO request_id=a05b1d582c664fd1 status=200 ms=1497.0 questions=3 rows=6 tokens=2710 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:40,827 gso.api INFO request_id=8f0ba19914854a87 status=200 ms=1684.0 questions=3 rows=7 tokens=2972 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:42,320 gso.api INFO request_id=fce51abb4b8341e6 status=200 ms=1492.3 questions=3 rows=6 tokens=2709 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:43,812 gso.api INFO request_id=35854b133ff84654 status=200 ms=1490.9 questions=3 rows=6 tokens=2681 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:46,000 gso.api INFO request_id=b1c4c31df0664273 status=200 ms=2187.0 questions=3 rows=9 tokens=3862 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:48,022 gso.api INFO request_id=09f7ddcf8c604049 status=200 ms=2020.3 questions=3 rows=8 tokens=3644 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:50,486 gso.api INFO request_id=40ae18cacc854115 status=200 ms=2463.6 questions=3 rows=10 tokens=4476 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:51,978 gso.api INFO request_id=3ea2609391b84a91 status=200 ms=1491.2 questions=3 rows=6 tokens=2695 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:55,227 gso.api INFO request_id=d58f05042a2f4e31 status=200 ms=3247.2 questions=3 rows=13 tokens=6086 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:11:57,476 gso.api INFO request_id=99ea3594ef6f4690 status=200 ms=2248.6 questions=3 rows=9 tokens=4091 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:00,150 gso.api INFO request_id=6e3694d46c914e67 status=200 ms=2672.2 questions=3 rows=11 tokens=4833 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:01,837 gso.api INFO request_id=f0cf84a55386403e status=200 ms=1686.0 questions=3 rows=7 tokens=2930 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:04,299 gso.api INFO request_id=fb47c3f4b9ae46c5 status=200 ms=2461.5 questions=3 rows=10 tokens=4476 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:05,772 gso.api INFO request_id=6ecaafbea66b4b6a status=200 ms=1472.0 questions=3 rows=6 tokens=2622 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:07,271 gso.api INFO request_id=07e6f1a42fd14c15 status=200 ms=1497.2 questions=3 rows=6 tokens=2704 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:08,465 gso.api INFO request_id=ef124cdead9144d5 status=200 ms=1192.9 questions=3 rows=5 tokens=1999 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:11,527 gso.api INFO request_id=63da3cb27f2542e4 status=200 ms=3061.5 questions=3 rows=12 tokens=5753 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:13,026 gso.api INFO request_id=6d9d7905472e49f0 status=200 ms=1497.5 questions=3 rows=6 tokens=2712 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:15,305 gso.api INFO request_id=af3af9b557084d3d status=200 ms=2278.6 questions=3 rows=9 tokens=4282 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:17,776 gso.api INFO request_id=e6e7f45ec5b34c52 status=200 ms=2469.1 questions=3 rows=10 tokens=4529 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:20,255 gso.api INFO request_id=7da5bce12a704231 status=200 ms=2478.1 questions=3 rows=10 tokens=4526 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:20,965 gso.api INFO request_id=98796bf009c34dcb status=200 ms=709.4 questions=3 rows=3 tokens=1099 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:23,272 gso.api INFO request_id=4e5b1e309b1d4dfb status=200 ms=2305.7 questions=3 rows=9 tokens=4292 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:25,942 gso.api INFO request_id=0e7e5d220ae14d7c status=200 ms=2669.4 questions=3 rows=11 tokens=4798 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:27,938 gso.api INFO request_id=1e6563f6119748e3 status=200 ms=1994.9 questions=3 rows=8 tokens=3644 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:30,429 gso.api INFO request_id=34dd225970b94646 status=200 ms=2489.7 questions=3 rows=10 tokens=4537 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:31,871 gso.api INFO request_id=c117dd4130b44251 status=200 ms=1440.5 questions=3 rows=6 tokens=2497 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:34,128 gso.api INFO request_id=bc524ab725404874 status=200 ms=2256.3 questions=3 rows=9 tokens=4154 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:35,575 gso.api INFO request_id=64ed8441e8944b71 status=200 ms=1445.7 questions=3 rows=6 tokens=2527 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:37,051 gso.api INFO request_id=fcb5088032264a01 status=200 ms=1474.7 questions=3 rows=6 tokens=2651 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:39,277 gso.api INFO request_id=1b22d6ab28214633 status=200 ms=2225.1 questions=3 rows=9 tokens=4046 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:40,766 gso.api INFO request_id=ae5fb7dc838842cf status=200 ms=1488.1 questions=3 rows=6 tokens=2683 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:42,451 gso.api INFO request_id=b6f33635e85543e6 status=200 ms=1684.1 questions=3 rows=7 tokens=2950 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:44,687 gso.api INFO request_id=366b17291c0e4583 status=200 ms=2235.2 questions=3 rows=9 tokens=4068 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:46,180 gso.api INFO request_id=ab99093a4a664eda status=200 ms=1492.0 questions=3 rows=6 tokens=2704 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:47,667 gso.api INFO request_id=d7ff25ef273a44fd status=200 ms=1486.0 questions=3 rows=6 tokens=2666 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:49,387 gso.api INFO request_id=e0fd42e54f7b419f status=200 ms=1718.1 questions=3 rows=7 tokens=3034 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:51,851 gso.api INFO request_id=0022e189d75d415f status=200 ms=2463.3 questions=3 rows=10 tokens=4429 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:55,375 gso.api INFO request_id=ba8692dfc941452f status=200 ms=3522.8 questions=3 rows=14 tokens=6475 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:56,576 gso.api INFO request_id=9b357ec15af8466e status=200 ms=1199.4 questions=3 rows=5 tokens=2056 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:12:58,826 gso.api INFO request_id=3b9c1be3ad2147df status=200 ms=2249.6 questions=3 rows=9 tokens=4141 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:01,296 gso.api INFO request_id=920edd906f244992 status=200 ms=2468.9 questions=3 rows=10 tokens=4429 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:01,995 gso.api INFO request_id=5723106de27d4217 status=200 ms=697.9 questions=3 rows=3 tokens=1134 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:04,988 gso.api INFO request_id=990cd3a2e7fd426a status=200 ms=2992.3 questions=3 rows=12 tokens=5554 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:06,432 gso.api INFO request_id=f859407a28484f46 status=200 ms=1442.8 questions=3 rows=6 tokens=2532 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:07,928 gso.api INFO request_id=a1ac633ba49e45f0 status=200 ms=1494.5 questions=3 rows=6 tokens=2713 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:10,927 gso.api INFO request_id=baa28e3fd0454724 status=200 ms=2998.0 questions=3 rows=12 tokens=5562 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:13,159 gso.api INFO request_id=9cb9e2fc07ee450a status=200 ms=2231.2 questions=3 rows=9 tokens=4053 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:15,404 gso.api INFO request_id=ab8e1d4e21cf4353 status=200 ms=2243.3 questions=3 rows=9 tokens=4104 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:18,916 gso.api INFO request_id=efac8fde7c9e4039 status=200 ms=3511.6 questions=3 rows=14 tokens=6431 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:19,610 gso.api INFO request_id=8c9570447d244bf5 status=200 ms=692.4 questions=3 rows=3 tokens=1103 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:21,114 gso.api INFO request_id=007e5e3befb14d46 status=200 ms=1502.9 questions=3 rows=6 tokens=2708 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:23,587 gso.api INFO request_id=b7e15108eca54a4a status=200 ms=2472.5 questions=3 rows=10 tokens=4535 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:26,259 gso.api INFO request_id=97055ab908db4a41 status=200 ms=2670.8 questions=3 rows=11 tokens=4842 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:28,730 gso.api INFO request_id=658d55addf1e4091 status=200 ms=2469.8 questions=3 rows=10 tokens=4451 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:30,962 gso.api INFO request_id=0b6d34c6a7764e78 status=200 ms=2230.9 questions=3 rows=9 tokens=4050 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:33,630 gso.api INFO request_id=0647be09100d43d5 status=200 ms=2667.0 questions=3 rows=11 tokens=4777 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:36,682 gso.api INFO request_id=777fb9402add47bb status=200 ms=3050.7 questions=3 rows=12 tokens=5777 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:39,151 gso.api INFO request_id=e0efb2ddbd824514 status=200 ms=2468.5 questions=3 rows=10 tokens=4463 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:40,648 gso.api INFO request_id=d14632ef6367472e status=200 ms=1496.0 questions=3 rows=6 tokens=2706 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:42,135 gso.api INFO request_id=376bad575e2e4ebc status=200 ms=1485.8 questions=3 rows=6 tokens=2709 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:44,417 gso.api INFO request_id=268e1bd0d1b44967 status=200 ms=2280.8 questions=3 rows=9 tokens=4279 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:46,107 gso.api INFO request_id=30a3ea454af1461f status=200 ms=1688.3 questions=3 rows=7 tokens=2888 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:48,083 gso.api INFO request_id=cf70f6c20c434d11 status=200 ms=1975.8 questions=3 rows=8 tokens=3558 image=True
+INFO:     127.0.0.1:62950 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:48,091 gso.api INFO request_id=4a2dcb17c41e47a8 status=503 ms=0.0 questions=3 rows=None tokens=None image=True
+INFO:     127.0.0.1:62977 - "POST /v1/decide HTTP/1.1" 503 Service Unavailable
+2026-09-23 22:13:48,092 gso.api INFO request_id=48172a04963142d2 status=503 ms=0.0 questions=3 rows=None tokens=None image=True
+INFO:     127.0.0.1:62978 - "POST /v1/decide HTTP/1.1" 503 Service Unavailable
+2026-09-23 22:13:49,561 gso.api INFO request_id=397e04f507e147c4 status=200 ms=1471.2 questions=3 rows=6 tokens=2651 image=True
+INFO:     127.0.0.1:62973 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:51,029 gso.api INFO request_id=2f02253241b44a10 status=200 ms=2938.8 questions=3 rows=6 tokens=2651 image=True
+INFO:     127.0.0.1:62972 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:52,494 gso.api INFO request_id=d798a5ed2acb40c6 status=200 ms=4403.8 questions=3 rows=6 tokens=2651 image=True
+INFO:     127.0.0.1:62974 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:53,960 gso.api INFO request_id=25c93e331e8d464a status=200 ms=5869.9 questions=3 rows=6 tokens=2651 image=True
+INFO:     127.0.0.1:62975 - "POST /v1/decide HTTP/1.1" 200 OK
+2026-09-23 22:13:55,426 gso.api INFO request_id=2e5a227c981a4010 status=200 ms=7335.7 questions=3 rows=6 tokens=2651 image=True
+INFO:     127.0.0.1:62976 - "POST /v1/decide HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [24942]
+~/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '

@@ -1,0 +1,31 @@
+# Fase 3, piloto: LoRA (q_proj ×35, v_proj ×15) + cabezales sobre E2B, datos pilot_v3 (spec §7.B).
+# Hiperparámetros iniciales de la spec, fijados antes de ejecutar; no se ajustan con test.
+# Arranca de los cabezales congelados de referencia (misma huella, dataset y split); con B=0 la
+# época 0 es exactamente ese modelo. Selección por NLL de validación entre las épocas 0..3.
+kind: lora_decision_heads
+name: pilot_lora_v3
+base_config: configs/e2b_text.yaml
+dataset: data/pilot_v3
+split_seed: 0
+primitives: [noul, choice, score]
+init_heads_from: runs/pilot_ce_v3/20260923T005721Z/checkpoint
+extraction:
+  microbatch_rows: 1  # decisión 0002; con autograd, reports/phase3/repro_lora_microbatch.json
+runs_dir: runs
+lora: {r: 8, alpha: 16, dropout: 0.05, projections: [q_proj, v_proj]}
+train:
+  epochs: 3
+  lr_lora: 0.0001
+  lr_heads: 0.0005
+  weight_decay_lora: 0.0
+  weight_decay_heads: 0.01
+  warmup_fraction: 0.05
+  clip_grad_norm: 1.0
+  questions_per_step: 8
+  seed: 0
+  threshold: 0.5
+  rps_lambda: 0.0
+  type_weights: {noul: 1.0, choice: 1.0, score: 1.0}
+  train_heads: true
+  select_on: validation
+  resume_every_steps: 50

@@ -1,0 +1,26 @@
+# Fase 3, referencia congelada: E2B congelado + tres evaluadores sobre pilot_v3 (spec §7.A).
+# Igual que pilot_ce salvo datos v3 (cláusula de acceso) y tope de 30 épocas: en v2 la época
+# elegida fue el máximo (10). λ=0 (elegido en fase 2). Es el comparador de LoRA (spec §10, fase 3).
+kind: decision_heads
+name: pilot_ce_v3
+base_config: configs/e2b_text.yaml
+dataset: data/pilot_v3
+split_seed: 0
+primitives: [noul, choice, score]
+extraction:
+  # 1 fila por forward: representación independiente del lote (decisión 0002)
+  microbatch_rows: 1
+cache_dir: artifacts/cache/representations
+runs_dir: runs
+train:
+  epochs: 30  # tope; en v2 la mejor fue la última (10). Se elige por NLL de validación
+  lr: 0.001
+  weight_decay: 0.01
+  questions_per_step: 8
+  logit_chunk_rows: 4
+  seed: 0
+  threshold: 0.5
+  rps_lambda: 0.0
+  type_weights: {noul: 1.0, choice: 1.0, score: 1.0}
+  select_on: validation
+  feature_norm: standardize_train

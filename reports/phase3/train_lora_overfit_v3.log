@@ -1,0 +1,19 @@
+Loading weights:   0%|          | 0/1951 [00:00<?, ?it/s]Loading weights:  59%|█████▉    | 1154/1951 [00:00<00:00, 11534.21it/s]Loading weights: 100%|██████████| 1951/1951 [00:00<00:00, 12783.96it/s]
+[train] run: runs/lora_overfit_v3/20260923T011059Z  época elegida: 12 (train)  pasos: 72  base sin cambios: True
+  época 0: eval nll_all=0.4012 train_loss=None
+  época 1: eval nll_all=1.0090 train_loss=1.240090312785469
+  época 2: eval nll_all=0.6645 train_loss=0.8846418402487567
+  época 3: eval nll_all=0.1992 train_loss=0.6755019399279263
+  época 4: eval nll_all=0.0734 train_loss=0.3996503521619836
+  época 5: eval nll_all=0.0251 train_loss=0.07749786963683884
+  época 6: eval nll_all=0.0055 train_loss=0.08536631581671135
+  época 7: eval nll_all=0.0009 train_loss=0.015758238933553475
+  época 8: eval nll_all=0.0005 train_loss=0.001489349650015755
+  época 9: eval nll_all=0.0003 train_loss=0.0004492968400566788
+  época 10: eval nll_all=0.0002 train_loss=0.00028781786336444054
+  época 11: eval nll_all=0.0002 train_loss=0.00020572915970928918
+  época 12: eval nll_all=0.0002 train_loss=0.00016467444515821938
+  lora_heads           train      {"questions": 48, "mean_nll_all": 0.00016210785098679453, "noul": {"n": 16, "nll": 0.00048576597061254464, "accuracy": 1.0}, "choice": {"n": 23, "nll": 3.592864066315851e-07, "accuracy": 1.0}, "score": {"n": 9, "nll": 7.308113453104614e-08, "accuracy": 1.0}}
+  initial_frozen_heads train      {"questions": 48, "mean_nll_all": 0.40124078562404764, "noul": {"n": 16, "nll": 0.05934569409169605, "accuracy": 1.0}, "choice": {"n": 23, "nll": 0.5718753100823506, "accuracy": 0.782608695652174}, "score": {"n": 9, "nll": 0.5729882747325655, "accuracy": 0.8888888888888888}}
+  overfit_check: {'criterion': 'por primitiva: train accuracy == 1.0 y train NLL < 0.05', 'train_questions': 48, 'per_type': {'noul': {'accuracy': 1.0, 'nll': 0.00048576597061254464}, 'choice': {'accuracy': 1.0, 'nll': 3.592864066315851e-07}, 'score': {'accuracy': 1.0, 'nll': 7.308113453104614e-08}}, 'passed': True}
+.venv/bin/gso train --config configs/lora_overfit_v3.yaml --resume   99,80s user 19,52s system 34% cpu 5:47,05 total

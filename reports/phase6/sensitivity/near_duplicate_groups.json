@@ -1,0 +1,114 @@
+{
+ "total_pairs": 9,
+ "holdout_groups": [
+  "mix-s6-00003",
+  "mix-s6-00010",
+  "mix-s6-00013",
+  "mix-s6-00130",
+  "mix-s6-00144",
+  "mix-s6-00222",
+  "mix-s6-00235",
+  "mix-s6-00291"
+ ],
+ "pairs": [
+  {
+   "splits": [
+    "pilot_v3",
+    "holdout"
+   ],
+   "groups": [
+    "mix-s0-00216",
+    "mix-s6-00144"
+   ],
+   "jaccard": 0.857
+  },
+  {
+   "splits": [
+    "pilot_v3",
+    "holdout"
+   ],
+   "groups": [
+    "mix-s0-00591",
+    "mix-s6-00235"
+   ],
+   "jaccard": 0.917
+  },
+  {
+   "splits": [
+    "pilot_v3",
+    "holdout"
+   ],
+   "groups": [
+    "mix-s0-00627",
+    "mix-s6-00003"
+   ],
+   "jaccard": 0.8
+  },
+  {
+   "splits": [
+    "pilot_v3",
+    "holdout"
+   ],
+   "groups": [
+    "mix-s0-00645",
+    "mix-s6-00291"
+   ],
+   "jaccard": 0.842
+  },
+  {
+   "splits": [
+    "pilot_v3",
+    "holdout"
+   ],
+   "groups": [
+    "mix-s0-00652",
+    "mix-s6-00010"
+   ],
+   "jaccard": 0.857
+  },
+  {
+   "splits": [
+    "pilot_v3",
+    "holdout"
+   ],
+   "groups": [
+    "mix-s0-00775",
+    "mix-s6-00013"
+   ],
+   "jaccard": 0.857
+  },
+  {
+   "splits": [
+    "pilot_v3",
+    "holdout"
+   ],
+   "groups": [
+    "mix-s0-00826",
+    "mix-s6-00130"
+   ],
+   "jaccard": 0.8
+  },
+  {
+   "splits": [
+    "pilot_v3",
+    "holdout"
+   ],
+   "groups": [
+    "mix-s0-00836",
+    "mix-s6-00222"
+   ],
+   "jaccard": 0.833
+  },
+  {
+   "splits": [
+    "pilot_v3",
+    "holdout"
+   ],
+   "groups": [
+    "mix-s0-00993",
+    "mix-s6-00235"
+   ],
+   "jaccard": 0.846
+  }
+ ]
+}

@@ -1,0 +1,69 @@
+{
+  "checkpoint": "runs/vision_text_only/20260923T150230Z/checkpoint",
+  "stage": "phase2_decision_heads_frozen_backbone",
+  "split": "all",
+  "use_cache": false,
+  "external_dataset": {
+    "root": "data/vision_transfer_v1",
+    "sha256": "63e9d6b5f3aaae27eaf78ad2d9fcf7d2043775809872b890f39327eeb5eae629"
+  },
+  "external_leakage": {
+    "errors": [],
+    "near_duplicate_states": 0
+  },
+  "diagnostic_only": true,
+  "backbone_loaded": true,
+  "extraction": {
+    "split": "all",
+    "questions": 450,
+    "rows": 1258,
+    "backbone_forwards": 1258,
+    "valid_tokens": 224968,
+    "padding_tokens": 0,
+    "max_row_tokens": 216,
+    "seconds_synchronized": 62.7215,
+    "cache_hit": false,
+    "image_rows": 0,
+    "image_tokens": 0
+  },
+  "usage": {
+    "questions": 450,
+    "expanded_rows": 1258,
+    "backbone_forwards": 1258,
+    "processed_input_tokens": 224968,
+    "generated_tokens": 0
+  },
+  "memory": {
+    "sampling": "instantáneas en puntos instrumentados; el pico real puede ser mayor",
+    "budget_bytes": 34359738368,
+    "peaks_sampled": {
+      "process_rss_bytes": 951009280,
+      "mps_current_allocated_bytes": 10215276544,
+      "mps_driver_allocated_bytes": 10339336192,
+      "swap_used_bytes": 0
+    },
+    "over_budget": [],
+    "swap_delta_bytes": 0
+  },
+  "report_path": "runs/vision_text_only/20260923T150230Z/evaluations/vision_transfer_v1-all-20260923T152810Z.json",
+  "predictions_path": "runs/vision_text_only/20260923T150230Z/evaluations/vision_transfer_v1-all-20260923T152810Z-predictions.jsonl",
+  "metrics_summary": {
+    "questions": 450,
+    "mean_nll_all": 1.1416592691790406,
+    "noul": {
+      "n": 184,
+      "nll": 0.7438601162093711,
+      "accuracy": 0.5380434782608695
+    },
+    "choice": {
+      "n": 130,
+      "nll": 1.428430309665764,
+      "accuracy": 0.24615384615384617
+    },
+    "score": {
+      "n": 136,
+      "nll": 1.40573874626099,
+      "accuracy": 0.29411764705882354
+    }
+  }
+}

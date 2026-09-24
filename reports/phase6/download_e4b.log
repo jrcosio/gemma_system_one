@@ -1,0 +1,11 @@
+Fetching 9 files:   0%|          | 0/9 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Fetching 9 files:  22%|██▏       | 2/9 [00:00<00:00,  7.78it/s]Fetching 9 files: 100%|██████████| 9/9 [05:50<00:00, 41.71s/it]Fetching 9 files: 100%|██████████| 9/9 [05:50<00:00, 38.94s/it]
+[download] google/gemma-4-E4B-it@ee0ef6023621cff504d758262d4e04895a5af4a2: descargado
+  {"file": "config.json", "size": 5145, "hub_size_match": true}
+  {"file": "processor_config.json", "size": 1689, "hub_size_match": true}
+  {"file": "tokenizer.json", "size": 32169626, "hub_size_match": true, "hub_sha256": "cc8d3a0ce36466ccc1278bf987df5f71db1719b9ca6b4118264f45cb627bfe0f", "blob_name_matches_sha256": true, "sha256": "cc8d3a0ce36466ccc1278bf987df5f71db1719b9ca6b4118264f45cb627bfe0f"}
+  {"file": "tokenizer_config.json", "size": 3082, "hub_size_match": true}
+  {"file": "chat_template.jinja", "size": 18569, "hub_size_match": true}
+  {"file": "model.safetensors", "size": 15992595884, "hub_size_match": true, "hub_sha256": "cfbd3d2f1cd71bd471c37fe2bf8546d5028d41e5736f64e1ca6c6b8893125503", "blob_name_matches_sha256": true, "sha256": "cfbd3d2f1cd71bd471c37fe2bf8546d5028d41e5736f64e1ca6c6b8893125503"}
+[download] manifiesto: artifacts/manifests/download_ee0ef6023621cff504d758262d4e04895a5af4a2.json
+EXIT 0

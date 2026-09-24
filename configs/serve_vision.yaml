@@ -1,0 +1,9 @@
+# Fase 5: servicio con imagen, artefacto V2 del cierre de fase 4 (E2B congelado + cabezales, estilos por
+# partición; decisión 0008). Sin calibración: V2 no se calibró. La modalidad del checkpoint exige imagen.
+kind: serve
+model_id: gemma-system-one-e2b-v0.1
+checkpoint: runs/vision2_heads/20260923T161024Z/checkpoint
+host: 127.0.0.1
+port: 8000
+max_queue: 4
+request_timeout_s: 120

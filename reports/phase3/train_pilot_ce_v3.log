@@ -1,0 +1,9 @@
+Loading weights:   0%|          | 0/1951 [00:00<?, ?it/s]Loading weights: 100%|██████████| 1951/1951 [00:00<00:00, 27137.20it/s]
+[train] run: runs/pilot_ce_v3/20260923T005721Z  época elegida: 28 (validation)
+  gemma_heads  train      nll_all=0.1693 | noul: nll=0.075 acc=0.963 (n=936) | choice: nll=0.230 acc=0.928 (n=643) | score: nll=0.264 acc=0.923 (n=521)
+  gemma_heads  validation nll_all=0.4238 | noul: nll=0.159 acc=0.961 (n=127) | choice: nll=0.570 acc=0.810 (n=84) | score: nll=0.663 acc=0.730 (n=89)
+  prior        train      nll_all=0.9977 | noul: nll=0.615 acc=0.696 (n=936) | choice: nll=1.430 acc=0.173 (n=643) | score: nll=1.152 acc=0.367 (n=521)
+  prior        validation nll_all=1.0339 | noul: nll=0.656 acc=0.646 (n=127) | choice: nll=1.429 acc=0.131 (n=84) | score: nll=1.200 acc=0.292 (n=89)
+  bow          train      nll_all=0.8539 | noul: nll=0.387 acc=0.818 (n=936) | choice: nll=1.303 acc=0.453 (n=643) | score: nll=1.138 acc=0.388 (n=521)
+  bow          validation nll_all=0.9343 | noul: nll=0.486 acc=0.772 (n=127) | choice: nll=1.371 acc=0.381 (n=84) | score: nll=1.162 acc=0.438 (n=89)
+EXIT 0

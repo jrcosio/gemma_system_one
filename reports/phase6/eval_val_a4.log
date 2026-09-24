@@ -1,0 +1,110 @@
+{
+  "checkpoint": "runs/e4b_experiment/20260923T204945Z/checkpoint",
+  "stage": "phase2_decision_heads_frozen_backbone",
+  "split": "validation",
+  "use_cache": true,
+  "code": {
+    "sha": "65d425025dd654fb4814062dc42b245062f151b1",
+    "dirty": true,
+    "source": {
+      "sha256": "241ccb255eb60013a5b3bcf7e5bcd98b8a194aca53a879c80457567964d61cba",
+      "files": 77,
+      "globs": [
+        "src/**/*.py",
+        "configs/*.yaml",
+        "scripts/*.py",
+        "pyproject.toml",
+        "uv.lock"
+      ],
+      "archive": "artifacts/source/241ccb255eb60013a5b3bcf7e5bcd98b8a194aca53a879c80457567964d61cba.tar"
+    }
+  },
+  "calibration": {
+    "file": "runs/e4b_experiment/20260923T204945Z/calibration/calibration-20260923T210339Z.json",
+    "temperatures": {
+      "noul": 1.6875301443312407,
+      "choice": 0.7061236678420023,
+      "score": 1.741242168246128
+    },
+    "calibrated": {
+      "noul": true,
+      "choice": true,
+      "score": true
+    }
+  },
+  "final_test_used": false,
+  "backbone_loaded": false,
+  "extraction": {
+    "split": "validation",
+    "questions": 300,
+    "rows": 781,
+    "backbone_forwards": 0,
+    "valid_tokens": 0,
+    "padding_tokens": 0,
+    "max_row_tokens": 0,
+    "seconds_synchronized": 0.0,
+    "cache_hit": true,
+    "image_rows": 0,
+    "image_tokens": 0
+  },
+  "usage": {
+    "questions": 300,
+    "expanded_rows": 781,
+    "backbone_forwards": 0,
+    "processed_input_tokens": 0,
+    "generated_tokens": 0
+  },
+  "reload_vs_training": {
+    "compared_questions": 300,
+    "max_abs_logit_diff": 0.0,
+    "atol": 0.0001,
+    "ok": true
+  },
+  "memory": {
+    "sampling": "instantáneas en puntos instrumentados; el pico real puede ser mayor",
+    "budget_bytes": 34359738368,
+    "peaks_sampled": {},
+    "over_budget": [],
+    "swap_delta_bytes": null
+  },
+  "report_path": "runs/e4b_experiment/20260923T204945Z/evaluations/validation-calibrated-20260923T210502Z.json",
+  "predictions_path": "runs/e4b_experiment/20260923T204945Z/evaluations/validation-calibrated-20260923T210502Z-predictions.jsonl",
+  "metrics_summary": {
+    "questions": 300,
+    "mean_nll_all": 0.2811540914728262,
+    "noul": {
+      "n": 127,
+      "nll": 0.09981839423570152,
+      "accuracy": 0.9763779527559056
+    },
+    "choice": {
+      "n": 84,
+      "nll": 0.37728850639474737,
+      "accuracy": 0.8452380952380952
+    },
+    "score": {
+      "n": 89,
+      "nll": 0.44918041389612373,
+      "accuracy": 0.8539325842696629
+    }
+  },
+  "metrics_calibrated_summary": {
+    "questions": 300,
+    "mean_nll_all": 0.2872771662640865,
+    "noul": {
+      "n": 127,
+      "nll": 0.09490731167922414,
+      "accuracy": 0.9763779527559056
+    },
+    "choice": {
+      "n": 84,
+      "nll": 0.4077923792892599,
+      "accuracy": 0.8452380952380952
+    },
+    "score": {
+      "n": 89,
+      "nll": 0.44803776894007485,
+      "accuracy": 0.8539325842696629
+    }
+  }
+}

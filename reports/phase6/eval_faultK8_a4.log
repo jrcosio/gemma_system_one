@@ -1,0 +1,98 @@
+Loading weights:   0%|          | 0/2076 [00:00<?, ?it/s]Loading weights: 100%|██████████| 2076/2076 [00:00<00:00, 22095.73it/s]
+{
+  "checkpoint": "runs/e4b_experiment/20260923T204945Z/checkpoint",
+  "stage": "phase2_decision_heads_frozen_backbone",
+  "split": "all",
+  "use_cache": true,
+  "code": {
+    "sha": "65d425025dd654fb4814062dc42b245062f151b1",
+    "dirty": true,
+    "source": {
+      "sha256": "241ccb255eb60013a5b3bcf7e5bcd98b8a194aca53a879c80457567964d61cba",
+      "files": 77,
+      "globs": [
+        "src/**/*.py",
+        "configs/*.yaml",
+        "scripts/*.py",
+        "pyproject.toml",
+        "uv.lock"
+      ],
+      "archive": "artifacts/source/241ccb255eb60013a5b3bcf7e5bcd98b8a194aca53a879c80457567964d61cba.tar"
+    }
+  },
+  "calibration": {
+    "file": "runs/e4b_experiment/20260923T204945Z/calibration/calibration-20260923T210339Z.json",
+    "temperatures": {
+      "noul": 1.6875301443312407,
+      "choice": 0.7061236678420023,
+      "score": 1.741242168246128
+    },
+    "calibrated": {
+      "noul": true,
+      "choice": true,
+      "score": true
+    }
+  },
+  "external_dataset": {
+    "root": "data/pilot_v3_holdout6_faultK8",
+    "sha256": "33be68c6f8d60fea4bf7e2d96c706ef6a4f0a5958b3426ee41f4a0f1d48a5ae8"
+  },
+  "external_leakage": {
+    "errors": [],
+    "near_duplicate_states": 6
+  },
+  "diagnostic_only": true,
+  "backbone_loaded": true,
+  "extraction": {
+    "split": "all",
+    "questions": 135,
+    "rows": 1054,
+    "backbone_forwards": 1054,
+    "valid_tokens": 332262,
+    "padding_tokens": 0,
+    "max_row_tokens": 378,
+    "seconds_synchronized": 154.2102,
+    "cache_hit": false,
+    "image_rows": 0,
+    "image_tokens": 0
+  },
+  "usage": {
+    "questions": 135,
+    "expanded_rows": 1054,
+    "backbone_forwards": 1054,
+    "processed_input_tokens": 332262,
+    "generated_tokens": 0
+  },
+  "memory": {
+    "sampling": "instantáneas en puntos instrumentados; el pico real puede ser mayor",
+    "budget_bytes": 34359738368,
+    "peaks_sampled": {
+      "process_rss_bytes": 1300561920,
+      "mps_current_allocated_bytes": 15890195712,
+      "mps_driver_allocated_bytes": 17051779072,
+      "swap_used_bytes": 323747840
+    },
+    "over_budget": [],
+    "swap_delta_bytes": 0
+  },
+  "report_path": "runs/e4b_experiment/20260923T204945Z/evaluations/pilot_v3_holdout6_faultK8-all-calibrated-20260923T212157Z.json",
+  "predictions_path": "runs/e4b_experiment/20260923T204945Z/evaluations/pilot_v3_holdout6_faultK8-all-calibrated-20260923T212157Z-predictions.jsonl",
+  "metrics_summary": {
+    "questions": 135,
+    "mean_nll_all": 0.2730828457802883,
+    "choice": {
+      "n": 135,
+      "nll": 0.2730828457802883,
+      "accuracy": 0.8888888888888888
+    }
+  },
+  "metrics_calibrated_summary": {
+    "questions": 135,
+    "mean_nll_all": 0.2762973001518588,
+    "choice": {
+      "n": 135,
+      "nll": 0.2762973001518588,
+      "accuracy": 0.8888888888888888
+    }
+  }
+}

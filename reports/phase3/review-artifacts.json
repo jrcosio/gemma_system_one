@@ -1,0 +1,43 @@
+{
+  "runs/pilot_ce_v3/20260923T005721Z": {
+    "reload": {
+      "compared_questions": 2,
+      "max_abs_logit_diff": 0.0,
+      "atol": 0.0001,
+      "ok": true
+    },
+    "extraction": {
+      "split": "validation",
+      "questions": 2,
+      "rows": 5,
+      "backbone_forwards": 5,
+      "valid_tokens": 1138,
+      "padding_tokens": 0,
+      "max_row_tokens": 250,
+      "seconds_synchronized": 0.4228,
+      "cache_hit": false
+    },
+    "device": "mps"
+  },
+  "runs/pilot_lora_v3/20260923T012208Z": {
+    "reload": {
+      "compared_questions": 2,
+      "max_abs_logit_diff": 0.0,
+      "atol": 0.0001,
+      "ok": true
+    },
+    "extraction": {
+      "split": "validation",
+      "questions": 2,
+      "rows": 5,
+      "backbone_forwards": 5,
+      "valid_tokens": 1138,
+      "padding_tokens": 0,
+      "max_row_tokens": 250,
+      "seconds_synchronized": 0.3638,
+      "cache_hit": false
+    },
+    "device": "mps"
+  },
+  "stored_test_comparison_matches": true
+}

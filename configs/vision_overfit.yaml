@@ -1,0 +1,26 @@
+# Puerta de fase 4: sobreajuste controlado de 48 preguntas con imagen (E2B congelado + cabezales).
+# Prueba de implementación de la ruta texto+imagen, no de calidad.
+kind: decision_heads
+name: vision_overfit
+base_config: configs/e2b_vision.yaml
+dataset: data/vision_smoke_v1
+split_seed: 0
+primitives: [noul, choice, score]
+images: use
+extraction:
+  microbatch_rows: 1  # decisiones 0002 y 0007 (obligatorio con imagen)
+cache_dir: artifacts/cache/representations
+runs_dir: runs
+train:
+  epochs: 300
+  lr: 0.01
+  weight_decay: 0.0
+  questions_per_step: 8
+  logit_chunk_rows: 2
+  seed: 0
+  threshold: 0.5
+  rps_lambda: 0.0
+  type_weights: {noul: 1.0, choice: 1.0, score: 1.0}
+  select_on: train
+  max_train_questions: 48
+  feature_norm: standardize_train

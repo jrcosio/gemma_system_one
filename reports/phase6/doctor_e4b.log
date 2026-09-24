@@ -1,0 +1,13 @@
+[doctor] environment: pass (0.08 s)
+[doctor] mps_ops: pass (0.111 s)
+[doctor] checkpoint_metadata: pass (0.856 s)
+Loading weights:   0%|          | 0/2076 [00:00<?, ?it/s]Loading weights: 100%|██████████| 2076/2076 [00:00<00:00, 28406.74it/s]
+[doctor] load_backbone: pass (5.609 s)
+[doctor] text_forward: pass (2.978 s)
+[doctor] head_train: pass (0.244 s)
+[doctor] backbone_backward_probe: pass (0.334 s)
+[doctor] long_context_probe: pass (1.325 s)
+[doctor] save_reload: pass (1.299 s)
+[doctor] vision: pass (1.172 s)
+[doctor] memory: pass (0.012 s)
+[doctor] veredicto: pass — informe: reports/phase6/doctor_e4b.json

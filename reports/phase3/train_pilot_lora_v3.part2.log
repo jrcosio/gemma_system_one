@@ -1,0 +1,4 @@
+Loading weights:   0%|          | 0/1951 [00:00<?, ?it/s]Loading weights:  61%|██████    | 1189/1951 [00:00<00:00, 11886.44it/s]Loading weights: 100%|██████████| 1951/1951 [00:00<00:00, 12746.80it/s]
+.venv/bin/gso train --config configs/pilot_lora_v3.yaml --resume   260,53s user 90,87s system 27% cpu 21:14,83 total
+~/.local/share/uv/python/cpython-3.11.15-macos-aarch64-none/lib/python3.11/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '

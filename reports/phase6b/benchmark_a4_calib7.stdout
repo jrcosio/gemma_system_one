@@ -1,0 +1,120 @@
+{
+  "server_identity": {
+    "instance_id": "ffb56be44b9d4dfabed5a2749735361a",
+    "pid": 34789,
+    "code_sha256": "a7f6450022aea2af933ee0583415420bcf25c92689d3ffb7d3e3ec148b39d682"
+  },
+  "cold_start_seconds_client": 9.51,
+  "measured_requests": 100,
+  "warmup_requests": 5,
+  "status_counts": {
+    "200": 100
+  },
+  "http_latency_ms": {
+    "mean": 942.77,
+    "p50": 910.47,
+    "p95": 1545.61,
+    "max": 2044.8
+  },
+  "server_timing_ms": {
+    "queue_wait": {
+      "mean": 0.03,
+      "p50": 0.03,
+      "p95": 0.04,
+      "max": 0.05
+    },
+    "forward_synchronized": {
+      "mean": 923.17,
+      "p50": 889.4,
+      "p95": 1523.3,
+      "max": 2022.1
+    },
+    "engine_total": {
+      "mean": 941.27,
+      "p50": 909.04,
+      "p95": 1544.07,
+      "max": 2043.24
+    },
+    "forward_wall": {
+      "mean": 940.92,
+      "p50": 908.68,
+      "p95": 1543.69,
+      "max": 2042.84
+    },
+    "server_total": {
+      "mean": 941.66,
+      "p50": 909.41,
+      "p95": 1544.47,
+      "max": 2043.67
+    }
+  },
+  "throughput": {
+    "requests_per_s": 1.061,
+    "questions_per_s": 3.182,
+    "rows_per_s": 8.284,
+    "tokens_per_s": 2000.5
+  },
+  "usage_totals": {
+    "questions": 300,
+    "expanded_rows": 781,
+    "backbone_forwards": 781,
+    "processed_input_tokens": 188609,
+    "image_tokens": 0,
+    "padding_tokens": 0,
+    "generated_tokens": 0
+  },
+  "server_rss_peak_bytes_sampled": 1422802944,
+  "burst": {
+    "concurrent_requests": 7,
+    "results": {
+      "503:queue_full": 2,
+      "200": 5
+    },
+    "valid": true
+  },
+  "note": "Secuencial salvo la ráfaga; RSS muestreado tras cada petición; memoria MPS no observable desde el cliente; identidad del servidor comprobada en cada respuesta",
+  "created_utc": "2026-09-24T05:03:33.246725+00:00",
+  "serve_config": "configs/serve_e4b_text.yaml",
+  "dataset": "data/pilot_v3",
+  "split": "validation",
+  "server_exit_code": -15,
+  "client_code": {
+    "source": {
+      "sha256": "a7f6450022aea2af933ee0583415420bcf25c92689d3ffb7d3e3ec148b39d682",
+      "files": 78,
+      "globs": [
+        "src/**/*.py",
+        "configs/*.yaml",
+        "scripts/*.py",
+        "pyproject.toml",
+        "uv.lock"
+      ],
+      "archive": "artifacts/source/a7f6450022aea2af933ee0583415420bcf25c92689d3ffb7d3e3ec148b39d682.tar"
+    }
+  },
+  "same_code_as_server": true,
+  "server_ready": {
+    "checkpoint_id": "decision_heads:97fbb4d1b9cc7609+cal:f42131010813",
+    "modality": "text",
+    "device": "mps",
+    "cold_start_seconds": 8.762,
+    "warmup": {
+      "seconds": 6.8084,
+      "usage": {
+        "questions": 1,
+        "expanded_rows": 1,
+        "backbone_forwards": 1,
+        "processed_input_tokens": 93,
+        "image_tokens": 0,
+        "padding_tokens": 0,
+        "generated_tokens": 0
+      }
+    },
+    "calibrated": {
+      "noul": true,
+      "choice": true,
+      "score": true
+    },
+    "max_length": 512
+  }
+}

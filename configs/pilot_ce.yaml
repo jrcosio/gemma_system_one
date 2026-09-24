@@ -1,0 +1,26 @@
+# Fase 2, piloto: E2B congelado + tres evaluadores compartidos (spec §7.A).
+# lr y wd de la spec; estandarización y máximo de 10 épocas por decisión 0004. Score: CE + λ·RPS con λ=0
+# (λ se elige comparando pilot_ce y pilot_rps sólo en validación, spec §6.1).
+kind: decision_heads
+name: pilot_ce
+base_config: configs/e2b_text.yaml
+dataset: data/pilot_v2
+split_seed: 0
+primitives: [noul, choice, score]
+extraction:
+  # 1 fila por forward: representación independiente del lote (decisión 0002)
+  microbatch_rows: 1
+cache_dir: artifacts/cache/representations
+runs_dir: runs
+train:
+  epochs: 10  # máximo; la época se elige por NLL de validación (decisión 0004)
+  lr: 0.001
+  weight_decay: 0.01
+  questions_per_step: 8
+  logit_chunk_rows: 4
+  seed: 0
+  threshold: 0.5
+  rps_lambda: 0.0
+  type_weights: {noul: 1.0, choice: 1.0, score: 1.0}
+  select_on: validation
+  feature_norm: standardize_train

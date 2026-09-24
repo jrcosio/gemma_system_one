@@ -1,0 +1,20 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+.env
+.env.*
+# Pesos, datos y artefactos locales
+artifacts/
+data/
+runs/
+*.safetensors
+*.bin
+*.pt
+*.ckpt
+# Salidas brutas del doctor (el resumen vive en reports/compatibility.md)
+reports/doctor/

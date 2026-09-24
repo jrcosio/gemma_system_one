@@ -1,0 +1,158 @@
+Loading weights:   0%|          | 0/2076 [00:00<?, ?it/s]Loading weights:  64%|██████▍   | 1328/2076 [00:00<00:00, 13253.79it/s]Loading weights: 100%|██████████| 2076/2076 [00:00<00:00, 14027.89it/s]
+{
+  "checkpoint": "runs/e4b_experiment/20260923T204945Z/checkpoint",
+  "stage": "phase2_decision_heads_frozen_backbone",
+  "split": "all",
+  "use_cache": true,
+  "code": {
+    "sha": "65d425025dd654fb4814062dc42b245062f151b1",
+    "dirty": true,
+    "source": {
+      "sha256": "9c31e85b613dfc52d96a7f51fc49b56cebf0d70225bba2c8a094c3248e114249",
+      "files": 78,
+      "globs": [
+        "src/**/*.py",
+        "configs/*.yaml",
+        "scripts/*.py",
+        "pyproject.toml",
+        "uv.lock"
+      ],
+      "archive": "artifacts/source/9c31e85b613dfc52d96a7f51fc49b56cebf0d70225bba2c8a094c3248e114249.tar"
+    }
+  },
+  "calibration": {
+    "file": "runs/e4b_experiment/20260923T204945Z/calibration/calibration-20260924T045005Z.json",
+    "temperatures": {
+      "noul": 1.7035335020130389,
+      "choice": 1.2750463485175278,
+      "score": 0.9592616659051203
+    },
+    "calibrated": {
+      "noul": true,
+      "choice": true,
+      "score": true
+    }
+  },
+  "external_dataset": {
+    "root": "data/pilot_v3_final8",
+    "sha256": "d9f1b2fbbb7c87dc379cfb6ead71215f1de0715960196c32a46725a890bfcf39"
+  },
+  "external_leakage": {
+    "errors": [],
+    "near_duplicate_states": 4
+  },
+  "diagnostic_only": true,
+  "backbone_loaded": true,
+  "extraction": {
+    "split": "all",
+    "questions": 888,
+    "rows": 2327,
+    "backbone_forwards": 2327,
+    "valid_tokens": 550951,
+    "padding_tokens": 0,
+    "max_row_tokens": 328,
+    "seconds_synchronized": 267.9255,
+    "cache_hit": false,
+    "image_rows": 0,
+    "image_tokens": 0
+  },
+  "usage": {
+    "questions": 888,
+    "expanded_rows": 2327,
+    "backbone_forwards": 2327,
+    "processed_input_tokens": 550951,
+    "generated_tokens": 0
+  },
+  "memory": {
+    "sampling": "instantáneas en puntos instrumentados; el pico real puede ser mayor",
+    "budget_bytes": 34359738368,
+    "peaks_sampled": {
+      "process_rss_bytes": 1245642752,
+      "mps_current_allocated_bytes": 15890195712,
+      "mps_driver_allocated_bytes": 17059725312,
+      "swap_used_bytes": 449904640
+    },
+    "over_budget": [],
+    "swap_delta_bytes": 0
+  },
+  "report_path": "runs/e4b_experiment/20260923T204945Z/evaluations/pilot_v3_final8-all-calibrated-20260924T050002Z.json",
+  "predictions_path": "runs/e4b_experiment/20260923T204945Z/evaluations/pilot_v3_final8-all-calibrated-20260924T050002Z-predictions.jsonl",
+  "metrics_summary": {
+    "questions": 888,
+    "mean_nll_all": 0.20212432881344708,
+    "noul": {
+      "n": 376,
+      "nll": 0.1072081882927245,
+      "accuracy": 0.9627659574468085
+    },
+    "choice": {
+      "n": 284,
+      "nll": 0.2790560339496313,
+      "accuracy": 0.9014084507042254
+    },
+    "score": {
+      "n": 228,
+      "nll": 0.26282548923939164,
+      "accuracy": 0.8903508771929824
+    }
+  },
+  "metrics_calibrated_summary": {
+    "questions": 888,
+    "mean_nll_all": 0.200981397742531,
+    "noul": {
+      "n": 376,
+      "nll": 0.09133347582920869,
+      "accuracy": 0.9627659574468085
+    },
+    "choice": {
+      "n": 284,
+      "nll": 0.2962422674244673,
+      "accuracy": 0.9014084507042254
+    },
+    "score": {
+      "n": 228,
+      "nll": 0.26314601024138734,
+      "accuracy": 0.8903508771929824
+    }
+  },
+  "baselines_summary": {
+    "prior": {
+      "questions": 888,
+      "mean_nll_all": 1.0320909946048962,
+      "noul": {
+        "n": 376,
+        "nll": 0.6486172425136977,
+        "accuracy": 0.6542553191489362
+      },
+      "choice": {
+        "n": 284,
+        "nll": 1.4301046697619926,
+        "accuracy": 0.1795774647887324
+      },
+      "score": {
+        "n": 228,
+        "nll": 1.1687148851385596,
+        "accuracy": 0.27631578947368424
+      }
+    },
+    "bow": {
+      "questions": 888,
+      "mean_nll_all": 0.9420236943997519,
+      "noul": {
+        "n": 376,
+        "nll": 0.5306671007599307,
+        "accuracy": 0.7420212765957447
+      },
+      "choice": {
+        "n": 284,
+        "nll": 1.322631883033694,
+        "accuracy": 0.426056338028169
+      },
+      "score": {
+        "n": 228,
+        "nll": 1.146310333156476,
+        "accuracy": 0.40789473684210525
+      }
+    }
+  }
+}

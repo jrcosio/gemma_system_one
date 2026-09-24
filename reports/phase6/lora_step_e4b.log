@@ -1,0 +1,9 @@
+Loading weights:   0%|          | 0/2076 [00:00<?, ?it/s]Loading weights:  57%|█████▋    | 1187/2076 [00:00<00:00, 11858.17it/s]Loading weights: 100%|██████████| 2076/2076 [00:00<00:00, 12556.09it/s]
+Traceback (most recent call last):
+  File "~/Develop/IA/Gemma_System_One/scripts/profile_lora_step.py", line 122, in <module>
+    main(sys.argv[1], sys.argv[2], sys.argv[3], *(int(x) for x in sys.argv[4:]))
+  File "~/Develop/IA/Gemma_System_One/scripts/profile_lora_step.py", line 73, in main
+    tracker.sample(f"step{s}_question")
+  File "~/Develop/IA/Gemma_System_One/src/gemma_system_one/resources.py", line 70, in sample
+    raise RuntimeError(f"Presupuesto de memoria superado: {exceeded}")
+RuntimeError: Presupuesto de memoria superado: ['mps_driver_allocated_bytes']

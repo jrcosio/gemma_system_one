@@ -1,0 +1,9 @@
+Loading weights:   0%|          | 0/1951 [00:00<?, ?it/s]Loading weights: 100%|██████████| 1951/1951 [00:00<00:00, 25491.29it/s]
+[train] run: runs/vision_overfit/20260923T144159Z  época elegida: 300 (train)
+  gemma_heads  train      nll_all=0.0001 | noul: nll=0.000 acc=1.000 (n=21) | choice: nll=0.000 acc=1.000 (n=15) | score: nll=0.000 acc=1.000 (n=12)
+  gemma_heads  validation nll_all=1.9296 | noul: nll=0.157 acc=0.875 (n=8) | choice: nll=3.821 acc=0.833 (n=6) | score: nll=2.638 acc=0.750 (n=4)
+  prior        train      nll_all=1.0459 | noul: nll=0.683 acc=0.571 (n=21) | choice: nll=1.303 acc=0.200 (n=15) | score: nll=1.360 acc=0.333 (n=12)
+  prior        validation nll_all=1.0589 | noul: nll=0.702 acc=0.500 (n=8) | choice: nll=1.354 acc=0.167 (n=6) | score: nll=1.331 acc=0.250 (n=4)
+  bow          train      nll_all=0.7826 | noul: nll=0.172 acc=0.952 (n=21) | choice: nll=1.155 acc=0.533 (n=15) | score: nll=1.386 acc=0.250 (n=12)
+  bow          validation nll_all=1.1383 | noul: nll=0.765 acc=0.625 (n=8) | choice: nll=1.471 acc=0.333 (n=6) | score: nll=1.386 acc=0.500 (n=4)
+  overfit_check: {'criterion': 'por primitiva: train accuracy == 1.0 y train NLL < 0.05', 'train_questions': 48, 'per_type': {'noul': {'accuracy': 1.0, 'nll': 1.690033453704327e-05}, 'choice': {'accuracy': 1.0, 'nll': 1.3643152244415237e-05}, 'score': {'accuracy': 1.0, 'nll': 0.00029449273622708005}}, 'passed': True}

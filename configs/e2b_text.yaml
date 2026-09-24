@@ -1,0 +1,19 @@
+# Fase 0/1: Gemma 4 E2B, sólo texto, PyTorch + MPS.
+# Revisión verificada en el Hub el 2026-09-22 (no gated, licencia apache-2.0).
+name: e2b_text
+model:
+  repo_id: google/gemma-4-E2B-it
+  revision: 3e22461f65e89153144f8adb70e3b8c2cc9845a7
+  backbone_class: Gemma4Model
+  dtype: bfloat16
+  attn_implementation: sdpa
+runtime:
+  device: mps
+  allow_cpu_fallback: false
+  max_length: 512
+  memory_budget_gib: 32
+  seed: 0
+paths:
+  hf_cache: null
+  artifacts_dir: artifacts
+  reports_dir: reports

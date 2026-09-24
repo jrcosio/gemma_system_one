@@ -1,0 +1,165 @@
+{
+  "checkpoint": "runs/vision2_heads/20260923T161024Z/checkpoint",
+  "stage": "phase2_decision_heads_frozen_backbone",
+  "split": "validation",
+  "use_cache": false,
+  "code": {
+    "sha": "65d425025dd654fb4814062dc42b245062f151b1",
+    "dirty": true,
+    "source": {
+      "sha256": "78d02416e739bdedc7b9ce9e5789877a5362efa7ad99e080cdfb8ef0eb5a8beb",
+      "files": 68,
+      "globs": [
+        "src/**/*.py",
+        "configs/*.yaml",
+        "scripts/*.py",
+        "pyproject.toml",
+        "uv.lock"
+      ]
+    }
+  },
+  "final_test_used": false,
+  "backbone_loaded": true,
+  "extraction": {
+    "split": "validation",
+    "questions": 210,
+    "rows": 576,
+    "backbone_forwards": 576,
+    "valid_tokens": 258015,
+    "padding_tokens": 0,
+    "max_row_tokens": 491,
+    "seconds_synchronized": 141.2496,
+    "cache_hit": false,
+    "image_rows": 576,
+    "image_tokens": 153216
+  },
+  "usage": {
+    "questions": 210,
+    "expanded_rows": 576,
+    "backbone_forwards": 576,
+    "processed_input_tokens": 258015,
+    "generated_tokens": 0
+  },
+  "reload_vs_training": {
+    "compared_questions": 210,
+    "max_abs_logit_diff": 0.0,
+    "atol": 0.0001,
+    "ok": true
+  },
+  "memory": {
+    "sampling": "instantáneas en puntos instrumentados; el pico real puede ser mayor",
+    "budget_bytes": 34359738368,
+    "peaks_sampled": {
+      "process_rss_bytes": 1693450240,
+      "mps_current_allocated_bytes": 10215276544,
+      "mps_driver_allocated_bytes": 11466391552,
+      "swap_used_bytes": 0
+    },
+    "over_budget": [],
+    "swap_delta_bytes": 0
+  },
+  "report_path": "runs/vision2_heads/20260923T161024Z/evaluations/validation-20260923T164115Z.json",
+  "predictions_path": "runs/vision2_heads/20260923T161024Z/evaluations/validation-20260923T164115Z-predictions.jsonl",
+  "metrics_summary": {
+    "questions": 210,
+    "mean_nll_all": 0.3381951127017701,
+    "noul": {
+      "n": 89,
+      "nll": 0.29566054071377756,
+      "accuracy": 0.9101123595505618
+    },
+    "choice": {
+      "n": 57,
+      "nll": 0.1697960205237176,
+      "accuracy": 0.9649122807017544
+    },
+    "score": {
+      "n": 64,
+      "nll": 0.5473251933436503,
+      "accuracy": 0.75
+    }
+  },
+  "baselines_summary": {
+    "prior": {
+      "questions": 210,
+      "mean_nll_all": 1.091691591575724,
+      "noul": {
+        "n": 89,
+        "nll": 0.6946861473108004,
+        "accuracy": 0.5056179775280899
+      },
+      "choice": {
+        "n": 57,
+        "nll": 1.3753936634214907,
+        "accuracy": 0.2982456140350877
+      },
+      "score": {
+        "n": 64,
+        "nll": 1.3911051297689967,
+        "accuracy": 0.28125
+      }
+    },
+    "bow": {
+      "questions": 210,
+      "mean_nll_all": 1.0757446851386752,
+      "noul": {
+        "n": 89,
+        "nll": 0.6643120575772538,
+        "accuracy": 0.550561797752809
+      },
+      "choice": {
+        "n": 57,
+        "nll": 1.3694696779486524,
+        "accuracy": 0.3333333333333333
+      },
+      "score": {
+        "n": 64,
+        "nll": 1.3862943611198906,
+        "accuracy": 0.265625
+      }
+    }
+  },
+  "robustness": {
+    "choice_id_rename_permutation": {
+      "questions": 57,
+      "rows_identical": 57,
+      "max_prob_diff_remapped": 0.0
+    },
+    "score_reversed": {
+      "questions": 64,
+      "accuracy_original": 0.75,
+      "accuracy_variant": 0.71875,
+      "nll_original": 0.5473251933436503,
+      "nll_variant": 0.6098207590222795
+    },
+    "choice_drop_distractor": {
+      "questions": 57,
+      "accuracy_original": 0.9649122807017544,
+      "accuracy_variant": 0.8947368421052632,
+      "nll_original": 0.1697960205237176,
+      "nll_variant": 0.2920261988346711,
+      "prediction_unchanged": 0.9122807017543859
+    }
+  },
+  "vision_ablation": {
+    "questions_with_image": 210,
+    "seed": 0,
+    "image_omitted": {
+      "questions": 210,
+      "accuracy_original": 0.8761904761904762,
+      "accuracy_variant": 0.34285714285714286,
+      "nll_original": 0.3381951127017701,
+      "nll_variant": 2.8363881709427234,
+      "prediction_unchanged": 0.32857142857142857
+    },
+    "image_swapped": {
+      "questions": 210,
+      "accuracy_original": 0.8761904761904762,
+      "accuracy_variant": 0.3619047619047619,
+      "nll_original": 0.3381951127017701,
+      "nll_variant": 3.7365424267462735,
+      "prediction_unchanged": 0.3904761904761905
+    },
+    "note": "image_swapped usa la imagen de otro grupo de la misma partición y conserva la etiqueta original: un modelo que mira la imagen debe empeorar; la etiqueta correcta para la imagen donante no se evalúa"
+  }
+}

@@ -1,0 +1,15 @@
+== calibrate a2 04:37:25
+EXIT calibrate_a2 0
+== calibrate b2 04:40:41
+EXIT calibrate_b2 0
+== calibrate a4 04:44:09
+EXIT calibrate_a4 0
+== final a2 04:50:06 runs/pilot_ce_v3/20260923T005721Z/calibration/calibration-20260924T044041Z.json
+EXIT final_a2 0
+== final b2 04:52:41 runs/pilot_lora_v3/20260923T012208Z/calibration/calibration-20260924T044408Z.json
+EXIT final_b2 0
+== final a4 04:55:23 runs/e4b_experiment/20260923T204945Z/calibration/calibration-20260924T045005Z.json
+EXIT final_a4 0
+== profile 05:00:03
+EXIT profile 0
+ALL DONE 05:01:24

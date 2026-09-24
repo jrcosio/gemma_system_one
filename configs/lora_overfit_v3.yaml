@@ -1,0 +1,26 @@
+# Puerta de fase 3: sólo LoRA aprende (cabezales fijos del punto de partida) sobre 48 preguntas
+# de train de mixed_smoke_v3. Prueba de implementación del autograd real por el backbone, no de calidad.
+kind: lora_decision_heads
+name: lora_overfit_v3
+base_config: configs/e2b_text.yaml
+dataset: data/mixed_smoke_v3
+split_seed: 0
+primitives: [noul, choice, score]
+init_heads_from: runs/mixed_heads_v3/20260923T011017Z/checkpoint
+extraction:
+  microbatch_rows: 1  # decisión 0002 (también con autograd: reports/phase3/repro_lora_microbatch.json)
+runs_dir: runs
+lora: {r: 8, alpha: 16, dropout: 0.05, projections: [q_proj, v_proj]}
+train:
+  epochs: 12
+  lr_lora: 0.002
+  lr_heads: 0.0005
+  weight_decay_lora: 0.0
+  warmup_fraction: 0.0
+  clip_grad_norm: 1.0
+  questions_per_step: 8
+  seed: 0
+  train_heads: false
+  select_on: train
+  max_train_questions: 48
+  resume_every_steps: 20

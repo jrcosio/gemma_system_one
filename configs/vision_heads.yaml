@@ -1,0 +1,25 @@
+# Fase 4, modelo V: E2B congelado + tres evaluadores con la imagen del panel (spec §7.C).
+# Hiperparámetros de la referencia de fase 3 (pilot_ce_v3); se fijan antes de ver resultados.
+kind: decision_heads
+name: vision_heads
+base_config: configs/e2b_vision.yaml
+dataset: data/vision_pilot_v1
+split_seed: 0
+primitives: [noul, choice, score]
+images: use
+extraction:
+  microbatch_rows: 1  # decisiones 0002 y 0007
+cache_dir: artifacts/cache/representations
+runs_dir: runs
+train:
+  epochs: 30
+  lr: 0.001
+  weight_decay: 0.01
+  questions_per_step: 8
+  logit_chunk_rows: 4
+  seed: 0
+  threshold: 0.5
+  rps_lambda: 0.0
+  type_weights: {noul: 1.0, choice: 1.0, score: 1.0}
+  select_on: validation
+  feature_norm: standardize_train

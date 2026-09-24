@@ -1,0 +1,26 @@
+# Puerta de fase 2: sobreajuste controlado de 48 preguntas mixtas (Noul/Choice/Score).
+# Prueba de implementación (pérdidas de grupo y reconstrucción aprenden), no de calidad.
+kind: decision_heads
+name: mixed_overfit
+base_config: configs/e2b_text.yaml
+dataset: data/mixed_smoke_v2
+split_seed: 0
+primitives: [noul, choice, score]
+extraction:
+  # 1 fila por forward: representación independiente del lote (decisión 0002)
+  microbatch_rows: 1
+cache_dir: artifacts/cache/representations
+runs_dir: runs
+train:
+  epochs: 300
+  lr: 0.01
+  weight_decay: 0.0
+  questions_per_step: 8
+  logit_chunk_rows: 2
+  seed: 0
+  threshold: 0.5
+  rps_lambda: 0.0
+  type_weights: {noul: 1.0, choice: 1.0, score: 1.0}
+  select_on: train
+  max_train_questions: 48
+  feature_norm: standardize_train

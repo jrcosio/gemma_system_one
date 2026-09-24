@@ -1,0 +1,99 @@
+{
+  "server_ready": {
+    "checkpoint_id": "decision_heads:831c8c1f85ed4264",
+    "modality": "text+image",
+    "device": "mps",
+    "cold_start_seconds": 3.943,
+    "warmup": {
+      "seconds": 1.9137,
+      "usage": {
+        "questions": 1,
+        "expanded_rows": 1,
+        "backbone_forwards": 1,
+        "processed_input_tokens": 361,
+        "image_tokens": 266,
+        "padding_tokens": 0,
+        "generated_tokens": 0
+      }
+    },
+    "calibrated": {
+      "noul": false,
+      "choice": false,
+      "score": false
+    },
+    "max_length": 768
+  },
+  "cold_start_seconds_client": 4.76,
+  "measured_requests": 100,
+  "warmup_requests": 5,
+  "status_counts": {
+    "200": 100
+  },
+  "http_latency_ms": {
+    "mean": 2060.8,
+    "p50": 2231.44,
+    "p95": 3242.2,
+    "max": 3530.39
+  },
+  "server_timing_ms": {
+    "queue_wait": {
+      "mean": 0.04,
+      "p50": 0.04,
+      "p95": 0.04,
+      "max": 0.06
+    },
+    "forward_synchronized": {
+      "mean": 2046.6,
+      "p50": 2216.8,
+      "p95": 3227.2,
+      "max": 3516.1
+    },
+    "engine_total": {
+      "mean": 2058.64,
+      "p50": 2229.35,
+      "p95": 3240.0,
+      "max": 3528.19
+    },
+    "forward_wall": {
+      "mean": 2058.32,
+      "p50": 2229.02,
+      "p95": 3239.59,
+      "max": 3527.82
+    },
+    "server_total": {
+      "mean": 2059.66,
+      "p50": 2230.35,
+      "p95": 3241.01,
+      "max": 3529.25
+    }
+  },
+  "throughput": {
+    "requests_per_s": 0.485,
+    "questions_per_s": 1.456,
+    "rows_per_s": 4.037,
+    "tokens_per_s": 1809.4
+  },
+  "usage_totals": {
+    "questions": 300,
+    "expanded_rows": 832,
+    "backbone_forwards": 832,
+    "processed_input_tokens": 372878,
+    "image_tokens": 221312,
+    "padding_tokens": 0,
+    "generated_tokens": 0
+  },
+  "server_rss_peak_bytes_sampled": 1098465280,
+  "burst": {
+    "concurrent_requests": 7,
+    "results": {
+      "503:queue_full": 2,
+      "200": 5
+    }
+  },
+  "note": "Secuencial salvo la ráfaga; RSS muestreado tras cada petición; memoria MPS no observable desde el cliente",
+  "created_utc": "2026-09-23T17:08:39.912956+00:00",
+  "serve_config": "configs/serve_vision.yaml",
+  "dataset": "data/vision_pilot_v2",
+  "split": "validation",
+  "server_exit_code": -15
+}

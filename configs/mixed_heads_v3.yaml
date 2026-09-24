@@ -1,0 +1,24 @@
+# Fase 3, punto de partida de la puerta LoRA: cabezales de fase 2 sobre mixed_smoke_v3 (E2B congelado).
+# Selección por validación; no es un resultado de calidad (126 preguntas de train).
+kind: decision_heads
+name: mixed_heads_v3
+base_config: configs/e2b_text.yaml
+dataset: data/mixed_smoke_v3
+split_seed: 0
+primitives: [noul, choice, score]
+extraction:
+  microbatch_rows: 1  # decisión 0002
+cache_dir: artifacts/cache/representations
+runs_dir: runs
+train:
+  epochs: 30
+  lr: 0.001
+  weight_decay: 0.01
+  questions_per_step: 8
+  logit_chunk_rows: 4
+  seed: 0
+  threshold: 0.5
+  rps_lambda: 0.0
+  type_weights: {noul: 1.0, choice: 1.0, score: 1.0}
+  select_on: validation
+  feature_norm: standardize_train

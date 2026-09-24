@@ -1,0 +1,73 @@
+{
+ "config": "configs/e4b_text.yaml",
+ "repo_id": "google/gemma-4-E4B-it",
+ "revision": "ee0ef6023621cff504d758262d4e04895a5af4a2",
+ "hidden_size": 2560,
+ "device": "mps",
+ "dtype": "bfloat16",
+ "lora_targets": 66,
+ "recomputed_layers": 0,
+ "lora_trainable_params": 2269184,
+ "code": {
+  "sha256": "cfde84aeb8cc5f93c9aeb9a0a7430708d016f1c5ef32aeeeb5a014a501e2cd72",
+  "files": 76,
+  "archive": "artifacts/source/cfde84aeb8cc5f93c9aeb9a0a7430708d016f1c5ef32aeeeb5a014a501e2cd72.tar"
+ },
+ "load_seconds": 7.98,
+ "steps": [
+  {
+   "step": 0,
+   "seconds": 11.427,
+   "rows": 28,
+   "tokens": 7251,
+   "lora_grads": 132,
+   "grads_finite": true
+  },
+  {
+   "step": 1,
+   "seconds": 7.455,
+   "rows": 22,
+   "tokens": 5216,
+   "lora_grads": 132,
+   "grads_finite": true
+  },
+  {
+   "step": 2,
+   "seconds": 7.121,
+   "rows": 22,
+   "tokens": 5051,
+   "lora_grads": 132,
+   "grads_finite": true
+  }
+ ],
+ "median_step_seconds_excl_first": 7.288,
+ "rows_per_second_excl_first": 3.019,
+ "memory": {
+  "sampling": "instant\u00e1neas en puntos instrumentados; el pico real puede ser mayor",
+  "budget_bytes": 34359738368,
+  "peaks_sampled": {
+   "process_rss_bytes": 1348534272,
+   "mps_current_allocated_bytes": 15935726336,
+   "mps_driver_allocated_bytes": 34522988544,
+   "swap_used_bytes": 319094784
+  },
+  "over_budget": [
+   "mps_driver_allocated_bytes"
+  ],
+  "swap_delta_bytes": 786432
+ },
+ "budget_exceeded": {
+  "error": "Presupuesto de memoria superado: ['mps_driver_allocated_bytes']",
+  "at": "step3_question",
+  "completed_steps": 3,
+  "mps_driver_allocated_bytes": 34522988544,
+  "mps_current_allocated_bytes": 15935705344,
+  "question": {
+   "step": 3,
+   "index": 0,
+   "id": "mix-s0-00012-choice-fault_kind",
+   "rows": 6
+  }
+ },
+ "recompute_equivalence": null
+}

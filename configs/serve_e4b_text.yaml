@@ -1,0 +1,13 @@
+# Fase 6: servicio de texto recomendado (decisión 0011): A4, E4B congelado + cabezales, con su
+# calibración. Adoptado por la regla R2 predeclarada (reports/phase6-protocol.md). serve_text.yaml
+# (B2, E2B + LoRA) queda como opción de menor latencia.
+# Calibración: temperaturas de data/pilot_v3_calib7 (1200 preguntas; fase 6b, fijado en el protocolo
+# reports/phase6b-protocol.md). Confirmado en el test final pilot_v3_final8 (regla C).
+kind: serve
+model_id: gemma-system-one-e4b-heads-v0.1
+checkpoint: runs/e4b_experiment/20260923T204945Z/checkpoint
+calibration: runs/e4b_experiment/20260923T204945Z/calibration/calibration-20260924T045005Z.json
+host: 127.0.0.1
+port: 8000
+max_queue: 4
+request_timeout_s: 120

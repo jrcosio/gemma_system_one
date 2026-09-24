@@ -1,0 +1,19 @@
+# Fase 4: Gemma 4 E2B, texto + una imagen, PyTorch + MPS. Misma revisión, dtype y atención que
+# e2b_text; sólo cambia max_length. La huella de extracción incluye max_length: caché separada.
+name: e2b_vision
+model:
+  repo_id: google/gemma-4-E2B-it
+  revision: 3e22461f65e89153144f8adb70e3b8c2cc9845a7
+  backbone_class: Gemma4Model
+  dtype: bfloat16
+  attn_implementation: sdpa
+runtime:
+  device: mps
+  allow_cpu_fallback: false
+  max_length: 768  # fila con imagen: ~266 tokens visuales + texto (decisión 0007)
+  memory_budget_gib: 32
+  seed: 0
+paths:
+  hf_cache: null
+  artifacts_dir: artifacts
+  reports_dir: reports

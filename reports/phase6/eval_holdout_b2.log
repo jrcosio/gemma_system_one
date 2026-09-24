@@ -1,0 +1,158 @@
+Loading weights:   0%|          | 0/1951 [00:00<?, ?it/s]Loading weights: 100%|██████████| 1951/1951 [00:00<00:00, 37496.16it/s]
+{
+  "checkpoint": "runs/pilot_lora_v3/20260923T012208Z/checkpoint",
+  "stage": "phase3_lora_decision_heads",
+  "split": "all",
+  "use_cache": false,
+  "code": {
+    "sha": "65d425025dd654fb4814062dc42b245062f151b1",
+    "dirty": true,
+    "source": {
+      "sha256": "241ccb255eb60013a5b3bcf7e5bcd98b8a194aca53a879c80457567964d61cba",
+      "files": 77,
+      "globs": [
+        "src/**/*.py",
+        "configs/*.yaml",
+        "scripts/*.py",
+        "pyproject.toml",
+        "uv.lock"
+      ],
+      "archive": "artifacts/source/241ccb255eb60013a5b3bcf7e5bcd98b8a194aca53a879c80457567964d61cba.tar"
+    }
+  },
+  "calibration": {
+    "file": "runs/pilot_lora_v3/20260923T012208Z/calibration/calibration-20260923T043504Z.json",
+    "temperatures": {
+      "noul": 2.0025872223046144,
+      "choice": 1.8697866997004302,
+      "score": 1.6348847008524447
+    },
+    "calibrated": {
+      "noul": true,
+      "choice": true,
+      "score": true
+    }
+  },
+  "external_dataset": {
+    "root": "data/pilot_v3_holdout6_clean",
+    "sha256": "a0129b58db73f1954edb2b9e8f1e62036ff7d45839400267921848fd76336880"
+  },
+  "external_leakage": {
+    "errors": [],
+    "near_duplicate_states": 9
+  },
+  "diagnostic_only": true,
+  "backbone_loaded": true,
+  "extraction": {
+    "split": "all",
+    "questions": 885,
+    "rows": 2380,
+    "backbone_forwards": 2380,
+    "valid_tokens": 568270,
+    "padding_tokens": 0,
+    "max_row_tokens": 336,
+    "seconds_synchronized": 161.745,
+    "cache_hit": false,
+    "image_rows": 0,
+    "image_tokens": 0
+  },
+  "usage": {
+    "questions": 885,
+    "expanded_rows": 2380,
+    "backbone_forwards": 2380,
+    "processed_input_tokens": 568270,
+    "generated_tokens": 0
+  },
+  "memory": {
+    "sampling": "instantáneas en puntos instrumentados; el pico real puede ser mayor",
+    "budget_bytes": 34359738368,
+    "peaks_sampled": {
+      "process_rss_bytes": 1707393024,
+      "mps_current_allocated_bytes": 10220634112,
+      "mps_driver_allocated_bytes": 11372199936,
+      "swap_used_bytes": 319094784
+    },
+    "over_budget": [],
+    "swap_delta_bytes": 0
+  },
+  "report_path": "runs/pilot_lora_v3/20260923T012208Z/evaluations/pilot_v3_holdout6_clean-all-calibrated-20260923T211030Z.json",
+  "predictions_path": "runs/pilot_lora_v3/20260923T012208Z/evaluations/pilot_v3_holdout6_clean-all-calibrated-20260923T211030Z-predictions.jsonl",
+  "metrics_summary": {
+    "questions": 885,
+    "mean_nll_all": 0.46593619335101116,
+    "noul": {
+      "n": 358,
+      "nll": 0.2362275903155761,
+      "accuracy": 0.9413407821229051
+    },
+    "choice": {
+      "n": 281,
+      "nll": 0.5517998407435386,
+      "accuracy": 0.8220640569395018
+    },
+    "score": {
+      "n": 246,
+      "nll": 0.7021475550151802,
+      "accuracy": 0.7560975609756098
+    }
+  },
+  "metrics_calibrated_summary": {
+    "questions": 885,
+    "mean_nll_all": 0.38252939701545313,
+    "noul": {
+      "n": 358,
+      "nll": 0.1718745183151852,
+      "accuracy": 0.9413407821229051
+    },
+    "choice": {
+      "n": 281,
+      "nll": 0.4711747889662064,
+      "accuracy": 0.8220640569395018
+    },
+    "score": {
+      "n": 246,
+      "nll": 0.5878346467574623,
+      "accuracy": 0.7560975609756098
+    }
+  },
+  "baselines_summary": {
+    "prior": {
+      "questions": 885,
+      "mean_nll_all": 1.0461108517674167,
+      "noul": {
+        "n": 358,
+        "nll": 0.6353205396779699,
+        "accuracy": 0.6703910614525139
+      },
+      "choice": {
+        "n": 281,
+        "nll": 1.4409192895190224,
+        "accuracy": 0.17793594306049823
+      },
+      "score": {
+        "n": 246,
+        "nll": 1.1929472774577454,
+        "accuracy": 0.2682926829268293
+      }
+    },
+    "bow": {
+      "questions": 885,
+      "mean_nll_all": 0.9674322708575354,
+      "noul": {
+        "n": 358,
+        "nll": 0.5302296379419529,
+        "accuracy": 0.7318435754189944
+      },
+      "choice": {
+        "n": 281,
+        "nll": 1.3545790171719463,
+        "accuracy": 0.4128113879003559
+      },
+      "score": {
+        "n": 246,
+        "nll": 1.1614579085381411,
+        "accuracy": 0.42276422764227645
+      }
+    }
+  }
+}

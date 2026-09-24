@@ -1,0 +1,120 @@
+{
+  "server_identity": {
+    "instance_id": "783bfb1e084c429a9cf0003149d90194",
+    "pid": 24942,
+    "code_sha256": "73a72fdccf27fb6c2f38af57fd273cff1cdd3d73b0ee6feac447a15a85d14c81"
+  },
+  "cold_start_seconds_client": 4.87,
+  "measured_requests": 100,
+  "warmup_requests": 5,
+  "status_counts": {
+    "200": 100
+  },
+  "http_latency_ms": {
+    "mean": 2063.23,
+    "p50": 2232.11,
+    "p95": 3247.63,
+    "max": 3558.21
+  },
+  "server_timing_ms": {
+    "queue_wait": {
+      "mean": 0.03,
+      "p50": 0.03,
+      "p95": 0.04,
+      "max": 0.05
+    },
+    "forward_synchronized": {
+      "mean": 2047.74,
+      "p50": 2216.5,
+      "p95": 3232.4,
+      "max": 3543.7
+    },
+    "engine_total": {
+      "mean": 2061.01,
+      "p50": 2229.94,
+      "p95": 3245.4,
+      "max": 3555.94
+    },
+    "forward_wall": {
+      "mean": 2060.66,
+      "p50": 2229.55,
+      "p95": 3245.04,
+      "max": 3555.44
+    },
+    "server_total": {
+      "mean": 2062.06,
+      "p50": 2230.96,
+      "p95": 3246.49,
+      "max": 3557.04
+    }
+  },
+  "throughput": {
+    "requests_per_s": 0.485,
+    "questions_per_s": 1.454,
+    "rows_per_s": 4.032,
+    "tokens_per_s": 1807.2
+  },
+  "usage_totals": {
+    "questions": 300,
+    "expanded_rows": 832,
+    "backbone_forwards": 832,
+    "processed_input_tokens": 372878,
+    "image_tokens": 221312,
+    "padding_tokens": 0,
+    "generated_tokens": 0
+  },
+  "server_rss_peak_bytes_sampled": 1107378176,
+  "burst": {
+    "concurrent_requests": 7,
+    "results": {
+      "503:queue_full": 2,
+      "200": 5
+    },
+    "valid": true
+  },
+  "note": "Secuencial salvo la ráfaga; RSS muestreado tras cada petición; memoria MPS no observable desde el cliente; identidad del servidor comprobada en cada respuesta",
+  "created_utc": "2026-09-23T20:13:55.613820+00:00",
+  "serve_config": "configs/serve_vision.yaml",
+  "dataset": "data/vision_pilot_v2",
+  "split": "validation",
+  "server_exit_code": -15,
+  "client_code": {
+    "source": {
+      "sha256": "73a72fdccf27fb6c2f38af57fd273cff1cdd3d73b0ee6feac447a15a85d14c81",
+      "files": 69,
+      "globs": [
+        "src/**/*.py",
+        "configs/*.yaml",
+        "scripts/*.py",
+        "pyproject.toml",
+        "uv.lock"
+      ],
+      "archive": "artifacts/source/73a72fdccf27fb6c2f38af57fd273cff1cdd3d73b0ee6feac447a15a85d14c81.tar"
+    }
+  },
+  "same_code_as_server": true,
+  "server_ready": {
+    "checkpoint_id": "decision_heads:831c8c1f85ed4264",
+    "modality": "text+image",
+    "device": "mps",
+    "cold_start_seconds": 4.119,
+    "warmup": {
+      "seconds": 1.9958,
+      "usage": {
+        "questions": 1,
+        "expanded_rows": 1,
+        "backbone_forwards": 1,
+        "processed_input_tokens": 361,
+        "image_tokens": 266,
+        "padding_tokens": 0,
+        "generated_tokens": 0
+      }
+    },
+    "calibrated": {
+      "noul": false,
+      "choice": false,
+      "score": false
+    },
+    "max_length": 768
+  }
+}

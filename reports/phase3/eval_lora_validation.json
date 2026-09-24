@@ -1,0 +1,87 @@
+{
+  "checkpoint": "runs/pilot_lora_v3/20260923T012208Z/checkpoint",
+  "stage": "phase3_lora_decision_heads",
+  "split": "validation",
+  "use_cache": false,
+  "final_test_used": false,
+  "backbone_loaded": true,
+  "extraction": {
+    "split": "validation",
+    "questions": 300,
+    "rows": 781,
+    "backbone_forwards": 781,
+    "valid_tokens": 188609,
+    "padding_tokens": 0,
+    "max_row_tokens": 319,
+    "seconds_synchronized": 54.3659,
+    "cache_hit": false
+  },
+  "usage": {
+    "questions": 300,
+    "expanded_rows": 781,
+    "backbone_forwards": 781,
+    "processed_input_tokens": 188609,
+    "generated_tokens": 0
+  },
+  "reload_vs_training": {
+    "compared_questions": 300,
+    "max_abs_logit_diff": 0.0,
+    "atol": 0.0001,
+    "ok": true
+  },
+  "memory": {
+    "sampling": "instantáneas en puntos instrumentados; el pico real puede ser mayor",
+    "budget_bytes": 34359738368,
+    "peaks_sampled": {
+      "process_rss_bytes": 1499594752,
+      "mps_current_allocated_bytes": 10220634112,
+      "mps_driver_allocated_bytes": 11373510656,
+      "swap_used_bytes": 0
+    },
+    "over_budget": [],
+    "swap_delta_bytes": 0
+  },
+  "report_path": "runs/pilot_lora_v3/20260923T012208Z/evaluations/validation-20260923T043305Z.json",
+  "predictions_path": "runs/pilot_lora_v3/20260923T012208Z/evaluations/validation-20260923T043305Z-predictions.jsonl",
+  "metrics_summary": {
+    "questions": 300,
+    "mean_nll_all": 0.4222496477252291,
+    "noul": {
+      "n": 127,
+      "nll": 0.18204682159489435,
+      "accuracy": 0.9448818897637795
+    },
+    "choice": {
+      "n": 84,
+      "nll": 0.5961637484910605,
+      "accuracy": 0.7738095238095238
+    },
+    "score": {
+      "n": 89,
+      "nll": 0.600867338222113,
+      "accuracy": 0.7415730337078652
+    }
+  },
+  "robustness": {
+    "choice_id_rename_permutation": {
+      "questions": 84,
+      "rows_identical": 84,
+      "max_prob_diff_remapped": 0.0
+    },
+    "score_reversed": {
+      "questions": 89,
+      "accuracy_original": 0.7415730337078652,
+      "accuracy_variant": 0.7078651685393258,
+      "nll_original": 0.600867338222113,
+      "nll_variant": 0.7907542589585315
+    },
+    "choice_drop_distractor": {
+      "questions": 84,
+      "accuracy_original": 0.7738095238095238,
+      "accuracy_variant": 0.7857142857142857,
+      "nll_original": 0.5961637484910606,
+      "nll_variant": 0.5571313895284469,
+      "prediction_unchanged": 0.75
+    }
+  }
+}

@@ -1,0 +1,1117 @@
+# Estado vigente — fase 6b cerrada: servicio A4 confirmado en un test independiente (2026-09-24, 05:08 UTC)
+
+Sustituye a las secciones siguientes (relevo y revisión de la fase 6), que quedan como registro histórico. Resuelve sus pendientes 2 y 3 (medida independiente del servicio elegido y calibración de A4) y ejercita en MPS la corrección del perfilador (pendiente 4). El pendiente 1 (commit) sigue siendo decisión del usuario.
+
+## 1. Fase, rama y veredicto
+
+| Campo | Estado |
+|---|---|
+| Fase | **6 completa, incluida la 6b.** No hay fases posteriores en la spec §10. Informes: `reports/phase6-e4b.md` (selección) y **`reports/phase6b-final.md`** (medida final). Protocolo `reports/phase6b-protocol.md`, sha256 `209e9259…` (en `reports/phase6b/protocol.sha256`), escrito antes de generar los datos y ejecutar los modelos |
+| Resultado | **Regla C:** en el test final nuevo `pilot_v3_final8` (888 preguntas, 296 grupos, no usado para decidir), A4 − B2 = **−0,146 [−0,186; −0,104]** de NLL calibrada, así que **A4 queda confirmado** como servicio de texto. A4 − A2 = −0,183 [−0,227; −0,141]; B2 − A2 = −0,038 [−0,066; −0,012] |
+| Calibración | Temperaturas nuevas con 1200 preguntas externas (`pilot_v3_calib7`). NLL de A4 en `final8`: 0,2021 sin T, 0,2089 con T de 300 preguntas y **0,2010 con T de `calib7`**. Resuelto según el criterio declarado, de forma marginal: en Choice la T global sigue empeorando (0,279 → 0,296). En A2 y B2 mejora claramente |
+| Servicio | `configs/serve_e4b_text.yaml` (A4) y `configs/serve_text.yaml` (B2) apuntan ahora a las calibraciones de `calib7`. Benchmark de A4: 100 × 200, p50/p95 910/1546 ms, ráfaga válida y log con 112 peticiones |
+| Rama / commit | `main`, HEAD `65d425025dd654fb4814062dc42b245062f151b1`. **Fases 0–6 sin commit**; stash vacío. Git sólo muestra `README.md` modificado; el resto está sin seguimiento |
+| Referencia del árbol | `artifacts/tree/76a3562d….tar` (304 ficheros, generado antes de esta línea); anteriores `9f54e5ef…` y `e7b7a322…`. No sustituye a un commit |
+| Código | Actual **`a7f6450022aea2af933ee0583415420bcf25c92689d3ffb7d3e3ec148b39d682`** (78 ficheros), con copia en `artifacts/source/`. Calibraciones, evaluaciones y perfil se ejecutaron con `9c31e85b…`; el benchmark, con `a7f64500…` (sólo cambian los YAML de servicio) |
+| Pruebas | **288 CPU** (34,41 s) y **14 MPS/E2E reales** (128,30 s, 0 omitidos), con el código actual. Ruff, formato (128 ficheros), `uv lock --check` y `git diff --check` correctos |
+
+## 2. Procesos activos
+
+`pgrep -fl 'gso|pytest|uvicorn'` terminó con código 1 y `lsof -nP -iTCP:8000 -sTCP:LISTEN` también: **ningún proceso del proyecto** y el puerto libre. El servidor de benchmark terminó por SIGTERM. No hay entrenamientos ni descargas.
+
+## 3. Checkpoints, calibraciones y datos
+
+| Ruta | Uso |
+|---|---|
+| `runs/e4b_experiment/20260923T204945Z/checkpoint` | **A4**, E4B + cabezales (servicio de texto recomendado) |
+| `…/e4b_experiment/20260923T204945Z/calibration/calibration-20260924T045005Z.json` | **Calibración vigente de A4** (`calib7`); la anterior (`…210339Z`, 300 preguntas) queda como historial |
+| `runs/pilot_lora_v3/20260923T012208Z/checkpoint` + `calibration/calibration-20260924T044408Z.json` | B2 (opción de menor latencia) y su calibración vigente (`calib7`) |
+| `runs/pilot_ce_v3/20260923T005721Z/checkpoint` + `calibration/calibration-20260924T044041Z.json` | A2 (comparador) |
+| `runs/vision2_heads/20260923T161024Z/checkpoint`; `runs/vision2_text_only/20260923T162937Z/checkpoint` | V2, servicio visual E2B; C2, control textual |
+| Caché HF | E2B `3e22461f…` y E4B `ee0ef602…` (una copia de cada) |
+| `data/pilot_v3_calib7` (`cdf1005c…`) | Sólo calibración externa |
+| `data/pilot_v3_final8` (`d9f1b2fb…`) | Test final de la fase 6b, **ya usado** |
+| `data/pilot_v3_seed7`, `data/pilot_v3_seed8` | Generados sin filtrar (origen de los anteriores) |
+
+**Conjuntos ya usados, que no deben servir para decidir:** el test de `pilot_v3`, los tests de `vision_pilot_v1/v2`, `pilot_v3_holdout6*` (conjunto de selección de la fase 6) y `pilot_v3_final8`.
+
+## 4. Archivos de esta fase (6b)
+
+**Nuevos:**
+- `scripts/derive_phase6b_data.py`;
+- `reports/phase6b-protocol.md`, `reports/phase6b-final.md`;
+- `reports/phase6b/`: logs, `run_chain.sh`, comparaciones, `calibration_variants_final8.json`, benchmark y perfil.
+
+**Modificados:**
+- `src/gemma_system_one/calibration.py`: calibración externa, `EXTERNAL_SPLIT`;
+- `src/gemma_system_one/training/decisions_pipeline.py`: `evaluate` rechaza el mismo conjunto de calibración;
+- `src/gemma_system_one/cli.py`: `calibrate --split all --dataset`;
+- `configs/serve_e4b_text.yaml`, `configs/serve_text.yaml`: calibración de `calib7`;
+- `tests/integration/test_phase3_pipeline.py`: un test;
+- `README.md`: párrafo de la fase 6b;
+- `docs/decisions/0011-…md`: anexo de confirmación.
+
+Los ficheros de la fase 6 están en la sección histórica siguiente. `data/`, `runs/`, `artifacts/` y `.venv/` quedan fuera de Git.
+
+## 5. Decisiones
+
+- **0011, con anexo:** A4 confirmado por la regla C; el servicio usa la calibración de `calib7`.
+- 0001–0010 siguen vigentes.
+- La calibración externa es una extensión del procedimiento de la spec §6.2: mismo método, otro conjunto sin fugas y vinculado por sha256.
+
+## 6. Comandos exactos
+
+Lista completa en `reports/phase6b-final.md` («Comandos ejecutados»):
+- protocolo y su sha256;
+- `generate-data` con semillas 7 y 8, `scripts/derive_phase6b_data.py` y `validate-data`;
+- `reports/phase6b/run_chain.sh`: 3 calibraciones externas, 3 evaluaciones finales y el perfil LoRA de E4B;
+- 3 `gso compare`;
+- `gso benchmark` de `serve_e4b_text.yaml`;
+- `pytest` CPU y MPS/E2E.
+
+## 7. Fallos reproducibles
+
+No aparecieron fallos de código nuevos. Límite metodológico que persiste: una temperatura global en Choice empeora la NLL de A4 en `final8`. Se reproduce con `reports/phase6b/calibration_variants_final8.json`, calculado desde los `row_logits` de `pred_a4`.
+
+## 8. Pendientes, en orden
+
+1. **Commit de las fases 0–6, a decidir por el usuario.** Sin él, `HEAD` no ejecuta el proyecto (hallazgo alto de la revisión). Excluir `data/`, `runs/`, `artifacts/` y credenciales.
+2. **Revisión independiente de la fase 6b:**
+   - calibración externa y su guarda;
+   - datos sin solapes (4 grupos excluidos de `final8`; 4 pares casi duplicados declarados);
+   - aplicación de la regla C.
+3. **Opcionales:**
+   - calibración de Choice más allá de una T global, decidida con datos nuevos y no con `final8`;
+   - LoRA sobre E4B con su configuración real (`recompute_layers: true`);
+   - E4B con imagen;
+   - abstención con umbrales congelados;
+   - Score por tramos.
+4. **Riesgos que se mantienen:**
+   - el timeout no interrumpe un forward MPS y la cola no limita las conexiones;
+   - el RSS muestreado no es el pico de MPS;
+   - datos sintéticos de una familia; V2 sin calibrar;
+   - falta la copia histórica `70068e15…`;
+   - `reports/doctor/20260922T195301Z.json` contiene una ruta absoluta del usuario.
+
+### Privacidad
+
+- **Contenido:** sin secretos ni datos personales.
+- **Rutas:** las de `reports/phase6b/` están enmascaradas con `~`.
+- **Credenciales:** no se usó ningún token.
+
+---
+
+# Registro histórico — relevo tras la revisión de fase 6 (2026-09-24, 04:31 UTC)
+
+Este relevo **sólo modifica `docs/STATUS.md`**. Mantiene el alcance, PyTorch/MPS, los modelos y el contrato público. La revisión técnica vigente empieza tras esta sección; los cierres anteriores son históricos.
+
+| Campo | Estado para el siguiente asistente |
+|---|---|
+| Fase y dictamen | Fase 6 implementada y revisada. E4B/BF16 tuvo una recarga y un forward reales en MPS en la revisión anterior. La comparación A4 − B2 se reprodujo desde 885 pares de predicciones. **No es una evaluación final independiente del servicio A4 elegido**, porque R2 usó ese holdout para escogerlo. |
+| Rama y commit | `main`, `65d425025dd654fb4814062dc42b245062f151b1`; stash vacío. |
+| Árbol modificado | `README.md` modificado; `.gitignore`, `.python-version`, `configs/`, `docs/STATUS.md`, `docs/decisions/`, `pyproject.toml`, `reports/`, `scripts/`, `src/`, `tests/` y `uv.lock` sin seguimiento. `git diff --stat` sólo muestra README y no representa los archivos nuevos. En este relevo no se tocó código, datos, pesos ni configuraciones. |
+| Decisiones | 0001–0009 siguen vigentes. 0010 mantiene una fila por forward y ofrece recomputación para LoRA. 0011 recomienda A4 para texto según R2, con la salvedad del holdout usado para selección. Ninguna decisión técnica cambió en este relevo. |
+| Huella | Las 77 fuentes siguen en `125c93fe8b0b54abcb9bd33d39c8a0c04af44c5d6c62115607fcfd7e741e0f2a`; el tar correspondiente existe en `artifacts/source/`. Los tar `artifacts/tree/9f54e5ef…` y `e7b7a322…` están presentes. Son referencias locales, no un commit. |
+| Procesos | La inspección por ejecutable devolvió `[]` para `gso`, `pytest` y `uvicorn`. `lsof -nP -iTCP:8000 -sTCP:LISTEN` terminó con código 1 y sin salida. No se inició entrenamiento, descarga ni servicio en este relevo. |
+
+**Checkpoints locales:** sólo se verificó su existencia ahora; no se repitió su recarga o integridad.
+
+| Modelo | Ruta |
+|---|---|
+| A4, E4B + cabezales | `runs/e4b_experiment/20260923T204945Z/checkpoint` |
+| Calibración A4 | `runs/e4b_experiment/20260923T204945Z/calibration/calibration-20260923T210339Z.json` |
+| B2, E2B + LoRA | `runs/pilot_lora_v3/20260923T012208Z/checkpoint` |
+| Calibración B2 | `runs/pilot_lora_v3/20260923T012208Z/calibration/calibration-20260923T043504Z.json` |
+| A2, E2B + cabezales | `runs/pilot_ce_v3/20260923T005721Z/checkpoint` |
+| V2, E2B visual; C2, control textual | `runs/vision2_heads/20260923T161024Z/checkpoint`; `runs/vision2_text_only/20260923T162937Z/checkpoint` |
+
+**Comandos exactos de esta verificación y resultados:**
+
+```sh
+git branch --show-current && git rev-parse HEAD && git status --short && git diff --stat && git stash list
+# main; 65d425025dd654fb4814062dc42b245062f151b1; estado según tabla; stash vacío
+date -u '+%Y-%m-%d %H:%M:%S UTC'
+# 2026-09-24 04:31:46 UTC
+.venv/bin/python -c 'import os,psutil; print([(p.pid,p.info["name"]) for p in psutil.process_iter(["name","cmdline"]) if p.pid!=os.getpid() and (os.path.basename((p.info["cmdline"] or [""])[0]) in {"gso","pytest","uvicorn"})])'
+# []
+lsof -nP -iTCP:8000 -sTCP:LISTEN
+# código 1, sin salida
+.venv/bin/python -c 'from pathlib import Path; from gemma_system_one.env import source_fingerprint; x=source_fingerprint(); print(x["sha256"], x["files"], (Path("artifacts/source")/(x["sha256"]+".tar")).is_file())'
+# 125c93fe8b0b54abcb9bd33d39c8a0c04af44c5d6c62115607fcfd7e741e0f2a 77 True
+shasum -a 256 -c reports/phase6/protocol.sha256
+# reports/phase6-protocol.md: OK
+git diff --check
+# sin errores
+.venv/bin/python -c 'from pathlib import Path; p=["runs/e4b_experiment/20260923T204945Z/checkpoint/manifest.json","runs/e4b_experiment/20260923T204945Z/calibration/calibration-20260923T210339Z.json","runs/pilot_lora_v3/20260923T012208Z/checkpoint/manifest.json","runs/pilot_lora_v3/20260923T012208Z/calibration/calibration-20260923T043504Z.json","runs/pilot_ce_v3/20260923T005721Z/checkpoint/manifest.json","runs/vision2_heads/20260923T161024Z/checkpoint/manifest.json","runs/vision2_text_only/20260923T162937Z/checkpoint/manifest.json"]; print({x:Path(x).is_file() for x in p})'
+# siete rutas: True
+.venv/bin/python -c 'from pathlib import Path; print({p.name:p.is_file() for p in Path("artifacts/tree").glob("*.tar")})'
+# dos tar: True
+```
+
+También se comprobó con sondas Python de sólo lectura la presencia de las siete rutas de la tabla y de los dos tar de `artifacts/tree/`; todas estaban presentes. **No se ejecutaron tests CPU/MPS en este relevo.** Los 287 tests CPU y la sonda E4B/MPS consignados debajo pertenecen a la revisión anterior; los 14 MPS/E2E del cierre de fase 6 son aún anteriores.
+
+**Fallos reproducibles y tareas pendientes:**
+
+1. Desde `HEAD` solo no se puede ejecutar el proyecto; `git status --short` muestra la implementación como `??`. Versionar el árbol cuando se decida el commit, excluyendo `data/`, `runs/`, `artifacts/` y credenciales.
+2. R2 eligió A4 usando `pilot_v3_holdout6_clean`. Tratar ese holdout y sus variantes `faultK*` como ya usados; reservar un conjunto nuevo e intacto para medir el servicio elegido. No reajustar con ellos.
+3. A4 empeoró la NLL del holdout tras temperatura (0,174 → 0,200). Estudiar más datos de calibración o un método distinto usando validación para decidir; medir después en el conjunto nuevo.
+4. El perfil de seis pasos LoRA E4B no valida un entrenamiento completo. El perfilador ya falla si falta un gradiente LoRA, pero esa corrección no se volvió a ejercitar en MPS. Si se prosigue con LoRA E4B, usar la configuración real y medir memoria/recarga sin entrenamientos simultáneos.
+
+---
+
+# Registro de la revisión independiente de fase 6 (2026-09-24)
+
+**Veredicto:** la carga y la inferencia E4B de la fase 6 tienen evidencia real en MPS, y las cifras archivadas de la comparación coinciden con los ficheros de predicciones. La mejora medida es válida como resultado de este conjunto sintético. **No se aprueba todavía como evaluación final independiente del servicio elegido:** la regla R2 empleó el propio holdout de fase 6 para escoger A4 como servicio por defecto. La regla estaba escrita antes y evita una elección improvisada, pero ese holdout ya es un conjunto de selección; hace falta uno nuevo, intacto, para medir el servicio elegido tras la selección. La fase tampoco es reproducible desde `HEAD` solo: casi todo el código y los informes siguen sin seguimiento en Git. Este dictamen sustituye al veredicto de cierre que figura abajo como historial.
+
+| Gravedad | Hallazgo y evidencia | Estado |
+|---|---|---|
+| Alta, metodología | `reports/phase6-protocol.md` define R2 sobre `pilot_v3_holdout6_clean` como test y `docs/decisions/0011` adopta A4 usando ese resultado. La NLL A4 − B2 de −0,182 [−0,236; −0,133] es una comparación real y predeclarada, pero no una medida independiente posterior a la elección del servicio. Los 9 pares casi duplicados se declaran y el análisis de sensibilidad conserva el signo. | Pendiente: test nuevo sin usar para decidir, o presentar el holdout actual explícitamente como conjunto de selección. No reutilizarlo para ajustar nada. |
+| Alta, entrega | `HEAD=65d4250` contiene esencialmente documentación inicial; `git diff` muestra README y el resto de implementación figura como `??`. Un clon del commit no ejecuta `gso`. Los archivos `artifacts/tree/` y `artifacts/source/` ayudan a auditar esta máquina, pero no sustituyen un commit. | Pendiente de versionar el árbol, respetando la decisión del usuario sobre el commit. |
+| Media, alcance | `scripts/profile_lora_step.py` usa cabezales aleatorios, un LR único de 1e-4 y sin scheduler, mientras `configs/pilot_lora_v3.yaml` inicia cabezales desde A2 con LR 5e-4 y scheduler. Los seis pasos reales de E4B con recomputación (132 tensores LoRA con gradiente; driver muestreado 17,4 GB) demuestran esa carga, no el entrenamiento E4B completo ni una duración garantizada de 2,6 h. Sin recomputación, el perfil superó 32 GiB después de 3 pasos. | Aclarado en el docstring del perfilador y README; un entrenamiento completo queda pendiente si se adopta LoRA E4B. |
+| Media, calibración | A4 empeora su NLL en este holdout al aplicar las temperaturas estimadas con 300 preguntas: 0,174 → 0,200. La ventaja frente a B2 persiste, pero «calibrado» describe el procedimiento, no una mejora demostrada de calibración fuera de la partición usada para ajustarla. | Pendiente; no ajustar temperaturas con este holdout. |
+| Baja, verificación | El perfilador calculaba `all()` sobre la lista de gradientes presentes: una lista vacía habría dado `grads_finite=true`. | Corregido: ahora falla si falta cualquier gradiente LoRA o si alguno no es finito. El bucle de entrenamiento principal ya comprobaba los gradientes faltantes. |
+
+**Pruebas de esta revisión:**
+
+- Código real: `Gemma4Model` de Transformers 5.17, BF16 y MPS, sin `lm_head`, 0 parámetros base entrenables. Recarga de `runs/e4b_experiment/20260923T204945Z/checkpoint` y una pregunta de validación sin caché: 1 forward, logit finito y diferencia máxima frente al guardado **0,0**. Esto prueba esa ruta real; no se repitió el `doctor` completo ni el entrenamiento.
+- Datos reales en disco: `pilot_v3` 3000 preguntas; holdout limpio 885; variantes estrecha y K ampliado 135 cada una. `leakage_checks`: 0 errores exactos y 9 pares casi duplicados. Regenerando hechos con semilla 6, ninguna opción añadida coincide con la categoría verdadera; K ampliado en el rango 5–8. Una media directa de los 885 pares de predicciones A4/B2 reproduce `−0,182046917372638`, con 295 grupos y la misma huella de entrada en cada par.
+- `pytest tests/unit tests/integration -q`: **287 passed, 2 warnings** (CPU, 32,61 s). Selección focalizada de 30 tests CPU: **30 passed**. `ruff check .`, `ruff format --check .`, `uv lock --check`, `git diff --check` y `py_compile` del perfilador: correctos. **No** se repitió la suite MPS/E2E de 14 pruebas ni el perfil LoRA tras la corrección; sus resultados en el informe son históricos.
+- Los dos tar de `artifacts/tree/` se compararon por contenido: 67 archivos añadidos, 9 cambiados y ninguno borrado entre el inicio y el cierre archivado de fase 6. El hash del protocolo actual coincide con `reports/phase6/protocol.sha256`; el hash por sí solo no acredita cuándo se redactó.
+
+**Comandos ejecutados:** `git status --short`, `git diff --stat`, `git diff -- README.md`, `shasum -a 256 -c reports/phase6/protocol.sha256`, `.venv/bin/pytest tests/unit/test_phase6_derive.py tests/unit/test_lora.py tests/unit/test_pooling.py tests/unit/test_review_regressions.py tests/integration/test_phase3_pipeline.py -q`, `.venv/bin/pytest tests/unit tests/integration -q`, `.venv/bin/ruff check .`, `.venv/bin/ruff format --check .`, `uv lock --check`, `git diff --check`, `.venv/bin/python -m py_compile scripts/profile_lora_step.py`, `.venv/bin/python scripts/snapshot_source.py`. Además, pequeñas sondas Python de sólo lectura recargaron A4 sin caché, comprobaron las cuatro colecciones de datos y compararon los tar de `artifacts/tree/`; sus resultados concretos figuran arriba. No se lanzaron entrenamientos, descargas ni servidores.
+
+**Archivos cambiados en esta revisión:** `scripts/profile_lora_step.py`, `README.md` y este `docs/STATUS.md`. El código de modelo, el backend y el contrato público siguen como estaban. Las predicciones, pesos y datasets no se modificaron. Huella de las 77 fuentes actuales: `125c93fe8b0b54abcb9bd33d39c8a0c04af44c5d6c62115607fcfd7e741e0f2a`, archivada en `artifacts/source/`.
+
+**Siguiente paso:** versionar el árbol cuando se decida el commit y reservar un test nuevo para medir A4 como servicio elegido. Si se quiere afirmar viabilidad de entrenamiento LoRA E4B, ejecutar una prueba completa con su configuración real antes de extrapolar los seis pasos.
+
+---
+
+# Registro histórico — fase 6 cerrada; relevo verificado (2026-09-24, 04:20 UTC)
+
+Sustituye a las secciones siguientes, que quedan como registro histórico (relevo y revisión independiente de la fase 5 y sus cierres anteriores).
+
+**Verificación del relevo** (sin cambiar código, datos ni alcance; sin lanzar trabajo pesado):
+- `git rev-parse HEAD`: `65d4250…`; rama `main`; `git stash list` vacío; `git status --short` igual que al cierre.
+- `.venv/bin/python scripts/snapshot_source.py`: `4fe63db1…` (77 ficheros), el mismo código del cierre.
+- `pgrep -fl 'gso|pytest|uvicorn'` y `lsof -nP -iTCP:8000 -sTCP:LISTEN`: código 1 y sin salida. **Ningún proceso del proyecto; puerto libre.**
+- Existen los checkpoints A4, B2, A2 y V2 de §3, la calibración de A4 y `artifacts/tree/e7b7a322….tar`. Sólo se comprobó que existen: no se recargaron ni se revalidó su integridad.
+
+**Para el otro asistente:**
+- Leer esta sección, `reports/phase6-e4b.md`, `reports/phase6-protocol.md` y las decisiones 0010 y 0011.
+- Tarea natural: revisión independiente de la fase 6, con el prompt 2 de `PROMPTS.md`.
+- Puntos que conviene comprobar:
+  - que el holdout no tiene fugas (`data/derive.py`, `exclude_overlap`);
+  - que las opciones añadidas nunca son correctas (`widen_fault_kind`);
+  - el relajamiento de `compare_predictions` con otro número de filas;
+  - que la recomputación no cambia el forward (sólo marca la capa, no sus submódulos);
+  - que la regla R2 se aplicó tal como estaba predeclarada.
+- No reutilizar `pilot_v3_holdout6*` ni los tests ya abiertos para decidir nada.
+
+## 1. Fase, rama y veredicto
+
+| Campo | Estado |
+|---|---|
+| Fase | **6 cerrada** según su criterio («ganancia medida que justifique coste y complejidad»), para la tarea sintética del proyecto. Informe: `reports/phase6-e4b.md`. Protocolo predeclarado `reports/phase6-protocol.md` (sha256 `c745cfea…`, en `reports/phase6/protocol.sha256`), escrito antes de cargar E4B |
+| Resultado | **E4B congelado + cabezales (A4) es el servicio de texto recomendado** (decisión 0011). En el holdout nuevo, NLL calibrada: A4 − A2 −0,218 [−0,274; −0,168] y A4 − B2 −0,182 [−0,236; −0,133]. Memoria 17,1 GB; p95 HTTP 1540 ms frente a 909 ms de B2 (límite 1817). Agrupar filas por petición se descarta; la recomputación de activaciones se añade como opción para LoRA (decisión 0010). Con K = 8, la accuracy baja 0,03 en B2 y en A4, pero la NLL de B2 empeora +0,19 |
+| Siguiente | Fuera de las fases de la spec. Revisión independiente de la fase 6 y commit a decisión del usuario. Mejoras candidatas en §8 |
+| Rama / commit | `main`, HEAD `65d425025dd654fb4814062dc42b245062f151b1`. **Fases 0–6 sin commit**; stash vacío |
+| Referencia del árbol | Tar determinista del árbol completo (incluye tests, documentación e informes) con `scripts/snapshot_tree.py`: `artifacts/tree/9f54e5ef….tar` al empezar la fase (213 ficheros); al cierre, `artifacts/tree/e7b7a322….tar` (280 ficheros; generado justo antes de escribir esta línea en STATUS, que por tanto no incluye). No sustituye a un commit |
+| Código | Actual **`4fe63db1a38de5b3e589c10fab96d2d598b228adbe8b4157ff262b9d4fb1c2b4`** (77 ficheros). Todas las huellas usadas en la fase tienen copia en `artifacts/source/` (tabla en el informe). Los benchmarks usaron `2255651d…`, que sólo difiere en un comentario de `configs/serve_e4b_text.yaml` |
+| Pruebas | **287 CPU** (32,44 s) y **14 MPS/E2E reales** (128,46 s, 0 omitidos) al cierre. Ruff, formato (125 ficheros), `uv lock --check` y `git diff --check` correctos |
+
+## 2. Procesos activos
+
+- `pgrep -fl 'gso|pytest|uvicorn'` terminó con código 1 y `lsof -nP -iTCP:8000 -sTCP:LISTEN` también: **ningún proceso del proyecto** y el puerto 8000 está libre.
+- Los servidores de benchmark terminaron por SIGTERM (−15).
+- Sin descargas ni entrenamientos en curso.
+
+## 3. Checkpoints, pesos y datos
+
+| Ruta | Uso |
+|---|---|
+| `runs/e4b_experiment/20260923T204945Z/checkpoint` + `calibration/calibration-20260923T210339Z.json` | **A4**, E4B + cabezales, época 7/30; servido por `configs/serve_e4b_text.yaml` |
+| `runs/pilot_lora_v3/20260923T012208Z/checkpoint` + `calibration-20260923T043504Z.json` | B2, E2B + LoRA; `configs/serve_text.yaml` (opción de menor latencia) |
+| `runs/pilot_ce_v3/20260923T005721Z/checkpoint` + `calibration-20260923T043407Z.json` | A2, E2B + cabezales (comparador) |
+| `runs/vision2_heads/20260923T161024Z/checkpoint` | V2, servicio visual E2B (`configs/serve_vision.yaml`); E4B con imagen sin medir |
+| Caché HF | E2B `3e22461f…` y **E4B `ee0ef602…`** (15,99 GB, descargado una vez; manifiesto `artifacts/manifests/download_ee0ef602….json`) |
+| Otros `runs/*/*/checkpoint` | Pruebas de humo, sobreajuste y pilotos de fases 1–4 (`noul_*`, `mixed_*`, `pilot_ce*`, `pilot_rps`, `lora_overfit_v3`, `vision_*`, `vision2_text_only`); evidencia de sus informes, no se sirven |
+| `artifacts/source/`, `artifacts/tree/` | Copias por hash del código (todas las huellas de la fase) y del árbol completo (`9f54e5ef…` al empezar, `e7b7a322…` al cierre) |
+| `artifacts/cache/representations/` | Representaciones de E4B de train/validation/calibration de `pilot_v3` (clave con la revisión E4B) |
+| `data/pilot_v3_holdout6{,_clean,_faultK,_faultK8}` | Holdout de fase 6 **ya usado**: no usarlo para decidir nada nuevo |
+
+**Tests ya usados, que no deben servir para decidir:** `pilot_v3` test, `vision_pilot_v1/v2` test y `pilot_v3_holdout6*`.
+
+## 4. Archivos de esta fase
+
+**Nuevos:**
+- código y scripts:
+  - `src/gemma_system_one/data/derive.py`;
+  - `scripts/{snapshot_tree,derive_phase6_data,measure_request_batching,profile_lora_step}.py`;
+- configuración: `configs/{e4b_text,e4b_experiment,serve_e4b_text}.yaml`;
+- tests: `tests/unit/test_phase6_{derive,tree_snapshot}.py`;
+- documentación e informes:
+  - `docs/decisions/0010-phase6-recompute-and-batching.md`, `docs/decisions/0011-e4b-frozen-heads-text-service.md`;
+  - `reports/phase6-protocol.md`, `reports/phase6-e4b.md`;
+  - `reports/phase6/`: JSON, logs, `run_evals.sh`, `sensitivity/`, `uncalibrated/`.
+
+**Modificados:**
+- `src/gemma_system_one/models/lora.py`: `enable_layer_recomputation` y `set_lora_mode` con capas marcadas;
+- `src/gemma_system_one/training/lora.py`: `recompute_layers`;
+- `src/gemma_system_one/training/lora_pipeline.py`;
+- `src/gemma_system_one/metrics.py`: `compare` con otro número de candidatos exige la misma `target_description`;
+- tests: `tests/unit/test_lora.py` y `tests/integration/test_phase3_pipeline.py` (un test cada uno);
+- `README.md`: sección de la fase 6.
+
+Fuera de Git por `.gitignore`: `data/`, `runs/`, `artifacts/` y `.venv/`.
+
+## 5. Decisiones
+
+- **0010:** recomputación de activaciones como opción, con gradientes idénticos medidos; agrupar filas por petición se rechaza (Δp 0,149, 2 decisiones cambiadas, 1,00×).
+- **0011:** A4 como servicio de texto recomendado, por la regla R2 predeclarada.
+- 0001–0009 siguen vigentes.
+
+## 6. Comandos exactos
+
+La lista completa está en `reports/phase6-e4b.md` («Comandos ejecutados»). En resumen:
+- `generate-data` con semilla 6 y `scripts/derive_phase6_data.py`;
+- `gso download` y `gso doctor` de `configs/e4b_text.yaml`;
+- `scripts/measure_request_batching.py` y `scripts/profile_lora_step.py` (×4);
+- `gso train --config configs/e4b_experiment.yaml` y `gso calibrate`;
+- `reports/phase6/run_evals.sh` (10 evaluaciones);
+- `gso compare` (validación, holdout, K);
+- `gso benchmark` de B2 y A4;
+- `pytest` CPU y MPS/E2E.
+
+## 7. Fallos reproducibles encontrados
+
+1. **LoRA sobre E4B supera el presupuesto de 32 GiB** sin recomputación.
+   - Reproducción: `scripts/profile_lora_step.py configs/e4b_text.yaml data/pilot_v3 out.json 6` sale con código 2 en el paso 3 (driver 34,5 GB). Se resuelve con `--recompute` (o `train.recompute_layers: true`). No se subió el límite.
+2. **`gso compare` rechazaba el control de más opciones** (el índice de la etiqueta cambia con K). Corregido: se exige `target_description` igual con otro número de filas; con el mismo K se sigue exigiendo el índice. Test: `tests/unit/test_phase6_derive.py::test_comparison_with_more_candidates_requires_same_semantic_label`.
+3. **La calibración de A4 empeora el holdout** (0,174 sin calibrar frente a 0,200 calibrada). No es un fallo de código, sino un límite metodológico: temperaturas estimadas con 300 preguntas. Pendiente en §8.
+
+## 8. Pendientes, en orden
+
+1. **Revisión independiente de la fase 6** y **commit de las fases 0–6, a decidir por el usuario**.
+2. **Calibración de A4:** una partición de calibración mayor (dataset nuevo con split planificado) o un método por primitiva más robusto, decidido en validación. El holdout de fase 6 no debe usarse para ello.
+3. **Opcionales:**
+   - LoRA sobre E4B con `recompute_layers: true` (unas 2,6 h), sólo si se busca mejorar a A4 en validación;
+   - E4B con imagen (perfilar memoria con 266 tokens visuales por fila);
+   - Score por tramos y abstención con umbrales fijados en validación.
+4. **Riesgos que se mantienen:**
+   - el timeout no interrumpe un forward MPS iniciado y la cola no limita las conexiones;
+   - el RSS muestreado no es el pico de MPS;
+   - datos sintéticos de una familia; V2 sin calibrar;
+   - falta la copia histórica `70068e15…`;
+   - `reports/doctor/20260922T195301Z.json` (fase 0) contiene una ruta absoluta del usuario.
+
+### Privacidad
+
+- **Contenido:** sin secretos ni datos personales.
+- **Rutas:** las rutas de `reports/phase6/` están enmascaradas con `~`.
+- **Descargas:** se hicieron sin token HF (aviso de peticiones no autenticadas).
+
+---
+
+# Registro histórico — relevo tras la revisión de la fase 5 (2026-09-23, 20:29 UTC)
+
+**Fase y decisión:** fase 5 revisada y funcional para el prototipo local E2B; fase 6 no iniciada. Siguen vigentes las decisiones 0001–0009, PyTorch/MPS, Gemma 4 E2B y el contrato API. Este relevo sólo actualiza `docs/STATUS.md`; no cambia el alcance ni el código. La revisión técnica vigente figura inmediatamente debajo y en [el informe](../reports/phase5c-review.md).
+
+**Rama/commit y archivos:** `main`, HEAD `65d425025dd654fb4814062dc42b245062f151b1`, stash vacío. `README.md` está modificado; `.gitignore`, `.python-version`, `configs/`, `docs/STATUS.md`, `docs/decisions/`, `pyproject.toml`, `reports/`, `scripts/`, `src/`, `tests/` y `uv.lock` siguen sin seguimiento. En la revisión previa sólo se añadieron `reports/phase5c-review.md` y texto a STATUS; en este turno sólo se edita STATUS. `git diff --stat` muestra únicamente README porque el resto no está versionado. Huella de código sin cambios: `73a72fdccf27fb6c2f38af57fd273cff1cdd3d73b0ee6feac447a15a85d14c81` (69 fuentes), archivo `artifacts/source/<hash>.tar` existente.
+
+**Resultados anteriores, no repetidos en este relevo:** 21 pruebas CPU de API/benchmark, 49 CPU de máscaras/serialización/grupos/gradientes/checkpoints, 2 E2E reales y 2 MPS reales aprobaron sin omisiones en la revisión independiente. Antes, el cierre completo había pasado 280 CPU y 14 MPS/E2E con el mismo código. Los informes `reports/phase5c/benchmark_{text,vision}.json` registran 100 respuestas 200 por servicio, misma huella cliente/servidor y ráfagas 5 × 200 + 2 × 503; esta verificación sólo comprobó que la huella actual no ha cambiado. No presentar esas pruebas CPU como MPS ni estos resultados como calidad general.
+
+**Fallos reproducibles y riesgos:** no hubo fallo nuevo en la última revisión ni en este relevo. Los fallos ya corregidos de atribución de errores HTTP y cantidades inválidas del benchmark se reproducen con los comandos `pytest ... -k unattributed` y `pytest ... -k invalid_counts` documentados en [phase5b-review](../reports/phase5b-review.md). Pendiente principal: versionar el árbol completo; la huella de fuentes excluye tests/documentación y falta la copia histórica `70068e15…`. El timeout no interrumpe forward MPS, la cola no limita conexiones HTTP, RSS muestreado no es pico de MPS, V2 no está calibrado y los datos son sintéticos. No usar tests ya abiertos para seleccionar nuevos ajustes.
+
+**Procesos y checkpoints:** el filtro por ejecutable/módulo devolvió `project_processes: []`; `lsof -nP -iTCP:8000 -sTCP:LISTEN` no mostró listener (código 1). Existen B `runs/pilot_lora_v3/20260923T012208Z/checkpoint`, su calibración `runs/pilot_lora_v3/20260923T012208Z/calibration/calibration-20260923T043504Z.json`, V2 `runs/vision2_heads/20260923T161024Z/checkpoint` y C2 `runs/vision2_text_only/20260923T162937Z/checkpoint`. Aquí se comprobó existencia, no se recargaron pesos ni se revalidó integridad. No queda proceso lanzado por esta revisión.
+
+**Comandos exactos de este relevo:**
+
+```sh
+git branch --show-current && git rev-parse HEAD && git status --short && git diff --stat && git stash list
+date -u '+%Y-%m-%d %H:%M:%S UTC' && .venv/bin/python -c 'from gemma_system_one.env import source_fingerprint as f; x=f(); print(x["sha256"], x["files"])' && git diff --check
+.venv/bin/python - <<'PY'
+from pathlib import Path
+paths = ('runs/pilot_lora_v3/20260923T012208Z/checkpoint', 'runs/pilot_lora_v3/20260923T012208Z/calibration/calibration-20260923T043504Z.json', 'runs/vision2_heads/20260923T161024Z/checkpoint', 'runs/vision2_text_only/20260923T162937Z/checkpoint', 'artifacts/source/73a72fdccf27fb6c2f38af57fd273cff1cdd3d73b0ee6feac447a15a85d14c81.tar')
+for raw in paths:
+ p=Path(raw)
+ print(raw, 'exists' if p.exists() else 'MISSING')
+PY
+.venv/bin/python - <<'PY'
+import os, psutil
+found=[]
+for p in psutil.process_iter(['pid','name','cmdline']):
+ try:
+  if p.pid == os.getpid(): continue
+  args=p.info.get('cmdline') or []
+  exe=os.path.basename(args[0]) if args else ''
+  if exe in {'gso','pytest','uvicorn'} or ('-m' in args and any(a in {'gemma_system_one.cli','pytest','uvicorn'} for a in args)):
+   found.append({'pid':p.pid,'name':p.info.get('name')})
+ except (psutil.NoSuchProcess,psutil.AccessDenied): pass
+print('project_processes:',found)
+PY
+lsof -nP -iTCP:8000 -sTCP:LISTEN
+```
+
+Resultado: `2026-09-23 20:29:06 UTC`, misma huella de 69 fuentes, cinco rutas presentes, ningún proceso del proyecto ni listener. No se imprimieron argumentos de otros procesos, secretos ni datos privados.
+
+---
+
+# Registro de la revisión independiente de la fase 5 (2026-09-23, 20:26 UTC)
+
+**Veredicto:** la fase 5 supera la puerta funcional de la especificación para este prototipo: API y benchmark HTTP local con checkpoints E2B reales, texto e imagen, sin respuestas simuladas en producción. No se detectó un nuevo fallo de ejecución o metodología que requiera cambiar código. El alcance de los datos sigue siendo sintético y limitado. Detalle: [revisión independiente](../reports/phase5c-review.md).
+
+| Punto | Estado verificado |
+|---|---|
+| Fase / rama / commit | Fase 5 revisada; fase 6 no iniciada. `main`, `65d425025dd654fb4814062dc42b245062f151b1`. Fases 0–5 aún sin commit |
+| Archivos de esta revisión | Nuevo `reports/phase5c-review.md` y esta actualización de `docs/STATUS.md`; sin cambios de código, tests, configs, datos o pesos |
+| Código y decisión | Huella `73a72fdccf27fb6c2f38af57fd273cff1cdd3d73b0ee6feac447a15a85d14c81` de 69 fuentes, igual a los dos informes `phase5c`. Se conservan el backend PyTorch/MPS, el modelo E2B, el contrato API y las decisiones 0001–0009 |
+| Evidencia nueva CPU | 21 pruebas focalizadas de benchmark/API y 49 de máscaras, serialización, grupos, gradientes y checkpoints; todas aprobaron |
+| Evidencia nueva MPS/E2E | 2 E2E reales (B y V2) y 2 pruebas MPS reales (doctor E2B/BF16 y LoRA con gradientes), todas aprobaron, cero omitidas. No se hicieron pasar pruebas CPU por MPS |
+| Benchmark previo comprobado | JSON y logs `reports/phase5c/`: 100 respuestas 200 por modalidad; ráfagas de 5 × 200 y 2 × 503 atribuidas por el arnés; 112 registros HTTP por servicio (110 × 200, 2 × 503); hash del cliente y servidor igual al actual. No se repitieron las 100 consultas |
+| Riesgos pendientes | El árbol sigue mayoritariamente sin seguimiento; la huella de fuentes excluye tests y docs. RSS muestreado no es pico MPS; timeout no interrumpe forward; cola no limita conexiones; datos sintéticos y V2 sin calibrar; falta archivo de fuentes histórico `70068e15…` |
+| Checkpoints | B `runs/pilot_lora_v3/20260923T012208Z/checkpoint` y calibración `runs/pilot_lora_v3/20260923T012208Z/calibration/calibration-20260923T043504Z.json`; V2 `runs/vision2_heads/20260923T161024Z/checkpoint`; C2 `runs/vision2_text_only/20260923T162937Z/checkpoint` |
+
+**Reproducción y resultados de esta revisión:**
+
+```sh
+.venv/bin/pytest tests/unit/test_phase5_benchmark.py tests/integration/test_phase5_review.py tests/integration/test_api.py -q
+# 21 passed, 1 warning, 6,23 s
+.venv/bin/pytest tests/e2e/test_api_real.py::test_ready_reports_real_device_and_calibration tests/e2e/test_api_real_vision.py::test_vision_api_matches_evaluation_and_requires_image -q -rs
+# 2 passed, 0 skipped, 13,33 s
+.venv/bin/pytest tests/mps/test_mps_real.py::test_doctor_real_e2b tests/mps/test_phase3_real.py::test_lora_on_real_e2b_mps -q -rs
+# 2 passed, 0 skipped, 15,36 s
+.venv/bin/pytest tests/unit/test_pooling.py tests/unit/test_serialization.py tests/unit/test_lora.py tests/unit/test_dataset_split.py tests/unit/test_checkpoint.py -q
+# 49 passed, 1 warning, 4,09 s
+git diff --check
+# correcto
+```
+
+No se reprodujeron fallos nuevos. Los fallos reproducibles corregidos en revisiones anteriores, con sus comandos, permanecen en el histórico y en `reports/phase5b-review.md`. El siguiente paso es versionar el árbol completo para cerrar la brecha de trazabilidad antes de iniciar cualquier cambio de fase; no se usan los tests ya abiertos para elegir nuevos ajustes.
+
+**Procesos:** al terminar las pruebas, la inspección por ejecutable/módulo devolvió `project_processes: []`; `lsof -nP -iTCP:8000 -sTCP:LISTEN` terminó sin salida. No quedó servidor, entrenamiento ni test activo de esta revisión.
+
+---
+
+# Registro histórico — fase 5 cerrada; relevo verificado (2026-09-23, 20:23 UTC)
+
+Sustituye a las secciones siguientes, que quedan como registro histórico (segunda revisión de la fase 5, cierre anterior y relevos).
+
+**Verificación del relevo (20:23 UTC, sin cambiar código ni lanzar trabajo pesado):**
+- `git rev-parse HEAD` → `65d4250…`; rama `main`, `git stash list` vacío.
+- `.venv/bin/python scripts/snapshot_source.py` → `73a72fdc…`, igual que en el cierre.
+- `pgrep -fl 'gso|pytest|uvicorn'` y `lsof -nP -iTCP:8000 -sTCP:LISTEN` → código 1, sin salida.
+
+**Para empezar:** leer este estado y `reports/phase5-api.md` §8. Después, o revisar el cierre, o esperar la decisión del usuario sobre el commit y la fase 6. No reabrir tests ya usados.
+
+## 1. Fase, rama y veredicto
+
+| Campo | Estado |
+|---|---|
+| Fase | **5 cerrada.** El último pendiente de la segunda revisión, una ráfaga real con el arnés corregido y los rechazos atribuidos al servidor lanzado, está ejecutado y es válido |
+| Siguiente | Fase 6 (E4B, más opciones, optimización opcional; «ganancia medida que justifique coste y complejidad»). **No iniciada.** Requiere descargar E4B (~16 GB) y perfilar antes de entrenar. Conviene una revisión de este cierre primero |
+| Rama / commit | `main`, HEAD `65d425025dd654fb4814062dc42b245062f151b1`. **Fases 0–5 sin commit**; sin stash ni cambio de rama. El diff de Git sólo muestra `README.md`: el resto está sin seguimiento |
+| Código | **`73a72fdccf27fb6c2f38af57fd273cff1cdd3d73b0ee6feac447a15a85d14c81`** (69 ficheros; excluye tests y documentación). Copia en `artifacts/source/73a72fdc….tar`. Es el código de la segunda revisión y el de los benchmarks vigentes. Este cierre no cambió código |
+| Pruebas | **280 CPU** (28,05 s) en este cierre. **14 MPS/E2E** (136,46 s, 0 omitidos) en la segunda revisión, con el mismo código; no repetidas. Ruff, formato, `uv lock --check` y `git diff --check` correctos |
+
+**Evidencia del cierre** (`reports/phase5-api.md` §8; `reports/phase5c/benchmark_*.json`):
+
+| Servicio | Medidas | Ráfaga de 7 | Latencia HTTP p50 / p95 | Log del servidor |
+|---|---|---|---|---|
+| Texto (B, calibrado) | 100 × 200 | 5 × 200 + 2 × 503 `queue_full` con identidad del hijo; `valid: true` | 561 / 940 ms | 112 peticiones: 110 × 200 y 2 × 503 |
+| Imagen (V2) | 100 × 200 | Ídem | 2232 / 3248 ms | 112 peticiones: 110 × 200 y 2 × 503 |
+
+- `same_code_as_server: true` en ambos.
+- Las latencias vigentes son éstas; las de `reports/phase5b` corresponden a `547b5658…`.
+
+## 2. Procesos activos
+
+- Al cierre, `pgrep -fl 'gso|pytest|uvicorn'` terminó con código 1, sin salida, y `lsof -nP -iTCP:8000 -sTCP:LISTEN` también (código 1, sin salida).
+- **Ningún proceso del proyecto.** Los dos servidores de benchmark terminaron por SIGTERM (−15).
+- Los procesos auxiliares ajenos (`caffeinate`, servidor MCP de otra herramienta) no se han tocado. Sin descargas ni entrenamientos.
+
+## 3. Checkpoints y artefactos
+
+| Ruta | Uso |
+|---|---|
+| `runs/pilot_lora_v3/20260923T012208Z/checkpoint` + `calibration/calibration-20260923T043504Z.json` | **B**, servido por `configs/serve_text.yaml` |
+| `runs/vision2_heads/20260923T161024Z/checkpoint` | **V2**, servido por `configs/serve_vision.yaml` |
+| `runs/vision2_text_only/20260923T162937Z/checkpoint` | C2 (control sin imagen) |
+| Fases 3 y 4 originales | Sin cambios |
+| Otros `runs/*/*/checkpoint` | Pruebas de humo, sobreajuste y pilotos de fases 1–4 (`noul_*`, `mixed_*`, `pilot_ce*`, `pilot_rps`, `lora_overfit_v3`, `vision_*`), conservados como evidencia de sus informes; ninguno se sirve |
+| `reports/phase5c/` | Benchmarks vigentes y logs del servidor (rutas enmascaradas con `~`) |
+| `artifacts/source/73a72fdc….tar` | Copia del código vigente |
+
+Pesos base en la caché de HF, una copia, revisión fijada `3e22461f…`.
+
+**Tests usados, que no deben usarse para decidir:** `pilot_v3`, `vision_pilot_v1` y `vision_pilot_v2`.
+
+## 4. Archivos modificados
+
+**Frente a `65d4250`, todo sin commit:**
+- modificado: `README.md`;
+- sin seguimiento:
+  - `.gitignore`, `.python-version`, `pyproject.toml`, `uv.lock`;
+  - `configs/`, `scripts/`, `src/`, `tests/`;
+  - `docs/STATUS.md`, `docs/decisions/` (0001–0009);
+  - `reports/`.
+
+**Excluidos por `.gitignore`, fuera del commit:** `data/`, `runs/`, `artifacts/` y `.venv/`.
+
+**En este cierre** no hubo cambios de código ni de tests. Documentación:
+
+- `reports/phase5-api.md` §8;
+- `reports/phase5c/`: `benchmark_{text,vision}.json`, `.stdout`, `.server.log` y `chain.log`;
+- esta sección de STATUS.
+
+## 5. Decisiones
+
+Sin decisiones nuevas; 0001–0009 vigentes. La 0009 incluye la cabecera `X-GSO-Instance-ID` de la segunda revisión.
+
+## 6. Comandos exactos de este cierre
+
+```bash
+head -30 docs/STATUS.md ; cat reports/phase5b-review.md ; sed -n 263,310p src/gemma_system_one/benchmark.py
+.venv/bin/pytest tests/unit/test_phase5_benchmark.py tests/integration/test_api.py -q      # 14 passed
+pgrep -fl 'gso|pytest|uvicorn' ; lsof -nP -iTCP:8000 -sTCP:LISTEN                          # libres
+caffeinate -i .venv/bin/gso benchmark --config configs/serve_text.yaml --dataset data/pilot_v3 --split validation \
+  --requests 100 --warmup 5 --out reports/phase5c/benchmark_text.json
+caffeinate -i .venv/bin/gso benchmark --config configs/serve_vision.yaml --dataset data/vision_pilot_v2 --split validation \
+  --requests 100 --warmup 5 --out reports/phase5c/benchmark_vision.json
+grep -c 'request_id=' reports/phase5c/benchmark_{text,vision}.server.log                 # 112 cada uno
+.venv/bin/pytest tests/unit tests/integration -q                                         # 280 passed
+.venv/bin/ruff check . ; .venv/bin/ruff format --check . ; uv lock --check ; git diff --check
+```
+
+## 7. Fallos reproducibles
+
+No aparecieron fallos nuevos en este cierre. Los de la segunda revisión (identidad no exigida en los errores; cantidades inválidas) están corregidos y cubiertos por `tests/unit/test_phase5_benchmark.py`: `-k unattributed` y `-k invalid_counts`.
+
+## 8. Pendientes, en orden
+
+1. **Revisión de este cierre (opcional pero recomendable)** y **commit de las fases 0–5, a decidir por el usuario**.
+2. **Fase 6**, sólo si una ganancia medida lo justifica:
+   - perfilar E4B (descarga única) frente a E2B con la misma batería;
+   - batching con equivalencia demostrada (decisión 0002);
+   - recomputación o checkpointing para LoRA con imagen (K > 5 no probado).
+3. **Mejoras candidatas**, sin usar tests ya abiertos:
+   - calibrar V2 (partición de calibración, estilos 9–10);
+   - Score por tramos;
+   - abstención con umbrales fijados en validación.
+
+### Riesgos abiertos
+
+- **Timeout:** no interrumpe un forward MPS ya iniciado.
+- **Cola:** limita el trabajo admitido, no las conexiones HTTP.
+- **Memoria:** el RSS muestreado no mide el pico de MPS.
+- **E2E:** usa ASGI; el socket TCP sólo lo ejercita el benchmark.
+- **Trazabilidad:** falta la copia histórica `70068e15…`.
+- **Datos y servicio:** datos sintéticos de una sola familia visual; V2 sin calibrar; sin abstención ni batching.
+
+### Privacidad
+
+- **Contenido:** sin secretos ni datos personales.
+- **Logs del servidor:** sólo request_id, estado, duración y dimensiones; rutas de avisos enmascaradas.
+- **Pendiente anterior:** `reports/doctor/20260922T195301Z.json` (fase 0) contiene una ruta absoluta del usuario.
+
+---
+
+# Registro histórico
+
+## Segunda revisión de la fase 5 y relevo de las 20:03 UTC (histórico; su pendiente quedó cerrado arriba)
+
+**Fase:** segunda revisión independiente de la fase 5. La ejecución funcional está verificada; queda pendiente una ráfaga real con el arnés corregido antes de certificar la atribución de los rechazos por saturación. Fase 6 no iniciada. Este relevo sólo actualiza `docs/STATUS.md`; no cambia código, datos, pesos ni alcance.
+
+**Rama y commit:** `main`, `65d425025dd654fb4814062dc42b245062f151b1`; sin nuevo commit ni stash. `git status --short` sigue mostrando `README.md` modificado y `.gitignore`, `.python-version`, `configs/`, `docs/STATUS.md`, `docs/decisions/`, `pyproject.toml`, `reports/`, `scripts/`, `src/`, `tests/` y `uv.lock` sin seguimiento. Por ello `git diff --stat` sólo muestra `README.md`; se debe revisar el código real. La huella vigente de 69 fuentes es `73a72fdccf27fb6c2f38af57fd273cff1cdd3d73b0ee6feac447a15a85d14c81`, con copia en `artifacts/source/73a72fdccf27fb6c2f38af57fd273cff1cdd3d73b0ee6feac447a15a85d14c81.tar`.
+
+**Archivos de la última revisión:** `src/gemma_system_one/api.py`, `src/gemma_system_one/benchmark.py`, `tests/unit/test_phase5_benchmark.py`, `tests/integration/test_api.py`, `tests/e2e/test_api_real.py`, `docs/decisions/0009-local-api.md`, `reports/phase5b-review.md` y este STATUS. En el presente relevo sólo cambia STATUS. La decisión 0009 documenta la cabecera aditiva `X-GSO-Instance-ID` para atribuir también los errores HTTP; no cambia el modelo, PyTorch/MPS ni el JSON público.
+
+**Resultados comprobados en la última revisión, sin repetirlos en este relevo:** 280 pruebas CPU aprobadas (30,80 s) y 14 MPS/E2E aprobadas (136,46 s, cero omitidas). Las regresiones con transporte simulado son CPU; las E2E usan checkpoints E2B reales mediante ASGI. Ruff, formato, lock y `git diff --check` pasaron. Los benchmarks previos de 100 respuestas 200 por modalidad pertenecen a la fuente `547b5658…`; sus respuestas 503 de ráfaga carecían de atribución verificada. No atribuir esas latencias a la fuente actual.
+
+**Fallos reproducibles:** antes de las correcciones, dos tests `-k unattributed` fallaban porque un HTTP 503 sin identidad contaba como respuesta del hijo; tres tests `-k invalid_counts` fallaban porque cantidades inválidas alcanzaban la carga de configuración. Ahora pasan dentro de la suite CPU. Véase [informe de revisión](../reports/phase5b-review.md). En esta verificación no aparecieron fallos nuevos. El primer filtro de procesos de este relevo dio falsos positivos al detectar el texto de su propio comando; el filtro por ejecutable y módulo que figura abajo devolvió `project_processes: []`.
+
+**Procesos y checkpoints:** no hay proceso `gso`, `pytest`, `uvicorn` ni módulo `gemma_system_one.cli` activo según el filtro corregido; `lsof -nP -iTCP:8000 -sTCP:LISTEN` terminó con código 1 y sin salida. Están presentes `runs/pilot_lora_v3/20260923T012208Z/checkpoint` y su calibración `runs/pilot_lora_v3/20260923T012208Z/calibration/calibration-20260923T043504Z.json`, `runs/vision2_heads/20260923T161024Z/checkpoint` y `runs/vision2_text_only/20260923T162937Z/checkpoint`. Se comprobó existencia, no integridad ni nueva recarga. No se lanzaron entrenamientos, servicios ni descargas en este relevo.
+
+**Tareas pendientes:** ejecutar una ráfaga real breve con el arnés actual y revisar identidad en cada error; repetir el benchmark de 100 consultas sólo si se quieren publicar latencias de la fuente actual. Conservar el test reservado para medición, no para elegir ajustes. Persisten los límites documentados de timeout de MPS, memoria muestreada, datos sintéticos y la copia histórica ausente `70068e15…`. No iniciar fase 6 con la atribución pendiente.
+
+**Comandos exactos de este relevo** (las pruebas de la revisión previa figuran inmediatamente después y en el informe):
+
+```sh
+git branch --show-current && git rev-parse HEAD && git status --short && git diff --stat && git stash list
+date -u '+%Y-%m-%d %H:%M:%S UTC' && .venv/bin/python -c 'from gemma_system_one.env import source_fingerprint as f; x=f(); print(x["sha256"], x["files"])' && git diff --check
+.venv/bin/python - <<'PY'
+from pathlib import Path
+for name in (
+    'runs/pilot_lora_v3/20260923T012208Z/checkpoint',
+    'runs/pilot_lora_v3/20260923T012208Z/calibration/calibration-20260923T043504Z.json',
+    'runs/vision2_heads/20260923T161024Z/checkpoint',
+    'runs/vision2_text_only/20260923T162937Z/checkpoint',
+    'artifacts/source/73a72fdccf27fb6c2f38af57fd273cff1cdd3d73b0ee6feac447a15a85d14c81.tar',
+):
+    path = Path(name)
+    print(path.as_posix(), 'exists' if path.exists() else 'MISSING')
+PY
+.venv/bin/python - <<'PY'
+import os, psutil
+found=[]
+for p in psutil.process_iter(['pid','name','cmdline']):
+    try:
+        if p.pid == os.getpid(): continue
+        args=p.info.get('cmdline') or []
+        exe=os.path.basename(args[0]) if args else ''
+        is_project=exe in {'gso','pytest','uvicorn'} or ('-m' in args and any(a in {'gemma_system_one.cli','pytest','uvicorn'} for a in args))
+        if is_project: found.append({'pid':p.pid,'name':p.info.get('name')})
+    except (psutil.NoSuchProcess,psutil.AccessDenied): pass
+print('project_processes:',found)
+PY
+lsof -nP -iTCP:8000 -sTCP:LISTEN
+```
+
+Resultado: `2026-09-23 20:03:58 UTC`, huella `73a72fdc…d14c81` (69 archivos), cinco rutas presentes, `project_processes: []`, puerto 8000 sin listener. No se imprimieron argumentos de procesos ajenos, secretos ni datos privados.
+
+---
+
+# Registro de la segunda revisión independiente de fase 5 (2026-09-23)
+
+Este bloque sustituye el veredicto de cierre anterior, conservado debajo como histórico. **Fase 5 funcional verificada; cierre completo pendiente de una ráfaga real con el arnés corregido. Fase 6 no iniciada.**
+
+- **Rama/commit:** `main`, `65d425025dd654fb4814062dc42b245062f151b1`, sin commit nuevo. Gran parte del árbol sigue sin seguimiento; el diff Git por sí solo no representa la implementación.
+- **Fuente final:** `73a72fdccf27fb6c2f38af57fd273cff1cdd3d73b0ee6feac447a15a85d14c81`, 69 ficheros; copia `artifacts/source/73a72fdccf27fb6c2f38af57fd273cff1cdd3d73b0ee6feac447a15a85d14c81.tar`. Excluye tests/documentación. Se conservó también una copia intermedia `cfc31e01…`.
+- **Media, corregido:** las respuestas no 200 no tenían atribución verificada. Un 503 sin identidad se contaba como queue_full y la ráfaga figuraba válida. Dos pruebas fallaron antes del arreglo. Se añade cabecera `X-GSO-Instance-ID` a `/v1/decide` y el benchmark la exige en errores; respuestas no atribuibles abortan la medición secuencial o invalidan la ráfaga.
+- **Baja, corregido:** `requests <= 0` y `warmup < 0` no se rechazaban antes de preparar el benchmark. Tres pruebas interceptando configuración fallaron antes y ahora pasan; se rechazan sin arrancar servicio.
+- **Decisión técnica:** extensión aditiva de cabecera documentada en 0009; sin modificar JSON público, modelo ni backend. Se mantiene alcance de fase 5.
+- **Archivos modificados:** `src/gemma_system_one/api.py`, `src/gemma_system_one/benchmark.py`, `tests/unit/test_phase5_benchmark.py`, `tests/integration/test_api.py`, `tests/e2e/test_api_real.py`, `docs/decisions/0009-local-api.md`, este STATUS y nuevo `reports/phase5b-review.md`.
+- **Resultados:** suite final **280 CPU passed, 30,80 s**, dos avisos conocidos (Starlette/httpx y float de tensor en test LoRA). **14 MPS/E2E passed, 136,46 s, cero omitidos**, un aviso Starlette. Incluyen Gemma E2B local real y un test de configuración diminuta; los dobles de errores no se presentan como MPS. E2E usa ASGI. Ruff, formato (113 archivos), lock y diff correctos. No se repitió el benchmark de 100 peticiones.
+- **Evidencia histórica matizada:** se inspeccionaron los JSON `reports/phase5b/benchmark_*.json`: 100 respuestas 200 por modalidad, mismo hash cliente/servidor `547b5658…`, salida del servidor −15. Las latencias pertenecen a esa fuente. Sus dos 503 por ráfaga no fueron verificados por identidad: no se certifica la afirmación anterior «todas las respuestas». No hay prueba de que provinieran de otro proceso.
+- **Procesos al terminar:** filtro psutil de ejecutables del proyecto devuelve `[]`; `lsof -iTCP:8000 -sTCP:LISTEN` retorna 1 sin salida. Las dos sesiones de pytest terminaron. Sin servicios, descargas ni entrenamientos largos lanzados en esta revisión.
+- **Checkpoints sin cambios:** B `runs/pilot_lora_v3/20260923T012208Z/checkpoint`, calibración `runs/pilot_lora_v3/20260923T012208Z/calibration/calibration-20260923T043504Z.json`; V2 `runs/vision2_heads/20260923T161024Z/checkpoint`; C2 `runs/vision2_text_only/20260923T162937Z/checkpoint`. Los E2E recargan B y V2, no se atribuye a C2 una nueva recarga.
+- **Siguiente paso:** verificar una ráfaga real con el arnés actual antes de certificar la atribución de saturación. Repetir 100 consultas sólo si se publican latencias de la fuente nueva. No usar tests abiertos para ajuste. Límites pendientes: timeout no cancela forward, cola no limita conexiones, RSS muestreado no es pico MPS, fuente histórica `70068e15…` ausente, generalización sintética limitada y V2 sin calibrar.
+
+Informe: [reports/phase5b-review.md](../reports/phase5b-review.md). Comandos de pruebas y verificación ejecutados:
+
+```sh
+.venv/bin/pytest tests/unit/test_phase5_benchmark.py -k unattributed -q
+# Antes: 2 failed, 5 deselected.
+.venv/bin/pytest tests/unit/test_phase5_benchmark.py tests/integration/test_api.py -q
+# Tras identidad: 11 passed, 5,86 s.
+.venv/bin/pytest tests/unit/test_phase5_benchmark.py -k invalid_counts -q
+# Antes: 3 failed, 7 deselected.
+.venv/bin/pytest tests/unit tests/integration -q
+# Intermedia: 277 passed; final: 280 passed.
+.venv/bin/pytest tests/mps tests/e2e -q -rs
+# 14 passed, sin omisiones.
+.venv/bin/ruff check .
+.venv/bin/ruff format --check .
+uv lock --check
+git diff --check
+.venv/bin/python scripts/snapshot_source.py
+git branch --show-current
+git rev-parse HEAD
+lsof -iTCP:8000 -sTCP:LISTEN
+```
+
+---
+
+# Registro histórico — cierre de la fase 5 (2026-09-23, 17:41 UTC; relevo verificado a las 19:49 UTC)
+
+Esta sección sustituye a las siguientes. Debajo, como registro histórico, quedan la revisión independiente de 4b/5 y los relevos anteriores.
+
+## 1. Fase, rama y veredicto
+
+| Campo | Estado |
+|---|---|
+| Fase | **5 cerrada** (spec §10: «E2E con checkpoint entrenado, fallos claros y benchmark completo»). Se resolvió el hallazgo 6, el único pendiente de la revisión independiente: atribución al servidor lanzado y contabilización completa del benchmark. Benchmarks repetidos con el código corregido |
+| Siguiente fase | 6 (E4B, más opciones, optimización). **No iniciada**: primero, revisión independiente de este cierre |
+| Rama / commit | `main`, HEAD `65d425025dd654fb4814062dc42b245062f151b1`. **Fases 0–5 sin commit**; sin stash ni cambio de rama. Gran parte del proyecto está sin seguimiento: revisar los ficheros reales, no sólo `git diff` |
+| Identidad del código | **`547b5658f2342c6281db94c90a50cac8db9d2a0065a0c49cc81e17d771e38243`** (69 ficheros de `src`, `configs`, `scripts`, `pyproject.toml` y `uv.lock`; excluye tests y documentación). Copia en `artifacts/source/547b5658….tar`. Es el código de los benchmarks vigentes (`same_code_as_server: true`) y no ha cambiado desde entonces |
+| Pruebas | **275 CPU**, que incluyen 7 regresiones de la revisión y 5 nuevas del benchmark. **14 MPS + E2E reales** en 131,6 s, 0 omitidos. Ruff, formato, `uv lock --check` y `git diff --check` correctos |
+| Dependencias | Sin cambios desde la fase 5 (fastapi 0.141.1, uvicorn 0.53.0, starlette 1.7.0, httpx 0.28.1; torch 2.14.0, transformers 5.17.0, peft 0.21.0) |
+
+**Resultados vigentes** (`reports/phase5-api.md` §7; `reports/phase5b/benchmark_*.json`):
+
+| Servicio | Respuestas | Latencia HTTP p50 / p95 | Ráfaga de 7 |
+|---|---|---|---|
+| Texto (B de fase 3, calibrado) | 100 × 200 | 552 / 927 ms | 5 × 200 + 2 × 503 `queue_full`, válida |
+| Imagen (V2) | 100 × 200 | 2231 / 3247 ms | 5 × 200 + 2 × 503 `queue_full`, válida |
+
+- Identidad del servidor hijo comprobada en todas las respuestas.
+- E2E: la API devuelve exactamente la respuesta de `gso evaluate` en texto y con imagen (sin cambios).
+- Cierre de la fase 4 (V2 frente a C2 con estilos no vistos): sin cambios; ver `reports/phase4b-styles.md`.
+
+## 2. Procesos activos
+
+- En el relevo (19:49 UTC), `pgrep -fl 'gso|gemma_system_one|pytest|uvicorn'` terminó con código 1, sin salida. `lsof -iTCP:8000 -sTCP:LISTEN` terminó con código 1, sin salida (puerto libre). Lo mismo se había comprobado al cierre.
+- **Auxiliares ajenos, que no se han tocado** (inspección con `psutil` de nombre y proceso padre, sin argumentos):
+  - un `caffeinate` de una terminal del usuario;
+  - otro `caffeinate` y un shell, ambos del cliente Claude Code;
+  - un servidor MCP en Python lanzado por `uv` desde Codex.
+- Ningún proceso del proyecto; ningún servidor. Los servidores de benchmark terminaron por SIGTERM (−15).
+- El proceso auxiliar que ocupó el puerto 8000 en la reproducción se detuvo (`kill`), y se comprobó el puerto libre.
+- No se han tocado procesos ajenos. Sin descargas.
+
+## 3. Checkpoints y artefactos
+
+| Ruta | Uso |
+|---|---|
+| `runs/pilot_lora_v3/20260923T012208Z/checkpoint` + `calibration/calibration-20260923T043504Z.json` | **B**, servido por `configs/serve_text.yaml` |
+| `runs/vision2_heads/20260923T161024Z/checkpoint` | **V2**, servido por `configs/serve_vision.yaml` |
+| `runs/vision2_text_only/20260923T162937Z/checkpoint` | C2 (control) |
+| Fases 3 y 4 originales | Sin cambios (ver §3 histórico) |
+| `reports/phase5b/` | Benchmarks vigentes, logs del servidor (rutas enmascaradas) y `port_busy_check.log` |
+| `artifacts/source/` | 8 copias de fuentes:<br>• `aa718528…`: cierre de la fase 4 original<br>• `f414efce…`: revisión de la fase 4<br>• `457c66c3…`: primera copia tras añadir `snapshot_sources`<br>• `7f645568…`: inicio de V2<br>• `78d02416…`: V2 al guardar, C2 y evaluaciones de 4b<br>• `910a39a4…`: primera versión de la fase 5<br>• `ac7f751b…`: revisión de la fase 5<br>• **`547b5658…`: vigente, código de los benchmarks actuales**<br>No existe la copia `70068e15…` |
+
+Pesos base, una sola copia en la caché de HF, revisión fijada `3e22461f…`. **Tests ya usados, que no deben usarse para decidir:** `pilot_v3`, `vision_pilot_v1` y `vision_pilot_v2`.
+
+## 4. Archivos de este cierre
+
+- **Código:**
+  - `src/gemma_system_one/benchmark.py`:
+    - `port_is_free`, `check_identity`, `IdentityError`;
+    - `measure` (secuencial, cuenta todo);
+    - `run_burst` (cuenta errores de transporte y respuestas ajenas);
+    - `_wait_ready` con identidad;
+    - copia de fuentes del cliente y `same_code_as_server`.
+  - `src/gemma_system_one/api.py`: `SERVER_INSTANCE_ENV`; `instance_id`, `pid` y `code_sha256` en `ready` (incluso en 503); `instance_id`/`pid` en `metadata`.
+- **Tests:**
+  - nuevo `tests/unit/test_phase5_benchmark.py` (5 casos);
+  - `tests/integration/test_api.py` y `tests/e2e/test_api_real.py`: identidad.
+- **Documentación:** `docs/decisions/0009-local-api.md` (sección «Cierre del hallazgo 6»), `reports/phase5-api.md` §7 y esta sección.
+
+## 5. Decisiones
+
+Sin decisiones de arquitectura nuevas: 0001–0009 vigentes.
+
+## 6. Comandos exactos de este cierre
+
+```bash
+cat reports/phase5-review.md ; sed -n 70,260p src/gemma_system_one/benchmark.py
+.venv/bin/pytest tests/integration/test_phase5_review.py -q        # 1 fallo (Popen interceptado atrapaba git) → 7 passed tras usar snapshot_sources
+.venv/bin/pytest tests/unit/test_phase5_benchmark.py -q            # 5 passed
+.venv/bin/pytest tests/unit tests/integration -q                   # 275 passed, 27,75 s
+caffeinate -i .venv/bin/pytest tests/mps tests/e2e -q -rs          # 14 passed, 131,59 s
+# Reproducción real: un proceso Python escuchando en 127.0.0.1:8000 (socket.listen), y:
+.venv/bin/gso benchmark --config configs/serve_text.yaml --dataset data/pilot_v3 --split validation --requests 3 --warmup 1 \
+  --out reports/phase5b/port_busy_check.json                       # exit 1: «ya está en uso»; sin servidor ni informe
+.venv/bin/python scripts/snapshot_source.py                        # 547b5658… (69)
+caffeinate -i .venv/bin/gso benchmark --config configs/serve_text.yaml --dataset data/pilot_v3 --split validation \
+  --requests 100 --warmup 5 --out reports/phase5b/benchmark_text.json
+caffeinate -i .venv/bin/gso benchmark --config configs/serve_vision.yaml --dataset data/vision_pilot_v2 --split validation \
+  --requests 100 --warmup 5 --out reports/phase5b/benchmark_vision.json
+.venv/bin/ruff check . ; .venv/bin/ruff format --check . ; uv lock --check ; git diff --check
+pgrep -fl 'gso|pytest|uvicorn' ; lsof -iTCP:8000 -sTCP:LISTEN
+```
+
+## 7. Fallos reproducibles de este cierre
+
+| Fallo | Reproducción | Estado |
+|---|---|---|
+| El benchmark podía medir a otro servidor en el puerto (hallazgo 6a) | Ocupar 127.0.0.1:8000 y ejecutar `gso benchmark` | Rechazo previo sin lanzar el servidor + identidad en cada respuesta; test y reproducción real |
+| Errores de transporte de la ráfaga sin registrar (hallazgo 6b) | `test_burst_records_transport_errors_and_foreign_answers` (transporte simulado) | Cada petición cuenta y las sumas se verifican |
+| Mi primera versión llamaba a `git_state()` (subprocesos) antes de lanzar el servidor, y un test que intercepta `Popen` lo detectó | `tests/integration/test_phase5_review.py::test_benchmark_creates_output_directory_before_starting_server` | El benchmark usa `snapshot_sources()`, sin subprocesos |
+
+## 8. Pendientes, en orden
+
+1. **Revisión independiente de este cierre**: benchmark (`port_is_free`, identidad, contabilización) e identidad en la API.
+2. **Commit o rama con las fases 0–5, a decidir por el usuario.**
+3. **Fase 6** (spec §10), sólo con una ganancia medida que justifique coste y complejidad:
+   - E4B (descarga única y perfilado de memoria antes de entrenar);
+   - batching con equivalencia demostrada (decisión 0002);
+   - recomputación o checkpointing para LoRA con imagen.
+4. **Mejoras candidatas**, sin usar tests ya abiertos:
+   - calibrar V2;
+   - Score por tramos;
+   - abstención.
+
+### 8.1 Relevo (19:49 UTC; sólo verificación; sólo cambia este documento)
+
+```bash
+date -u ; git rev-parse HEAD ; git branch --show-current ; git status --short ; git stash list | wc -l
+find src tests scripts configs docs reports README.md pyproject.toml uv.lock -newer docs/STATUS.md -type f   # nada
+pgrep -fl 'gso|gemma_system_one|pytest|uvicorn' ; lsof -iTCP:8000 -sTCP:LISTEN                            # ambos código 1, sin salida
+.venv/bin/python -c "from gemma_system_one.env import source_fingerprint as f; d=f(); print(d['sha256'], d['files'])"   # 547b5658…, 69
+ls artifacts/source                                                   # 8 copias (§3)
+.venv/bin/pytest tests/unit tests/integration -q                      # 275 passed, 27,96 s
+.venv/bin/pytest --collect-only -q tests/mps tests/e2e                # 14 recogidos; no ejecutados (código sin cambios)
+.venv/bin/ruff check . ; .venv/bin/ruff format --check . ; uv lock --check ; git diff --check   # correctos
+shasum -a 256 -c reports/phase4b/test-protocol.sha256                 # OK
+```
+
+- Existen los checkpoints de §3: B con su calibración, V2, C2, V de la fase 4 y la referencia congelada de la fase 3.
+- No se recargaron pesos ni se recalcularon hashes de checkpoints: esa evidencia es la del cierre y la de la revisión.
+
+### Riesgos abiertos
+
+- **Timeout:** no interrumpe un forward MPS ya iniciado.
+- **Cola:** limita el trabajo admitido, no las conexiones HTTP abiertas.
+- **Memoria:** el RSS muestreado no mide el pico de memoria unificada/MPS.
+- **E2E:** usa ASGI; el socket TCP sólo lo ejercita el benchmark.
+- **Trazabilidad:** falta la copia histórica `70068e15…`.
+- **Datos y servicio:**
+  - datos sintéticos y una sola familia visual;
+  - V2 sin calibrar;
+  - sin abstención ni batching.
+
+### Privacidad
+
+- **Contenido:** sin secretos ni datos personales.
+- **Logs:** los del servidor sólo registran request_id, estado, duración y dimensiones; las rutas absolutas de avisos de bibliotecas se enmascararon con `~`.
+- **Pendiente anterior:** `reports/doctor/20260922T195301Z.json` (fase 0) contiene una ruta absoluta del usuario.
+
+---
+
+# Registro histórico
+
+## Revisión independiente de 4b y 5 (histórico; su pendiente quedó cerrado arriba)
+
+Esta sección sustituye el veredicto del relevo anterior conservado debajo como registro histórico.
+
+- **Fase:** revisión de 4b y 5. Ejecución funcional real verificada tras correcciones; **cierre completo pendiente** por robustez del benchmark (atribución al proceso hijo y contabilización de errores de transporte). No iniciar fase 6 con esta revisión como aprobación sin reservas.
+- **Rama/commit:** `main`, `65d425025dd654fb4814062dc42b245062f151b1`; sin commit nuevo. Gran parte del proyecto sigue sin seguimiento; revisar código real además del diff.
+- **Fuente actual:** `ac7f751bc509025441ac23f9a581be0728fbf3f0f0087e5db42353cff6d92292`, 69 archivos, copia `artifacts/source/ac7f751bc509025441ac23f9a581be0728fbf3f0f0087e5db42353cff6d92292.tar`. Excluye documentación/tests. `910a39a4…` identifica sólo el cierre y benchmark anteriores.
+- **Correcciones:** rechazo de semilla distinta al split visual planificado y validación al cargarlo; decodificación de imagen dentro de cola/timeout; cancelación del futuro y cierre PIL; JSON profundo → 422; errores sin eco del cliente; warmup para primitiva entrenada; directorio del log de benchmark creado antes de abrirlo.
+- **Archivos modificados en esta revisión:** `src/gemma_system_one/{api.py,engine.py,benchmark.py,data/split.py}`, nuevo `tests/integration/test_phase5_review.py`, `docs/decisions/0009-local-api.md`, este STATUS y `reports/phase5-review.md`.
+- **Decisión:** mantener modelo, PyTorch/MPS, alcance y contrato público. Detalle de gravedad, reproducciones, comandos exactos y límites en [revisión independiente](../reports/phase5-review.md).
+- **Pruebas:** 263 CPU antes; 269 CPU después de seis regresiones; subconjunto final de siete regresiones aprobado (incluye una adicional). **14 MPS/E2E aprobados, cero omitidos, 132,36 s**, con pesos locales. No presentar los dobles CPU de timeout/errores como MPS. Ruff, formato, lock y diff correctos. No se repitió benchmark de 100 consultas con el código corregido.
+- **Procesos al terminar:** inspección con psutil filtrando ejecutables Python/gso/pytest/uvicorn del proyecto: lista vacía; `lsof -iTCP:8000 -sTCP:LISTEN` sin salida. Las sesiones de tests terminaron. No se lanzó entrenamiento largo, descarga ni servicio externo. No se afirma nada sobre procesos ajenos.
+- **Checkpoints conservados:** V2 `runs/vision2_heads/20260923T161024Z/checkpoint`; C2 `runs/vision2_text_only/20260923T162937Z/checkpoint`; B `runs/pilot_lora_v3/20260923T012208Z/checkpoint`, calibración `runs/pilot_lora_v3/20260923T012208Z/calibration/calibration-20260923T043504Z.json`. Ninguno modificado. Pesos base en caché local, revisión fijada; no redescargar.
+- **Pendientes del relevo:** corregir y probar identidad del proceso y fallos de transporte del benchmark; repetir mediciones sólo si se pretende publicar rendimiento del código actual. No reutilizar test para elegir parámetros. Mantener explícitos límites del timeout (no cancela forward), memoria muestreada y copia histórica ausente `70068e15…`. La evidencia de estilos v2 y los archivos fuente `7f645568…`/`78d02416…` sí se comprobaron.
+
+Comandos principales ejecutados (resultados y fallos iniciales en el informe):
+
+```sh
+.venv/bin/pytest tests/unit tests/integration -q
+.venv/bin/pytest tests/integration/test_phase5_review.py -q
+.venv/bin/pytest tests/integration/test_phase5_review.py -k planned_seed -q
+.venv/bin/pytest tests/integration/test_phase5_review.py tests/integration/test_api.py -q
+.venv/bin/pytest tests/mps tests/e2e -q -rs
+.venv/bin/ruff check .
+.venv/bin/ruff format --check .
+uv lock --check
+git diff --check
+.venv/bin/python scripts/snapshot_source.py
+git status --short
+git branch --show-current
+git rev-parse HEAD
+lsof -iTCP:8000 -sTCP:LISTEN
+```
+
+## Relevo comprobado a las 17:27 UTC (2026-09-23)
+
+En este turno **sólo se modifica `docs/STATUS.md`**. No se repiten tests, benchmark ni entrenamientos; los resultados anteriores pertenecen a la revisión inmediatamente anterior. Rama, HEAD y fingerprint permanecen iguales. Se confirmó la existencia de los tres directorios de checkpoint y del JSON de calibración indicados arriba; esta comprobación no es una nueva validación de integridad ni recarga.
+
+**Procesos:** ningún proceso del proyecto detectado por el filtro de abajo; puerto 8000 sin listener (`lsof` retorna 1, sin salida). No quedan procesos lanzados por este asistente. No se listan argumentos de procesos ajenos, variables de entorno, credenciales ni contenidos de datos.
+
+**Fallos reproducibles conservados** en `tests/integration/test_phase5_review.py` (ahora se espera que pasen):
+
+| Caso | Antes de corregir | Resultado esperado actual |
+|---|---|---|
+| Split v2 planificado con seed 0, solicitar seed 1 | Aceptaba cambio | `SplitError` |
+| Decodificador de 150 ms, timeout 30 ms | HTTP 200 fuera del plazo | HTTP 503 `timeout`, decodificador en worker |
+| JSON con 2000 niveles | HTTP 500 | HTTP 422 |
+| Discriminador inválido con marcador sintético | Repetía el marcador | Respuesta sin ese valor |
+| Warmup de checkpoint sólo Choice / sólo Score | Fallaban ambos | Usa una primitiva entrenada |
+| Benchmark hacia directorio inexistente | Apertura del log fallaba | Directorio y log creados antes de Popen |
+
+Los seis primeros casos (Choice/Score cuentan por separado) se observaron fallar antes del arreglo. El caso del directorio se probó después con Popen interceptado; no se presenta como reproducción previa ni arranque real. Reejecutar: `.venv/bin/pytest tests/integration/test_phase5_review.py -q`.
+
+**Orden de continuación, dentro de fase 5:**
+
+1. Leer AGENTS, especificación, auditoría, este estado y `reports/phase5-review.md`; inspeccionar `src/gemma_system_one/benchmark.py`.
+2. Corregir y probar atribución de respuestas al proceso lanzado y contabilización de errores en `_burst`. Ambos pendientes proceden de inspección, no de una reproducción con servicios.
+3. Ejecutar las pruebas pertinentes y actualizar evidencia. Sólo repetir benchmark real si se requiere publicar latencias del código corregido; no iniciar fase 6 ni usar test para decisiones de ajuste.
+4. Conservar pesos y checkpoints actuales, no redescargar ni subir artefactos privados. No se ha creado commit en este relevo.
+
+### Comandos exactos del relevo
+
+Inspección inicial:
+
+```sh
+pwd
+git branch --show-current
+git rev-parse HEAD
+git status --short
+sed -n '1,85p' docs/STATUS.md
+cat AGENTS.md
+```
+
+Comprobación de fuentes, existencia de artefactos y procesos (sin imprimir argumentos):
+
+```sh
+.venv/bin/python - <<'PY_CHECK'
+from datetime import datetime, timezone
+from pathlib import Path
+import os
+import psutil
+from gemma_system_one.env import source_fingerprint
+print('verified_utc:', datetime.now(timezone.utc).isoformat())
+print('source:', source_fingerprint())
+for name in ('runs/vision2_heads/20260923T161024Z/checkpoint', 'runs/vision2_text_only/20260923T162937Z/checkpoint', 'runs/pilot_lora_v3/20260923T012208Z/checkpoint', 'runs/pilot_lora_v3/20260923T012208Z/calibration/calibration-20260923T043504Z.json'):
+    print(name, 'exists:', Path(name).exists())
+found=[]
+for p in psutil.process_iter(['pid','name','cmdline']):
+    if p.pid == os.getpid():
+        continue
+    name=p.info['name'] or ''
+    if 'python' in name.lower() or name in ('gso','uvicorn','pytest'):
+        args=p.info['cmdline'] or []
+        if any('gemma_system_one' in a or a.endswith('/gso') or a.endswith('/pytest') or a == 'uvicorn' for a in args):
+            found.append({'pid':p.pid,'name':name})
+print('project_processes:', found)
+PY_CHECK
+lsof -iTCP:8000 -sTCP:LISTEN
+git diff --check
+```
+
+Resultado: fingerprint `ac7f751b…d92292`, cuatro rutas existentes, `project_processes: []`; sin listener. El delimitador del heredoc se llama aquí `PY_CHECK` para separarlo del script de edición; el cuerpo es el ejecutado. `git diff --check` no valida los archivos sin seguimiento, incluido STATUS: se revisa también el contenido del documento.
+
+---
+
+# Registro histórico — estado del trabajo — relevo al siguiente asistente
+
+Actualizado: 2026-09-23, 17:12 UTC. Relevo verificado a las 17:15 UTC sin cambios de código, datos ni artefactos; sólo cambia este documento (§6.1).
+
+**Resuelto en esta sesión:**
+
+- **Cierre de la fase 4:** estilos separados por partición y trazabilidad de fuentes, los pendientes de la revisión independiente.
+- **Fase 5 completada:** API local con E2E reales y benchmark.
+
+**Pendientes:** revisión independiente del cierre de la fase 4 y de la fase 5; commit, a decidir por el usuario.
+
+| Documento | Uso |
+|---|---|
+| [reports/phase5-api.md](../reports/phase5-api.md) | Informe de la fase 5 (referencia actual) |
+| [reports/phase4b-styles.md](../reports/phase4b-styles.md) | Cierre de la fase 4 (estilos por partición, test nuevo) |
+| [reports/phase4b-test-protocol.md](../reports/phase4b-test-protocol.md) | Protocolo predeclarado del test de cierre (sha256 `05901ce5…fb95`, sin desviaciones) |
+| [0008](decisions/0008-vision-styles-per-split-and-source-archives.md), [0009](decisions/0009-local-api.md) | Decisiones nuevas |
+| [reports/phase4-vision.md](../reports/phase4-vision.md), [reports/phase4-review.md](../reports/phase4-review.md), [0007](decisions/0007-single-image-path.md) | Fase 4 original y su revisión |
+| [reports/phase3-lora.md](../reports/phase3-lora.md), [reports/phase3-review.md](../reports/phase3-review.md), [0005](decisions/0005-lora-stage.md), [0006](decisions/0006-generator-v3-access-policy.md) | Fase 3 |
+
+## 1. Fase, rama y veredicto
+
+| Campo | Estado |
+|---|---|
+| Fase | **5 completada** (spec §10: «E2E con checkpoint entrenado, fallos claros y benchmark completo»). **Pendientes de la revisión de fase 4, resueltos**: estilos por partición con un test nuevo; copia de fuentes automática (con el límite histórico de `70068e15…`) |
+| Siguiente fase | 6: E4B, más opciones y optimización opcional, «ganancia medida que justifique coste y complejidad». Antes, la revisión independiente |
+| Rama / commit | `main`, HEAD `65d425025dd654fb4814062dc42b245062f151b1`. **Fases 0–5 sin commit**; sin stash ni cambio de rama. No hago commit sin petición del usuario |
+| Identidad del código | Al cierre: **`910a39a4eab76542e9e4c98bc6208ed427d831b65d767ff14c6c2ea9d2a212b7`** (69 ficheros de `src`, `configs`, `scripts`, `pyproject.toml` y `uv.lock`). Copia: `artifacts/source/910a39a4….tar`. Es el código con que se ejecutaron los E2E y los benchmarks: no se cambió desde entonces |
+| Árbol de trabajo | Modificado: `README.md`. Sin seguimiento: `.gitignore`, `.python-version`, `configs/`, `docs/STATUS.md`, `docs/decisions/`, `pyproject.toml`, `reports/`, `scripts/`, `src/`, `tests/`, `uv.lock` |
+| Pruebas | **263 CPU**, **10 tests/mps** y **4 tests/e2e** con E2B real, 0 omitidos. Ruff, formato, `uv lock --check` y `git diff --check` correctos |
+| Dependencias nuevas | `fastapi` 0.141.1, `uvicorn` 0.53.0 y `starlette` 1.7.0 (transitiva); `httpx` 0.28.1 ya estaba. torch 2.14.0, transformers 5.17.0 y peft 0.21.0 sin cambios |
+
+### Cierre de la fase 4 (test nuevo, estilos 11–12 no vistos; predeclarado)
+
+| Modelo | NLL en test |
+|---|---|
+| **V2**, con imagen | **0,415** |
+| **C2**, mismas filas sin imagen | 1,192 |
+| Prior | 1,085 |
+
+- V2 − C2 = **−0,778 [−0,886; −0,660]**.
+- Con la imagen de otro grupo, la NLL de V2 sube a 3,47 y la accuracy baja de 0,848 a 0,352.
+- Se cumple la regla predeclarada: **uso visual con estilos no vistos**, dentro de la misma familia de gráficos de barras.
+- Recarga desde el texto+imagen: Δlogit 0,0.
+
+### Fase 5
+
+- **E2E con E2B real:** la API devuelve **exactamente** la respuesta de `gso evaluate` para las mismas preguntas, en texto (B de fase 3, calibrado) y con imagen (V2). Además pasan las pruebas de permutación, pregunta independiente, cambio de pregunta, 404, modalidad y `usage` real.
+- **Benchmark** (100 consultas medidas por servicio, servidor en otro proceso):
+
+  | Servicio | Latencia HTTP p50 / p95 | Arranque hasta `ready` |
+  |---|---|---|
+  | Texto | 554 / 911 ms | 4,3 s |
+  | Imagen | 2231 / 3242 ms | 4,8 s |
+
+  En la ráfaga de 7 peticiones simultáneas: 5 × 200 y 2 × 503 `queue_full`.
+
+## 2. Procesos activos
+
+Verificado de nuevo en el relevo (17:15 UTC):
+
+- `pgrep -fl 'gso|gemma_system_one|pytest|uvicorn'` terminó con código 1, sin salida.
+- `lsof -iTCP:8000 -sTCP:LISTEN` no muestra ningún proceso escuchando.
+- **Ningún proceso del proyecto** (entrenamiento, evaluación, servidor ni tests); no hay pesos cargados. Los servidores de benchmark se detuvieron con SIGTERM al terminar (código de salida −15).
+- **Auxiliares ajenos, que no se han tocado** (inspección con `psutil` de nombre y proceso padre, sin argumentos):
+  - un `caffeinate` de una terminal del usuario;
+  - otro `caffeinate` y un shell, ambos del cliente Claude Code;
+  - un servidor MCP en Python lanzado por `uv` desde Codex.
+
+  Los PID son una instantánea y no se registran.
+- No hubo descargas de pesos. `uv add` sí descargó los paquetes de servicio (fastapi, uvicorn, starlette).
+
+## 3. Pesos, datos, checkpoints y artefactos (ignorados por Git)
+
+| Ruta | Contenido |
+|---|---|
+| `~/.cache/huggingface/hub/models--google--gemma-4-E2B-it/snapshots/3e22461f…/` | Pesos base, una sola copia. **No volver a descargar** |
+| `data/vision_pilot_v2` (+ split y `audit.jsonl`) | **Cierre de fase 4**: 2100 preguntas, 700 imágenes; estilos por partición (train 0–3, 5–6 · val 7–8 · cal 9–10 · test 11–12). sha256 `09b1d190…f604` |
+| `data/vision_transfer_v2` | 450 preguntas con el estilo 4 (diagnóstico) |
+| **`runs/vision2_heads/20260923T161024Z/checkpoint`** | **V2**: `decision_heads` v3, con imagen, época 30/30. Lo sirve `configs/serve_vision.yaml` |
+| `runs/vision2_text_only/20260923T162937Z/checkpoint` | **C2**: control sin imagen |
+| `runs/vision2_*/evaluations/test-*` | **Test de cierre usado** (una vez por artefacto). No reutilizar |
+| **`runs/pilot_lora_v3/20260923T012208Z/checkpoint`** + `calibration/calibration-20260923T043504Z.json` | **B** (fase 3, LoRA calibrado). Lo sirve `configs/serve_text.yaml` |
+| `runs/vision_heads/…`, `runs/vision_text_only/…`, `data/vision_pilot_v1` | Fase 4 original (estilos compartidos). Test v1 usado; sus fuentes `70068e15…` no se conservaron |
+| `runs/pilot_ce_v3/…`, `runs/pilot_lora_v3/…`, `data/pilot_v3` | Fase 3 |
+| `artifacts/source/*.tar` | Copias de fuentes por hash:<br>• `aa718528…`: cierre de la fase 4 original<br>• `f414efce…`: revisión de la fase 4<br>• `457c66c3…`: primera copia tras añadir `snapshot_sources`<br>• `7f645568…`: inicio de V2, el código que ejecutó<br>• `78d02416…`: V2 al guardar, C2 y evaluaciones de cierre de la fase 4<br>• `910a39a4…`: cierre de la fase 5, E2E y benchmarks<br>No existe la copia `70068e15…` (V/C de la fase 4 original) |
+| `reports/phase4b/`, `reports/phase5/` | Resúmenes CLI, comparaciones, benchmarks y logs del servidor (rutas enmascaradas con `~`) |
+
+## 4. Archivos de esta sesión
+
+**Nuevos:**
+
+- Código:
+  - `src/gemma_system_one/engine.py`
+  - `src/gemma_system_one/api.py`
+  - `src/gemma_system_one/benchmark.py`
+- Configuraciones: `configs/{vision2_heads,vision2_text_only,serve_text,serve_vision}.yaml`
+- Tests:
+  - `tests/integration/test_api.py`
+  - `tests/e2e/test_api_real.py` y `tests/e2e/test_api_real_vision.py`
+- Documentación:
+  - `docs/decisions/0008-…`, `0009-local-api.md`
+  - `reports/phase4b-test-protocol.md`, `reports/phase4b-styles.md`, `reports/phase5-api.md`
+  - `reports/phase4b/`, `reports/phase5/`
+
+**Modificados:**
+
+- **Código:**
+  - `data/generate_vision.py`: v2 con split planificado, estilos 5–12 y `STYLE_POOLS_V2`; v1 intacto.
+  - `data/split.py`: `check_planned_split`.
+  - `env.py`: `snapshot_sources`; `git_state(snapshot=…)`; `GSO_SOURCE_ARCHIVE_DIR`.
+  - `checkpoint.py`: el manifiesto guarda la copia de fuentes.
+  - `images.py`: `decode_image_bytes` e `ImageTooLargeError`.
+  - `features.py`: acepta imágenes ya decodificadas.
+  - `training/decisions_pipeline.py`:
+    - `load_decision_model`;
+    - `prepare_evaluation` la reutiliza;
+    - `input_modality`, `run_start_code`;
+    - `code` con copia.
+  - `training/lora_pipeline.py`: `input_modality`, `session_code`.
+  - `calibration.py`: `code` con copia.
+  - `cli.py`:
+    - `--vision-version`, `--split-seed`;
+    - `gso split` verifica el plan;
+    - `serve`, `benchmark`.
+  - `scripts/snapshot_source.py`: delega en `env`.
+  - `pyproject.toml` y `uv.lock`.
+- **Tests:**
+  - `tests/conftest.py`: copia de fuentes a un directorio temporal.
+  - `tests/unit/test_phase3_followups.py`: copia reproducible y manifiesto con copia.
+  - `tests/unit/test_phase4_vision_data.py`: estilos por partición y v1 intacto.
+  - `tests/integration/test_phase4_pipeline.py`: modalidad y código de inicio.
+- **Documentación:**
+  - `README.md` (fase 5 y comandos de visión con versión explícita);
+  - `reports/phase4-vision.md` (nota sobre `--vision-version v1`);
+  - este archivo.
+
+## 5. Decisiones vigentes
+
+- **0008:**
+  - datos visuales v2 con estilos disjuntos por partición y flujo aleatorio propio; el split se planifica con `assign_groups` y `gso split` lo verifica;
+  - copia automática de las fuentes en cada run, checkpoint, evaluación y calibración;
+  - límite histórico: la copia `70068e15…` no existe.
+- **0009:**
+  - API v1 con un worker y cola acotada (503 si está llena o se agota el tiempo);
+  - `ready` sólo tras un warmup real;
+  - límites previos a parsear y decodificar;
+  - motor compartido con la evaluación (`load_decision_model`, `expand`, `extract_pooled`, `reconstruct`);
+  - modalidad fija por checkpoint;
+  - `usage` real y logs sin contenido.
+- **Se mantienen:** 0001–0007.
+
+## 6. Comandos exactos de esta sesión (en orden)
+
+Detalle en `reports/phase4b-styles.md` y `reports/phase5-api.md`.
+
+```bash
+.venv/bin/python scripts/snapshot_source.py         # copias de fuentes
+shasum -a 256 reports/phase4b-test-protocol.md > reports/phase4b/test-protocol.sha256     # antes de generar
+PYTHONHASHSEED=1 .venv/bin/gso generate-data --kind vision --vision-version v2 --out data/vision_pilot_v2 --cases 700 --seed 0 --split-seed 0
+PYTHONHASHSEED=1 .venv/bin/gso generate-data --kind vision --vision-version v2 --variant transfer --out data/vision_transfer_v2 --cases 150 --seed 0
+.venv/bin/gso validate-data --dataset data/vision_pilot_v2 ; .venv/bin/gso validate-data --dataset data/vision_transfer_v2
+.venv/bin/gso split --dataset data/vision_pilot_v2 --seed 0
+caffeinate -i .venv/bin/gso train --config configs/vision2_heads.yaml
+caffeinate -i .venv/bin/gso train --config configs/vision2_text_only.yaml
+uv add "fastapi>=0.120" "uvicorn>=0.38" "httpx>=0.28"
+caffeinate -i .venv/bin/gso evaluate --checkpoint runs/vision2_heads/20260923T161024Z/checkpoint --split validation --no-cache --vision-ablation --robustness --baselines
+caffeinate -i .venv/bin/gso evaluate --checkpoint runs/vision2_heads/20260923T161024Z/checkpoint --split test --final-test --no-cache --baselines --vision-ablation
+caffeinate -i .venv/bin/gso evaluate --checkpoint runs/vision2_text_only/20260923T162937Z/checkpoint --split test --final-test --no-cache --baselines
+.venv/bin/gso compare --a runs/vision2_text_only/20260923T162937Z/evaluations/test-20260923T164713Z-predictions.jsonl \
+  --b runs/vision2_heads/20260923T161024Z/evaluations/test-20260923T164638Z-predictions.jsonl --allow-different-inputs \
+  --out reports/phase4b/test_compare_vision_minus_text.json
+caffeinate -i .venv/bin/gso evaluate --checkpoint runs/vision2_heads/20260923T161024Z/checkpoint --split all --dataset data/vision_transfer_v2 --no-cache --baselines --vision-ablation
+caffeinate -i .venv/bin/gso evaluate --checkpoint runs/vision2_text_only/20260923T162937Z/checkpoint --split all --dataset data/vision_transfer_v2 --no-cache
+.venv/bin/pytest tests/unit tests/integration -q                       # 263 passed
+caffeinate -i .venv/bin/pytest tests/mps tests/e2e -v -rs              # 10 + 2 passed; 2 fallos de aserción de dispositivo (corregidos)
+caffeinate -i .venv/bin/pytest tests/e2e -v -rs                        # 4 passed
+caffeinate -i .venv/bin/gso benchmark --config configs/serve_text.yaml --dataset data/pilot_v3 --split validation --requests 100 --warmup 5 --out reports/phase5/benchmark_text.json
+caffeinate -i .venv/bin/gso benchmark --config configs/serve_vision.yaml --dataset data/vision_pilot_v2 --split validation --requests 100 --warmup 5 --out reports/phase5/benchmark_vision.json
+.venv/bin/ruff check . ; .venv/bin/ruff format --check . ; uv lock --check ; git diff --check
+.venv/bin/python scripts/snapshot_source.py                            # 910a39a4… (69 ficheros)
+pgrep -fl 'gso|pytest|uvicorn' ; lsof -iTCP:8000 -sTCP:LISTEN          # sin salida
+```
+
+### 6.1 Este relevo (sólo verificación; sólo cambia `docs/STATUS.md`)
+
+```bash
+date -u ; git rev-parse HEAD ; git branch --show-current ; git status --short ; git stash list | wc -l
+find src tests scripts configs docs reports README.md pyproject.toml uv.lock -newer docs/STATUS.md -type f   # nada posterior
+pgrep -fl 'gso|gemma_system_one|pytest|uvicorn'          # código 1, sin salida
+lsof -iTCP:8000 -sTCP:LISTEN                             # sin salida
+.venv/bin/python -c "from gemma_system_one.env import source_fingerprint as f; d=f(); print(d['sha256'], d['files'])"   # 910a39a4…, 69
+ls artifacts/source/                                     # 6 copias (§3)
+.venv/bin/pytest tests/unit tests/integration -q         # 263 passed, 27,80 s
+.venv/bin/pytest --collect-only -q tests/mps tests/e2e   # 14 recogidos, no ejecutados (código sin cambios desde su última pasada)
+.venv/bin/ruff check . ; .venv/bin/ruff format --check . ; uv lock --check ; git diff --check   # correctos
+shasum -a 256 -c reports/phase4b/test-protocol.sha256    # OK (protocolo de cierre sin desviaciones)
+```
+
+También se comprobó que existen los manifiestos de V2, C2, B (con su calibración), V de la fase 4 y la referencia congelada de la fase 3, y se inspeccionaron los procesos auxiliares con `psutil` (§2).
+
+## 7. Fallos encontrados en esta sesión (reproducibles)
+
+| Fallo | Reproducción | Estado |
+|---|---|---|
+| Estilos visuales compartidos entre particiones (revisión de fase 4, hallazgo 4) | Cruzar `data/vision_pilot_v1/splits/seed0.json` con `audit.jsonl` | Resuelto con v2 y un test nuevo; v1 queda como historial |
+| Hash de fuentes sin copia (hallazgo 5) | `ls artifacts/source/70068e15*` (no existe) | Copia automática desde ahora; límite histórico documentado |
+| FastAPI interpretaba `request: Request` como parámetro de consulta (import local con `from __future__ import annotations`) | Mover `from fastapi import Request` dentro de `create_app` → `/health/ready` da 422 | Import a nivel de módulo; cubierto por `tests/integration/test_api.py` |
+| La copia de fuentes de los tests se escribía en `artifacts/` del repo | Ejecutar tests sin `GSO_SOURCE_ARCHIVE_DIR` | Fixture automático en `conftest.py` |
+| El test de estilo reservado suponía «el último de la lista» | `test_transfer_reserves_style_and_phrasing` con la lista ampliada | Usa `V1_STYLE_COUNT` |
+| Aserción de dispositivo (`mps:0` frente a `mps`) en los E2E | `tests/e2e` | Corregida en el test |
+| Hash de fuentes durante un run: el registrado al guardar el checkpoint puede diferir del ejecutado si se edita el código mientras corre (V2: `7f645568…` al empezar, `78d02416…` al guardar) | Manifiesto frente a `env.json` de `runs/vision2_heads/20260923T161024Z` | Desde ahora el checkpoint registra también `run_start_code`. Los dos tienen copia |
+
+## 8. Tareas pendientes, en orden
+
+1. **Revisión independiente** del cierre de fase 4 (`reports/phase4b-styles.md`) y de la fase 5 (`reports/phase5-api.md`). Comprobar en particular:
+   - que el protocolo `05901ce5…` es anterior a los datos v2 y que el test se ejecutó una vez por artefacto;
+   - que los estilos son disjuntos en el split real;
+   - la identidad train/serve de los E2E;
+   - los límites y códigos de la API;
+   - el benchmark.
+2. **Commit, a decidir por el usuario.**
+3. **Fase 6** (spec §10): E4B, más opciones y optimización. Sólo con una ganancia medida que justifique el coste. Antes de optimizar el servicio:
+   - batching con equivalencia demostrada (decisión 0002);
+   - recomputación o checkpointing para LoRA con imagen (K > 5 no probado).
+4. **Mejoras candidatas**, sin usar los tests ya abiertos:
+   - calibrar V2 con la partición de calibración (estilos 9–10);
+   - Score por tramos;
+   - umbrales de abstención (spec §6.2, §8);
+   - parada temprana o LoRA más corto.
+
+**Tests ya usados, que no deben usarse para decidir:** fase 3 (`pilot_v3`), fase 4 v1 (`vision_pilot_v1`) y cierre de fase 4 (`vision_pilot_v2`).
+
+### Riesgos abiertos
+
+- **Datos:** sintéticos, de una sola familia visual. Los estilos «no vistos» son variaciones del mismo gráfico. Particiones de 70–100 grupos.
+- **API:**
+  - sin batching, un checkpoint por proceso;
+  - el timeout con el modelo real sólo se probó con un doble en CPU;
+  - V2 no está calibrado;
+  - sin abstención.
+- **MPS:** reanudación y `empty_cache` no verificados bit a bit; FP16, gradient checkpointing y contexto > 512 con autograd, sin probar.
+- **Plantilla:** «using only the state» también con imagen.
+
+## 9. Privacidad
+
+- **Contenido:** datos sintéticos por reglas; imágenes generadas con valores conocidos. Sin credenciales ni datos personales.
+- **Logs:** los del servidor (`reports/phase5/*.server.log`) sólo registran request_id, estado, duración y dimensiones, nunca estado, textos ni imágenes. Las rutas absolutas de avisos de bibliotecas se enmascararon con `~`.
+- **Versionado:** datasets, imágenes, runs y artefactos no se versionan.
+- **Pendiente anterior:** `reports/doctor/20260922T195301Z.json` (fase 0) contiene una ruta absoluta del usuario.

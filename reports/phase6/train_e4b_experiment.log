@@ -1,0 +1,9 @@
+Loading weights:   0%|          | 0/2076 [00:00<?, ?it/s]Loading weights:  60%|█████▉    | 1244/2076 [00:00<00:00, 12431.54it/s]Loading weights: 100%|██████████| 2076/2076 [00:00<00:00, 14393.88it/s]
+[train] run: runs/e4b_experiment/20260923T204945Z  época elegida: 7 (validation)
+  gemma_heads  train      nll_all=0.1375 | noul: nll=0.060 acc=0.980 (n=936) | choice: nll=0.227 acc=0.919 (n=643) | score: nll=0.166 acc=0.931 (n=521)
+  gemma_heads  validation nll_all=0.2812 | noul: nll=0.100 acc=0.976 (n=127) | choice: nll=0.377 acc=0.845 (n=84) | score: nll=0.449 acc=0.854 (n=89)
+  prior        train      nll_all=0.9977 | noul: nll=0.615 acc=0.696 (n=936) | choice: nll=1.430 acc=0.173 (n=643) | score: nll=1.152 acc=0.367 (n=521)
+  prior        validation nll_all=1.0339 | noul: nll=0.656 acc=0.646 (n=127) | choice: nll=1.429 acc=0.131 (n=84) | score: nll=1.200 acc=0.292 (n=89)
+  bow          train      nll_all=0.8539 | noul: nll=0.387 acc=0.818 (n=936) | choice: nll=1.303 acc=0.453 (n=643) | score: nll=1.138 acc=0.388 (n=521)
+  bow          validation nll_all=0.9343 | noul: nll=0.486 acc=0.772 (n=127) | choice: nll=1.371 acc=0.381 (n=84) | score: nll=1.162 acc=0.438 (n=89)
+EXIT 0

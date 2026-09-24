@@ -1,0 +1,12 @@
+# Fase 5: servicio de texto con el artefacto B de fase 3 (LoRA + cabezales) y su calibración.
+# Un proceso, un worker, cola acotada; escucha sólo en loopback (spec §9).
+# Fase 6b: calibración de data/pilot_v3_calib7 (1200 preguntas), fijada en reports/phase6b-protocol.md.
+# La anterior (partición calibration, 300 preguntas) era calibration-20260923T043504Z.json.
+kind: serve
+model_id: gemma-system-one-e2b-v0.1
+checkpoint: runs/pilot_lora_v3/20260923T012208Z/checkpoint
+calibration: runs/pilot_lora_v3/20260923T012208Z/calibration/calibration-20260924T044408Z.json
+host: 127.0.0.1
+port: 8000
+max_queue: 4
+request_timeout_s: 120

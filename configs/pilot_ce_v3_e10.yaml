@@ -1,0 +1,25 @@
+# Diagnóstico de fase 3 (no seleccionado): pilot_ce_v3 con el tope de 10 épocas de pilot_ce (v2).
+# Sólo sirve para separar el efecto de los datos v3 del efecto de ampliar el tope a 30 épocas.
+kind: decision_heads
+name: pilot_ce_v3_e10
+base_config: configs/e2b_text.yaml
+dataset: data/pilot_v3
+split_seed: 0
+primitives: [noul, choice, score]
+extraction:
+  # 1 fila por forward: representación independiente del lote (decisión 0002)
+  microbatch_rows: 1
+cache_dir: artifacts/cache/representations
+runs_dir: runs
+train:
+  epochs: 10  # diagnóstico: mismo tope que pilot_ce (v2) para aislar el efecto de v3
+  lr: 0.001
+  weight_decay: 0.01
+  questions_per_step: 8
+  logit_chunk_rows: 4
+  seed: 0
+  threshold: 0.5
+  rps_lambda: 0.0
+  type_weights: {noul: 1.0, choice: 1.0, score: 1.0}
+  select_on: validation
+  feature_norm: standardize_train

@@ -1,0 +1,161 @@
+{
+  "run_dir": "runs/pilot_lora_v3/20260923T012208Z",
+  "steps": 789,
+  "step_seconds": {
+    "median": 4.5009,
+    "p95": 13.8679,
+    "total": 4502.7
+  },
+  "rows_per_second": 3.5825359335172275,
+  "tokens_per_second": 840.0370499643274,
+  "grad_norm_before_clip": {
+    "median": 4.282535552978516,
+    "fraction_clipped": 0.7655259822560203
+  },
+  "epochs": [
+    {
+      "epoch": 0,
+      "eval_nll": {
+        "all": 0.4238,
+        "noul": 0.159,
+        "choice": 0.5703,
+        "score": 0.6634
+      },
+      "train_loss_mean_steps": null,
+      "feature_drift": {
+        "rows": 781,
+        "mean_abs_dim_mean": 0.05734903737902641,
+        "mean_dim_std": 0.9757620692253113,
+        "max_dim_std": 1.1171194314956665
+      },
+      "eval_seconds": 57.8951
+    },
+    {
+      "epoch": 1,
+      "eval_nll": {
+        "all": 0.4222,
+        "noul": 0.182,
+        "choice": 0.5962,
+        "score": 0.6009
+      },
+      "train_loss_mean_steps": 0.1998597437837344,
+      "feature_drift": {
+        "rows": 781,
+        "mean_abs_dim_mean": 0.16599063575267792,
+        "mean_dim_std": 1.1678979396820068,
+        "max_dim_std": 1.494498610496521
+      },
+      "eval_seconds": 54.3431
+    },
+    {
+      "epoch": 2,
+      "eval_nll": {
+        "all": 0.4365,
+        "noul": 0.1531,
+        "choice": 0.554,
+        "score": 0.7299
+      },
+      "train_loss_mean_steps": 0.1522694217881139,
+      "feature_drift": {
+        "rows": 781,
+        "mean_abs_dim_mean": 0.3721957206726074,
+        "mean_dim_std": 1.4420514106750488,
+        "max_dim_std": 2.238628625869751
+      },
+      "eval_seconds": 64.2078
+    },
+    {
+      "epoch": 3,
+      "eval_nll": {
+        "all": 0.4303,
+        "noul": 0.1277,
+        "choice": 0.4918,
+        "score": 0.804
+      },
+      "train_loss_mean_steps": 0.08712544822304422,
+      "feature_drift": {
+        "rows": 781,
+        "mean_abs_dim_mean": 0.49923551082611084,
+        "mean_dim_std": 1.6076511144638062,
+        "max_dim_std": 2.838310956954956
+      },
+      "eval_seconds": 132.1823
+    }
+  ],
+  "selected_epoch": 1,
+  "base_params_unchanged_probe": true,
+  "lora": {
+    "peft_version": "0.21.0",
+    "method": "peft.inject_adapter_in_model",
+    "r": 8,
+    "alpha": 16.0,
+    "scaling": 2.0,
+    "dropout": 0.05,
+    "layers_by_projection": {
+      "q_proj": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34
+      ],
+      "v_proj": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ]
+    },
+    "trainable_parameters": 1339392,
+    "weight_dtype": "float32",
+    "base_trainable_parameters": 0
+  },
+  "memory": {
+    "process_rss_bytes": 3443769344,
+    "mps_current_allocated_bytes": 10236824064,
+    "mps_driver_allocated_bytes": 25228410880,
+    "swap_used_bytes": 0
+  },
+  "swap_delta_bytes": 0
+}

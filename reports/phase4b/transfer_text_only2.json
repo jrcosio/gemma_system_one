@@ -1,0 +1,84 @@
+{
+  "checkpoint": "runs/vision2_text_only/20260923T162937Z/checkpoint",
+  "stage": "phase2_decision_heads_frozen_backbone",
+  "split": "all",
+  "use_cache": false,
+  "code": {
+    "sha": "65d425025dd654fb4814062dc42b245062f151b1",
+    "dirty": true,
+    "source": {
+      "sha256": "78d02416e739bdedc7b9ce9e5789877a5362efa7ad99e080cdfb8ef0eb5a8beb",
+      "files": 68,
+      "globs": [
+        "src/**/*.py",
+        "configs/*.yaml",
+        "scripts/*.py",
+        "pyproject.toml",
+        "uv.lock"
+      ]
+    }
+  },
+  "external_dataset": {
+    "root": "data/vision_transfer_v2",
+    "sha256": "f7958bdb7c19732c8207aaeebc2058736b1f1d5940c4fb6fe206b0e9d89d29d8"
+  },
+  "external_leakage": {
+    "errors": [],
+    "near_duplicate_states": 0
+  },
+  "diagnostic_only": true,
+  "backbone_loaded": true,
+  "extraction": {
+    "split": "all",
+    "questions": 450,
+    "rows": 1244,
+    "backbone_forwards": 1244,
+    "valid_tokens": 221704,
+    "padding_tokens": 0,
+    "max_row_tokens": 216,
+    "seconds_synchronized": 61.6659,
+    "cache_hit": false,
+    "image_rows": 0,
+    "image_tokens": 0
+  },
+  "usage": {
+    "questions": 450,
+    "expanded_rows": 1244,
+    "backbone_forwards": 1244,
+    "processed_input_tokens": 221704,
+    "generated_tokens": 0
+  },
+  "memory": {
+    "sampling": "instantáneas en puntos instrumentados; el pico real puede ser mayor",
+    "budget_bytes": 34359738368,
+    "peaks_sampled": {
+      "process_rss_bytes": 944553984,
+      "mps_current_allocated_bytes": 10215276544,
+      "mps_driver_allocated_bytes": 10339336192,
+      "swap_used_bytes": 0
+    },
+    "over_budget": [],
+    "swap_delta_bytes": 0
+  },
+  "report_path": "runs/vision2_text_only/20260923T162937Z/evaluations/vision_transfer_v2-all-20260923T165940Z.json",
+  "predictions_path": "runs/vision2_text_only/20260923T162937Z/evaluations/vision_transfer_v2-all-20260923T165940Z-predictions.jsonl",
+  "metrics_summary": {
+    "questions": 450,
+    "mean_nll_all": 1.1453057027331295,
+    "noul": {
+      "n": 183,
+      "nll": 0.7874495743069723,
+      "accuracy": 0.5409836065573771
+    },
+    "choice": {
+      "n": 134,
+      "nll": 1.3611379284513376,
+      "accuracy": 0.26119402985074625
+    },
+    "score": {
+      "n": 133,
+      "nll": 1.4202391858590466,
+      "accuracy": 0.22556390977443608
+    }
+  }
+}

@@ -1,0 +1,21 @@
+# Fase 1: cabezal Noul sobre E2B congelado, fixture de humo (spec §7.A, §10).
+# Hiperparámetros iniciales de la especificación; no son óptimos conocidos.
+name: noul_smoke
+base_config: configs/e2b_text.yaml
+dataset: data/smoke_v1
+split_seed: 0
+primitive: noul
+extraction:
+  # 1 fila por forward: representación independiente del lote (decisión 0002)
+  microbatch_rows: 1
+cache_dir: artifacts/cache/representations
+runs_dir: runs
+train:
+  epochs: 3
+  lr: 0.001
+  weight_decay: 0.01
+  questions_per_step: 8
+  microbatch_rows: 8
+  seed: 0
+  threshold: 0.5
+  select_on: validation

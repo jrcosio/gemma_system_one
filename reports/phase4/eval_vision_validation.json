@@ -1,0 +1,150 @@
+{
+  "checkpoint": "runs/vision_heads/20260923T144256Z/checkpoint",
+  "stage": "phase2_decision_heads_frozen_backbone",
+  "split": "validation",
+  "use_cache": false,
+  "final_test_used": false,
+  "backbone_loaded": true,
+  "extraction": {
+    "split": "validation",
+    "questions": 210,
+    "rows": 591,
+    "backbone_forwards": 591,
+    "valid_tokens": 267588,
+    "padding_tokens": 0,
+    "max_row_tokens": 491,
+    "seconds_synchronized": 148.2666,
+    "cache_hit": false,
+    "image_rows": 591,
+    "image_tokens": 157206
+  },
+  "usage": {
+    "questions": 210,
+    "expanded_rows": 591,
+    "backbone_forwards": 591,
+    "processed_input_tokens": 267588,
+    "generated_tokens": 0
+  },
+  "reload_vs_training": {
+    "compared_questions": 210,
+    "max_abs_logit_diff": 0.0,
+    "atol": 0.0001,
+    "ok": true
+  },
+  "memory": {
+    "sampling": "instantáneas en puntos instrumentados; el pico real puede ser mayor",
+    "budget_bytes": 34359738368,
+    "peaks_sampled": {
+      "process_rss_bytes": 1750564864,
+      "mps_current_allocated_bytes": 10215276544,
+      "mps_driver_allocated_bytes": 11461066752,
+      "swap_used_bytes": 0
+    },
+    "over_budget": [],
+    "swap_delta_bytes": 0
+  },
+  "report_path": "runs/vision_heads/20260923T144256Z/evaluations/validation-20260923T151517Z.json",
+  "predictions_path": "runs/vision_heads/20260923T144256Z/evaluations/validation-20260923T151517Z-predictions.jsonl",
+  "metrics_summary": {
+    "questions": 210,
+    "mean_nll_all": 0.4241795172504051,
+    "noul": {
+      "n": 83,
+      "nll": 0.20686475050065187,
+      "accuracy": 0.927710843373494
+    },
+    "choice": {
+      "n": 48,
+      "nll": 0.35217288307175404,
+      "accuracy": 0.9166666666666666
+    },
+    "score": {
+      "n": 79,
+      "nll": 0.6962484296656557,
+      "accuracy": 0.6708860759493671
+    }
+  },
+  "baselines_summary": {
+    "prior": {
+      "questions": 210,
+      "mean_nll_all": 1.1022542432768292,
+      "noul": {
+        "n": 83,
+        "nll": 0.6819388177924349,
+        "accuracy": 0.5903614457831325
+      },
+      "choice": {
+        "n": 48,
+        "nll": 1.3661260732643996,
+        "accuracy": 0.3125
+      },
+      "score": {
+        "n": 79,
+        "nll": 1.3835242746160865,
+        "accuracy": 0.31645569620253167
+      }
+    },
+    "bow": {
+      "questions": 210,
+      "mean_nll_all": 1.116911749595092,
+      "noul": {
+        "n": 83,
+        "nll": 0.7145831292023282,
+        "accuracy": 0.5421686746987951
+      },
+      "choice": {
+        "n": 48,
+        "nll": 1.3692461075563473,
+        "accuracy": 0.20833333333333334
+      },
+      "score": {
+        "n": 79,
+        "nll": 1.386294361119891,
+        "accuracy": 0.20253164556962025
+      }
+    }
+  },
+  "robustness": {
+    "choice_id_rename_permutation": {
+      "questions": 48,
+      "rows_identical": 48,
+      "max_prob_diff_remapped": 0.0
+    },
+    "score_reversed": {
+      "questions": 79,
+      "accuracy_original": 0.6708860759493671,
+      "accuracy_variant": 0.5822784810126582,
+      "nll_original": 0.6962484296656557,
+      "nll_variant": 0.850354992246339
+    },
+    "choice_drop_distractor": {
+      "questions": 48,
+      "accuracy_original": 0.9166666666666666,
+      "accuracy_variant": 0.9166666666666666,
+      "nll_original": 0.35217288307175404,
+      "nll_variant": 0.20329000279176004,
+      "prediction_unchanged": 0.8958333333333334
+    }
+  },
+  "vision_ablation": {
+    "questions_with_image": 210,
+    "seed": 0,
+    "image_omitted": {
+      "questions": 210,
+      "accuracy_original": 0.8285714285714286,
+      "accuracy_variant": 0.2904761904761905,
+      "nll_original": 0.4241795172504051,
+      "nll_variant": 2.754077654958169,
+      "prediction_unchanged": 0.2714285714285714
+    },
+    "image_swapped": {
+      "questions": 210,
+      "accuracy_original": 0.8285714285714286,
+      "accuracy_variant": 0.36666666666666664,
+      "nll_original": 0.4241795172504051,
+      "nll_variant": 2.8654000352484976,
+      "prediction_unchanged": 0.38571428571428573
+    },
+    "note": "image_swapped usa la imagen de otro grupo de la misma partición y conserva la etiqueta original: un modelo que mira la imagen debe empeorar; la etiqueta correcta para la imagen donante no se evalúa"
+  }
+}

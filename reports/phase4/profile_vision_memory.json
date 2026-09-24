@@ -1,0 +1,28 @@
+{
+  "question_rows": 5,
+  "primitive": "choice",
+  "after_load": {
+    "mps_current_allocated_bytes": 10215276544,
+    "mps_driver_allocated_bytes": 10251337728
+  },
+  "with_image": {
+    "valid_tokens": 2215,
+    "seconds_forward_no_grad": 1.419,
+    "seconds_forward_backward": 2.344,
+    "mps_current_with_graph_bytes": 26170745856,
+    "graph_over_weights_gb": 15.955,
+    "mps_driver_after_backward_bytes": 26553810944,
+    "process_rss_bytes": 983547904,
+    "swap_used_bytes": 0
+  },
+  "without_image": {
+    "valid_tokens": 875,
+    "seconds_forward_no_grad": 0.332,
+    "seconds_forward_backward": 0.691,
+    "mps_current_with_graph_bytes": 16296990720,
+    "graph_over_weights_gb": 6.082,
+    "mps_driver_after_backward_bytes": 16363749376,
+    "process_rss_bytes": 998948864,
+    "swap_used_bytes": 0
+  }
+}

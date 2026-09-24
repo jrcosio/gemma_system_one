@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "~/Develop/IA/Gemma_System_One/.venv/bin/gso", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "~/Develop/IA/Gemma_System_One/src/gemma_system_one/cli.py", line 422, in main
+    return int(args.func(args))
+               ^^^^^^^^^^^^^^^
+  File "~/Develop/IA/Gemma_System_One/src/gemma_system_one/cli.py", line 292, in _cmd_benchmark
+    report = run_benchmark(
+             ^^^^^^^^^^^^^^
+  File "~/Develop/IA/Gemma_System_One/src/gemma_system_one/benchmark.py", line 119, in run_benchmark
+    raise RuntimeError(f"{cfg.host}:{cfg.port} ya está en uso: detén ese servicio antes del benchmark")
+RuntimeError: 127.0.0.1:8000 ya está en uso: detén ese servicio antes del benchmark
+.venv/bin/gso benchmark --config configs/serve_text.yaml --dataset  --split    0,81s user 0,09s system 85% cpu 1,045 total

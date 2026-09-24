@@ -1,0 +1,10 @@
+Loading weights:   0%|          | 0/1951 [00:00<?, ?it/s]Loading weights:  60%|█████▉    | 1163/1951 [00:00<00:00, 11623.72it/s]Loading weights: 100%|██████████| 1951/1951 [00:00<00:00, 12383.53it/s]
+[train] run: runs/pilot_lora_v3/20260923T012208Z  época elegida: 1 (validation)  pasos: 789  base sin cambios: True
+  época 0: eval nll_all=0.4238 train_loss=None
+  época 1: eval nll_all=0.4222 train_loss=0.1998597437837344
+  época 2: eval nll_all=0.4365 train_loss=0.1522694217881139
+  época 3: eval nll_all=0.4303 train_loss=0.08712544822304422
+  lora_heads           validation {"questions": 300, "mean_nll_all": 0.4222496477252291, "noul": {"n": 127, "nll": 0.18204682159489435, "accuracy": 0.9448818897637795}, "choice": {"n": 84, "nll": 0.5961637484910605, "accuracy": 0.7738095238095238}, "score": {"n": 89, "nll": 0.600867338222113, "accuracy": 0.7415730337078652}}
+  initial_frozen_heads validation {"questions": 300, "mean_nll_all": 0.42379543036869205, "noul": {"n": 127, "nll": 0.1589924628064327, "accuracy": 0.9606299212598425}, "choice": {"n": 84, "nll": 0.5702598082387118, "accuracy": 0.8095238095238095}, "score": {"n": 89, "nll": 0.6634242971026841, "accuracy": 0.7303370786516854}}
+.venv/bin/gso train --config configs/pilot_lora_v3.yaml --resume   1329,07s user 321,36s system 21% cpu 2:05:30,23 total
+EXIT 0

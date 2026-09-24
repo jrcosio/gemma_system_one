@@ -1,0 +1,64 @@
+{
+  "code": {
+    "sha": "65d425025dd654fb4814062dc42b245062f151b1",
+    "dirty": true,
+    "source": {
+      "sha256": "f414efcea70e83660d5bdd761648c9403e493bd397f985874f1b161b94cb67e3",
+      "files": 62,
+      "globs": [
+        "src/**/*.py",
+        "configs/*.yaml",
+        "scripts/*.py",
+        "pyproject.toml",
+        "uv.lock"
+      ]
+    }
+  },
+  "reload": {
+    "runs/vision_heads/20260923T144256Z": {
+      "check": {
+        "compared_questions": 2,
+        "max_abs_logit_diff": 0.0,
+        "atol": 0.0001,
+        "ok": true
+      },
+      "extraction": {
+        "split": "validation",
+        "questions": 2,
+        "rows": 5,
+        "backbone_forwards": 5,
+        "valid_tokens": 2290,
+        "padding_tokens": 0,
+        "max_row_tokens": 480,
+        "seconds_synchronized": 1.4396,
+        "cache_hit": false,
+        "image_rows": 5,
+        "image_tokens": 1330
+      },
+      "device": "mps"
+    },
+    "runs/vision_text_only/20260923T150230Z": {
+      "check": {
+        "compared_questions": 2,
+        "max_abs_logit_diff": 0.0,
+        "atol": 0.0001,
+        "ok": true
+      },
+      "extraction": {
+        "split": "validation",
+        "questions": 2,
+        "rows": 5,
+        "backbone_forwards": 5,
+        "valid_tokens": 950,
+        "padding_tokens": 0,
+        "max_row_tokens": 212,
+        "seconds_synchronized": 0.3134,
+        "cache_hit": false,
+        "image_rows": 0,
+        "image_tokens": 0
+      },
+      "device": "mps"
+    }
+  },
+  "stored_test_comparison_matches": true
+}

@@ -1,0 +1,9 @@
+Loading weights:   0%|          | 0/1951 [00:00<?, ?it/s]Loading weights: 100%|██████████| 1951/1951 [00:00<00:00, 38462.85it/s]
+[train] run: runs/vision2_heads/20260923T161024Z  época elegida: 30 (validation)
+  gemma_heads  train      nll_all=0.1825 | noul: nll=0.125 acc=0.939 (n=603) | choice: nll=0.042 acc=0.998 (n=422) | score: nll=0.393 acc=0.858 (n=445)
+  gemma_heads  validation nll_all=0.3382 | noul: nll=0.296 acc=0.910 (n=89) | choice: nll=0.170 acc=0.965 (n=57) | score: nll=0.547 acc=0.750 (n=64)
+  prior        train      nll_all=1.0925 | noul: nll=0.691 acc=0.534 (n=603) | choice: nll=1.362 acc=0.273 (n=422) | score: nll=1.381 acc=0.281 (n=445)
+  prior        validation nll_all=1.0917 | noul: nll=0.695 acc=0.506 (n=89) | choice: nll=1.375 acc=0.298 (n=57) | score: nll=1.391 acc=0.281 (n=64)
+  bow          train      nll_all=1.0637 | noul: nll=0.622 acc=0.647 (n=603) | choice: nll=1.354 acc=0.299 (n=422) | score: nll=1.386 acc=0.211 (n=445)
+  bow          validation nll_all=1.0757 | noul: nll=0.664 acc=0.551 (n=89) | choice: nll=1.369 acc=0.333 (n=57) | score: nll=1.386 acc=0.266 (n=64)
+EXIT 0

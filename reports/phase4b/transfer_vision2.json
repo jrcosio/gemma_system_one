@@ -1,0 +1,145 @@
+{
+  "checkpoint": "runs/vision2_heads/20260923T161024Z/checkpoint",
+  "stage": "phase2_decision_heads_frozen_backbone",
+  "split": "all",
+  "use_cache": false,
+  "code": {
+    "sha": "65d425025dd654fb4814062dc42b245062f151b1",
+    "dirty": true,
+    "source": {
+      "sha256": "78d02416e739bdedc7b9ce9e5789877a5362efa7ad99e080cdfb8ef0eb5a8beb",
+      "files": 68,
+      "globs": [
+        "src/**/*.py",
+        "configs/*.yaml",
+        "scripts/*.py",
+        "pyproject.toml",
+        "uv.lock"
+      ]
+    }
+  },
+  "external_dataset": {
+    "root": "data/vision_transfer_v2",
+    "sha256": "f7958bdb7c19732c8207aaeebc2058736b1f1d5940c4fb6fe206b0e9d89d29d8"
+  },
+  "external_leakage": {
+    "errors": [],
+    "near_duplicate_states": 0
+  },
+  "diagnostic_only": true,
+  "backbone_loaded": true,
+  "extraction": {
+    "split": "all",
+    "questions": 450,
+    "rows": 1244,
+    "backbone_forwards": 1244,
+    "valid_tokens": 555096,
+    "padding_tokens": 0,
+    "max_row_tokens": 484,
+    "seconds_synchronized": 305.9013,
+    "cache_hit": false,
+    "image_rows": 1244,
+    "image_tokens": 330904
+  },
+  "usage": {
+    "questions": 450,
+    "expanded_rows": 1244,
+    "backbone_forwards": 1244,
+    "processed_input_tokens": 555096,
+    "generated_tokens": 0
+  },
+  "memory": {
+    "sampling": "instantáneas en puntos instrumentados; el pico real puede ser mayor",
+    "budget_bytes": 34359738368,
+    "peaks_sampled": {
+      "process_rss_bytes": 1427357696,
+      "mps_current_allocated_bytes": 10215276544,
+      "mps_driver_allocated_bytes": 11443748864,
+      "swap_used_bytes": 0
+    },
+    "over_budget": [],
+    "swap_delta_bytes": 0
+  },
+  "report_path": "runs/vision2_heads/20260923T161024Z/evaluations/vision_transfer_v2-all-20260923T165833Z.json",
+  "predictions_path": "runs/vision2_heads/20260923T161024Z/evaluations/vision_transfer_v2-all-20260923T165833Z-predictions.jsonl",
+  "metrics_summary": {
+    "questions": 450,
+    "mean_nll_all": 0.36249524998740273,
+    "noul": {
+      "n": 183,
+      "nll": 0.28336907925316407,
+      "accuracy": 0.8633879781420765
+    },
+    "choice": {
+      "n": 134,
+      "nll": 0.14218978921211609,
+      "accuracy": 0.9552238805970149
+    },
+    "score": {
+      "n": 133,
+      "nll": 0.6933299942599899,
+      "accuracy": 0.6992481203007519
+    }
+  },
+  "baselines_summary": {
+    "prior": {
+      "questions": 450,
+      "mean_nll_all": 1.0921343478050438,
+      "noul": {
+        "n": 183,
+        "nll": 0.684692989374415,
+        "accuracy": 0.5792349726775956
+      },
+      "choice": {
+        "n": 134,
+        "nll": 1.350556070701398,
+        "accuracy": 0.291044776119403
+      },
+      "score": {
+        "n": 133,
+        "nll": 1.3923844058854469,
+        "accuracy": 0.19548872180451127
+      }
+    },
+    "bow": {
+      "questions": 450,
+      "mean_nll_all": 1.0920366698646111,
+      "noul": {
+        "n": 183,
+        "nll": 0.6876783937171607,
+        "accuracy": 0.5737704918032787
+      },
+      "choice": {
+        "n": 134,
+        "nll": 1.3521955623872328,
+        "accuracy": 0.27611940298507465
+      },
+      "score": {
+        "n": 133,
+        "nll": 1.3862943611198908,
+        "accuracy": 0.22556390977443608
+      }
+    }
+  },
+  "vision_ablation": {
+    "questions_with_image": 450,
+    "seed": 0,
+    "image_omitted": {
+      "questions": 450,
+      "accuracy_original": 0.8422222222222222,
+      "accuracy_variant": 0.29555555555555557,
+      "nll_original": 0.36249524998740273,
+      "nll_variant": 3.3396649477470786,
+      "prediction_unchanged": 0.30666666666666664
+    },
+    "image_swapped": {
+      "questions": 450,
+      "accuracy_original": 0.8422222222222222,
+      "accuracy_variant": 0.36666666666666664,
+      "nll_original": 0.36249524998740273,
+      "nll_variant": 3.236646953154453,
+      "prediction_unchanged": 0.3711111111111111
+    },
+    "note": "image_swapped usa la imagen de otro grupo de la misma partición y conserva la etiqueta original: un modelo que mira la imagen debe empeorar; la etiqueta correcta para la imagen donante no se evalúa"
+  }
+}
