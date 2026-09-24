@@ -1,0 +1,78 @@
+{
+ "bootstrap": {
+  "unit": "tr\u00edo",
+  "reps": 1000,
+  "seed": 0
+ },
+ "results": {
+  "a4v3": {
+   "triplets": 150,
+   "questions": 450,
+   "accuracy": 0.8956,
+   "accuracy_ci": [
+    0.8644,
+    0.9222
+   ],
+   "by_role": {
+    "real": 0.96,
+    "other": 0.8667,
+    "none": 0.86
+   },
+   "full_triplets": 0.7133,
+   "full_triplets_ci": [
+    0.6333,
+    0.7867
+   ],
+   "ceiling_without_state": {
+    "accuracy": 0.3333,
+    "full_triplets": 0.0
+   }
+  },
+  "a4v5": {
+   "triplets": 150,
+   "questions": 450,
+   "accuracy": 0.9222,
+   "accuracy_ci": [
+    0.8956,
+    0.9489
+   ],
+   "by_role": {
+    "real": 0.96,
+    "other": 0.9,
+    "none": 0.9067
+   },
+   "full_triplets": 0.8,
+   "full_triplets_ci": [
+    0.74,
+    0.86
+   ],
+   "ceiling_without_state": {
+    "accuracy": 0.3333,
+    "full_triplets": 0.0
+   }
+  },
+  "a2v5": {
+   "triplets": 150,
+   "questions": 450,
+   "accuracy": 0.7644,
+   "accuracy_ci": [
+    0.7289,
+    0.8022
+   ],
+   "by_role": {
+    "real": 0.8933,
+    "other": 0.8133,
+    "none": 0.5867
+   },
+   "full_triplets": 0.4267,
+   "full_triplets_ci": [
+    0.3467,
+    0.5067
+   ],
+   "ceiling_without_state": {
+    "accuracy": 0.3333,
+    "full_triplets": 0.0
+   }
+  }
+ }
+}

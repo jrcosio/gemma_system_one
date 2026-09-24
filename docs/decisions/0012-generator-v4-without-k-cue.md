@@ -51,6 +51,6 @@ Detalle: `reports/phase6d-final.md`.
 - **Diseño:** `derive.fault_kind_triplets` (protocolo `reports/phase6e-protocol.md`) da un control del uso del estado coherente con la semántica. Cada trío comparte exactamente las mismas opciones y sólo cambia el estado; sin leer el estado, el techo es 1/3 de accuracy y 0 tríos completos.
 - **Uso del estado:** los tres modelos lo usan. Tríos completos: A4v3 0,58, A4v4 0,50 y A2v4 0,21, todos con el límite inferior del IC > 0,10.
 - **Tolerancia a K = 8:** sólo A2v4 la cumple (Δaccuracy +0,013 [−0,024; +0,053]). En A4v3 (−0,024 [−0,060; +0,011]) y A4v4 (−0,027 [−0,051; −0,002]) no queda demostrada.
-- **`other`:** el error dominante en E4B es asignar los fallos de rendimiento y de datos a la opción «aplicación». Es una ambigüedad de las definiciones del generador; queda pendiente un v5 con categorías mutuamente excluyentes.
+- **`other`:** en E4B son frecuentes las asignaciones de fallos de rendimiento y datos a «aplicación» (A4v3 K8: 31 de 55 errores de `other`). En K4, el error más frecuente de A4v3 es `other` → `none` (26 de 48), y la composición de errores cambia con K. El posible solapamiento de definiciones es una hipótesis para un v5, no una causa demostrada.
 
 Detalle: `reports/phase6e-final.md`.

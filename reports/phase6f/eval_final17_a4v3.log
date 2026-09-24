@@ -1,0 +1,156 @@
+{
+  "checkpoint": "runs/e4b_experiment/20260923T204945Z/checkpoint",
+  "stage": "phase2_decision_heads_frozen_backbone",
+  "split": "all",
+  "use_cache": true,
+  "code": {
+    "sha": "0a958df7686570f448ab2e5171d765e673db3cdc",
+    "dirty": true,
+    "source": {
+      "sha256": "8d7c7d742c2e1fbef080e864516f0b7525c76b6e11c78364e04b29447ea7b9e1",
+      "files": 90,
+      "globs": [
+        "src/**/*.py",
+        "configs/*.yaml",
+        "scripts/*.py",
+        "pyproject.toml",
+        "uv.lock"
+      ],
+      "archive": "artifacts/source/8d7c7d742c2e1fbef080e864516f0b7525c76b6e11c78364e04b29447ea7b9e1.tar"
+    }
+  },
+  "calibration": {
+    "file": "runs/e4b_experiment/20260923T204945Z/calibration/calibration-20260924T191506Z.json",
+    "temperatures": {
+      "noul": 1.8809815875979123,
+      "choice": 1.272713638002809,
+      "score": 0.9330360188485847
+    },
+    "calibrated": {
+      "noul": true,
+      "choice": true,
+      "score": true
+    }
+  },
+  "external_calibration_leakage": {
+    "errors": [],
+    "near_duplicate_states": 2
+  },
+  "external_dataset": {
+    "root": "data/pilot_v5_final17",
+    "sha256": "d5e0db4914e6f1c8cce94789e34c59e28f2f968402e46060f97ea346e5b8e190"
+  },
+  "external_leakage": {
+    "errors": [],
+    "near_duplicate_states": 6
+  },
+  "diagnostic_only": true,
+  "backbone_loaded": false,
+  "extraction": {
+    "split": "all",
+    "questions": 837,
+    "rows": 2211,
+    "backbone_forwards": 0,
+    "valid_tokens": 0,
+    "padding_tokens": 0,
+    "max_row_tokens": 0,
+    "seconds_synchronized": 0.0,
+    "cache_hit": true,
+    "image_rows": 0,
+    "image_tokens": 0
+  },
+  "usage": {
+    "questions": 837,
+    "expanded_rows": 2211,
+    "backbone_forwards": 0,
+    "processed_input_tokens": 0,
+    "generated_tokens": 0
+  },
+  "memory": {
+    "sampling": "instantáneas en puntos instrumentados; el pico real puede ser mayor",
+    "budget_bytes": 34359738368,
+    "peaks_sampled": {},
+    "over_budget": [],
+    "swap_delta_bytes": null
+  },
+  "report_path": "runs/e4b_experiment/20260923T204945Z/evaluations/pilot_v5_final17-all-calibrated-20260924T192847Z.json",
+  "predictions_path": "runs/e4b_experiment/20260923T204945Z/evaluations/pilot_v5_final17-all-calibrated-20260924T192847Z-predictions.jsonl",
+  "metrics_summary": {
+    "questions": 837,
+    "mean_nll_all": 0.2649108555250289,
+    "noul": {
+      "n": 353,
+      "nll": 0.11748813115949726,
+      "accuracy": 0.9688385269121813
+    },
+    "choice": {
+      "n": 274,
+      "nll": 0.44793818709593464,
+      "accuracy": 0.8284671532846716
+    },
+    "score": {
+      "n": 210,
+      "nll": 0.27391434528981234,
+      "accuracy": 0.9142857142857143
+    }
+  },
+  "metrics_calibrated_summary": {
+    "questions": 837,
+    "mean_nll_all": 0.2563346540177464,
+    "noul": {
+      "n": 353,
+      "nll": 0.10444627706264333,
+      "accuracy": 0.9688385269121813
+    },
+    "choice": {
+      "n": 274,
+      "nll": 0.4352653156816162,
+      "accuracy": 0.8284671532846716
+    },
+    "score": {
+      "n": 210,
+      "nll": 0.2781898719665609,
+      "accuracy": 0.9142857142857143
+    }
+  },
+  "baselines_summary": {
+    "prior": {
+      "questions": 837,
+      "mean_nll_all": 1.0417082456473414,
+      "noul": {
+        "n": 353,
+        "nll": 0.6578431962542917,
+        "accuracy": 0.6430594900849859
+      },
+      "choice": {
+        "n": 274,
+        "nll": 1.4320468945629417,
+        "accuracy": 0.20437956204379562
+      },
+      "score": {
+        "n": 210,
+        "nll": 1.177668115327685,
+        "accuracy": 0.3523809523809524
+      }
+    },
+    "bow": {
+      "questions": 837,
+      "mean_nll_all": 0.9705217697635811,
+      "noul": {
+        "n": 353,
+        "nll": 0.5576719638662956,
+        "accuracy": 0.7110481586402266
+      },
+      "choice": {
+        "n": 274,
+        "nll": 1.3500807051480104,
+        "accuracy": 0.4051094890510949
+      },
+      "score": {
+        "n": 210,
+        "nll": 1.1692685944607628,
+        "accuracy": 0.32857142857142857
+      }
+    }
+  }
+}

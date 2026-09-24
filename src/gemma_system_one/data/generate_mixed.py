@@ -41,10 +41,15 @@ GENERATOR_VERSIONS = {
     #     estado describe y sortea «other» con la misma probabilidad para cualquier K. Nueva secuencia
     #     aleatoria: no es emparejable con v3.
     "v4": "support-mixed-v4",
+    # v5: v4 con definiciones de fault_type excluyentes («aplicación» no incluye lentitud ni pérdida
+    #     de datos, más una cláusula de precedencia en la instrucción) y la composición de las opciones
+    #     sorteada sin mirar los hechos: siempre «none» y «other» más K − 2 categorías; la etiqueta se
+    #     deduce después (revisión de las fases 6d/6e). Nueva secuencia aleatoria.
+    "v5": "support-mixed-v5",
 }
 GENERATOR_VERSION = GENERATOR_VERSIONS["v3"]
 Variant = Literal["main", "transfer"]
-Version = Literal["v1", "v2", "v3", "v4"]
+Version = Literal["v1", "v2", "v3", "v4", "v5"]
 # v3 reutiliza la secuencia aleatoria de v2: mismos estados, etiquetas, grupos e IDs; sólo
 # cambia el texto de las instrucciones de fallo técnico. Así la comparación v2/v3 es emparejada.
 _RNG_STREAM = {
@@ -52,6 +57,7 @@ _RNG_STREAM = {
     "v2": "support-mixed-v2",
     "v3": "support-mixed-v2",
     "v4": "support-mixed-v4",
+    "v5": "support-mixed-v5",
 }
 FAULT_FAMILIES = ("service_fault", "fault_type", "fault_severity")
 ACCESS_POLICY_CLAUSE = {
@@ -206,6 +212,41 @@ FAULT_DISTRACTOR_OPTIONS = {
             "Notification failure",
         ],
     },
+}
+# v5: definiciones mutuamente excluyentes. Los estados de rendimiento y de datos mencionan funciones
+# de la app («al abrir {feature}»); en v3/v4 «Error en una pantalla o función de la aplicación» los
+# abarcaba (fase 6e). La última redacción de cada lista es de transfer.
+FAULT_KIND_OPTIONS_V5 = {
+    "es": {
+        **FAULT_KIND_OPTIONS["es"],
+        "performance": [
+            "Lentitud o rendimiento (funciona, pero tarda mucho)",
+            "El sistema responde con mucho retraso",
+            "Problema de velocidad",
+        ],
+        "application": [
+            "Error, cierre o pantalla que no carga en una función (no incluye lentitud ni pérdida de datos)",
+            "Una función de la aplicación da error o no carga, sin ir lenta ni perder datos",
+            "Fallo de una sección de la app (ni lentitud ni datos perdidos)",
+        ],
+    },
+    "en": {
+        **FAULT_KIND_OPTIONS["en"],
+        "performance": [
+            "Slowness or performance (it works, but takes very long)",
+            "The system responds with a long delay",
+            "Speed problem",
+        ],
+        "application": [
+            "An error, crash or screen that does not load in a feature (not slowness or data loss)",
+            "An app feature errors out or does not load, without being slow or losing data",
+            "A section of the app breaks (neither slowness nor lost data)",
+        ],
+    },
+}
+FAULT_TYPE_CLAUSE_V5 = {
+    "es": "Clasifica por la naturaleza del fallo: la lentitud es rendimiento y los datos perdidos o dañados son datos, aunque ocurran en una función de la aplicación.",
+    "en": "Classify by the nature of the failure: slowness is performance and lost or damaged data is data, even if it happens in an app feature.",
 }
 FAULT_KIND_K = (3, 6)  # K de entrenamiento en fault_type (igual que v3)
 OTHER_RATE = 0.2  # con fallo activo o resuelto: proporción de conjuntos sin la categoría real
@@ -382,9 +423,10 @@ def _choice_fault_kind(rng, lang, f, variant):
     )
 
 
-def fault_categories(lang: str) -> dict[str, list[str]]:
-    """Categorías de fault_type en v4: las del generador y las distractoras."""
-    return {**FAULT_KIND_OPTIONS[lang], **FAULT_DISTRACTOR_OPTIONS[lang]}
+def fault_categories(lang: str, version: str = "v4") -> dict[str, list[str]]:
+    """Categorías de fault_type en v4/v5: las del generador y las distractoras."""
+    base = FAULT_KIND_OPTIONS_V5 if version == "v5" else FAULT_KIND_OPTIONS
+    return {**base[lang], **FAULT_DISTRACTOR_OPTIONS[lang]}
 
 
 def true_fault_category(f: dict[str, Any]) -> str:
@@ -409,6 +451,27 @@ def _choice_fault_kind_v4(rng, lang, f, variant, k_range: tuple[int, int] = FAUL
     instr = rng.choice(_pool(FAULT_KIND_INSTR[lang], variant))
     return {"type": "choice", "instructions": instr, "criteria": criteria}, {"class_id": label_id}, (
         "fault_type", "fault_kind_or_none_or_other_v4"
+    )
+
+
+def _choice_fault_kind_v5(rng, lang, f, variant, k_range: tuple[int, int] = FAULT_KIND_K):
+    """Composición independiente de los hechos: ``none`` + ``other`` + K − 2 categorías sorteadas entre
+    las cuatro reales y las tres distractoras, sin mirar el estado. La etiqueta se deduce después
+    (categoría real si está listada; si no, ``other``; sin fallo, ``none``). Así, P(opciones | hechos)
+    no depende de los hechos y las opciones sólo aportan la información semántica de la tarea."""
+    k = rng.randint(*k_range)
+    pool = [c for c in [*FAULT_KIND_OPTIONS_V5[lang], *FAULT_DISTRACTOR_OPTIONS[lang]] if c not in ("none", "other")]
+    chosen = ["none", "other", *rng.sample(pool, k - 2)]
+    rng.shuffle(chosen)
+    true = true_fault_category(f)
+    label = true if true in chosen else "other"  # sin fallo, true == "none", que siempre está
+    cats = fault_categories(lang, "v5")
+    ids = _opaque_ids(rng, len(chosen))
+    criteria = {i: rng.choice(_pool(cats[c], variant)) for i, c in zip(ids, chosen, strict=True)}
+    label_id = ids[chosen.index(label)]
+    instr = f"{rng.choice(_pool(FAULT_KIND_INSTR[lang], variant))} {FAULT_TYPE_CLAUSE_V5[lang]}"
+    return {"type": "choice", "instructions": instr, "criteria": criteria}, {"class_id": label_id}, (
+        "fault_type", "fault_kind_v5_facts_independent_options"
     )
 
 
@@ -503,14 +566,16 @@ def generate_mixed(
                 chosen.append(rng.choice(options))
         audit.append({"group_id": group_id, "facts": f, "questions": chosen})
         for kind in chosen:
-            builder = _choice_fault_kind_v4 if version == "v4" and kind == "choice.fault_kind" else BUILDERS[kind]
+            builder = BUILDERS[kind]
+            if kind == "choice.fault_kind" and version in ("v4", "v5"):
+                builder = _choice_fault_kind_v4 if version == "v4" else _choice_fault_kind_v5
             question, target, (family, method) = builder(rng, lang, f, variant)
             if version != "v1" and question["type"] == "score" and rng.random() < 0.5:
                 # Rúbrica descendente: mismo significado por nivel, índice invertido.
                 question["criteria"] = list(reversed(question["criteria"]))
                 target = {"level_index": len(question["criteria"]) - 1 - target["level_index"]}
                 method = f"{method}_descending"
-            if version in ("v3", "v4") and family in FAULT_FAMILIES:
+            if version in ("v3", "v4", "v5") and family in FAULT_FAMILIES:
                 # No consume aleatoriedad: la secuencia de v2 se conserva.
                 question["instructions"] = f"{question['instructions']} {ACCESS_POLICY_CLAUSE[lang]}"
             raw = {

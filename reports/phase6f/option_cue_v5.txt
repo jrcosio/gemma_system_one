@@ -1,0 +1,2 @@
+v4 {'questions': 9326, 'signatures': 418, 'other_rate': 0.148, 'acc_prior_only': 0.4271, 'acc_options_bayes': 0.4774, 'composition_gain': 0.0503}
+v5 {'questions': 9191, 'signatures': 98, 'other_rate': 0.4783, 'acc_prior_only': 0.4783, 'acc_options_bayes': 0.4907, 'composition_gain': 0.0124}

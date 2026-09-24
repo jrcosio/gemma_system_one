@@ -255,7 +255,7 @@ TRIPLET_ROLES = ("real", "other", "none")
 
 
 def fault_kind_triplets(
-    examples: list[Example], audit: list[dict[str, Any]], seed: int, n_triplets: int
+    examples: list[Example], audit: list[dict[str, Any]], seed: int, n_triplets: int, version: str = "v4"
 ) -> tuple[list[Example], list[Example]]:
     """Revisión de la fase 6d: control semánticamente coherente del uso del estado.
 
@@ -268,14 +268,21 @@ def fault_kind_triplets(
     Cada etiqueta sale de los hechos de su propio estado. Un predictor que no lea el estado da la
     misma respuesta a los tres: su accuracy máxima es 1/3 y nunca acierta un trío completo.
     Devuelve (K4, K8); K8 añade a cada pregunta las mismas cuatro distractoras (mismos IDs y textos
-    dentro del trío)."""
+    dentro del trío). ``version="v5"`` usa las definiciones excluyentes y la cláusula de precedencia
+    de v5, en el mismo orden que el generador."""
     from .generate_mixed import (
         ACCESS_POLICY_CLAUSE,
         FAULT_DISTRACTOR_OPTIONS,
         FAULT_KIND_INSTR,
         FAULT_KIND_OPTIONS,
+        FAULT_KIND_OPTIONS_V5,
+        FAULT_TYPE_CLAUSE_V5,
         true_fault_category,
     )
+
+    if version not in ("v4", "v5"):
+        raise ValueError("version debe ser v4 o v5")
+    kind_options = FAULT_KIND_OPTIONS_V5 if version == "v5" else FAULT_KIND_OPTIONS
 
     rng = random.Random(f"triplets:{seed}")
     facts = {a["group_id"]: a["facts"] for a in audit}
@@ -311,7 +318,7 @@ def fault_kind_triplets(
                 if g is not None:
                     pools[(lang, needed[role])].append(g)
             continue
-        cats = {**FAULT_KIND_OPTIONS[lang], **FAULT_DISTRACTOR_OPTIONS[lang], **DIAG_DISTRACTOR_OPTIONS[lang]}
+        cats = {**kind_options[lang], **FAULT_DISTRACTOR_OPTIONS[lang], **DIAG_DISTRACTOR_OPTIONS[lang]}
         base = ["none", "other", *pair]
         extra = [*FAULT_DISTRACTOR_OPTIONS[lang], *DIAG_DISTRACTOR_OPTIONS[lang]]
         ids: list[str] = []
@@ -322,7 +329,10 @@ def fault_kind_triplets(
         text = {c: rng.choice(cats[c][:-1]) for c in [*base, *extra]}  # redacciones de main
         k4 = {i: text[c] for i, c in zip(ids, base, strict=False)}
         k8 = {**k4, **{i: text[c] for i, c in zip(ids[len(base) :], extra, strict=True)}}
-        instr = f"{rng.choice(FAULT_KIND_INSTR[lang][:-1])} {ACCESS_POLICY_CLAUSE[lang]}"
+        instr = rng.choice(FAULT_KIND_INSTR[lang][:-1])
+        if version == "v5":
+            instr = f"{instr} {FAULT_TYPE_CLAUSE_V5[lang]}"
+        instr = f"{instr} {ACCESS_POLICY_CLAUSE[lang]}"
         answer = {"real": real_kind, "other": "other", "none": "none"}
         for role in TRIPLET_ROLES:
             src = first[got[role]]

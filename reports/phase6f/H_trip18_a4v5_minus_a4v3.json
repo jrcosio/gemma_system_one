@@ -1,0 +1,55 @@
+{
+ "a": "runs/e4b_experiment/20260923T204945Z/evaluations/pilot_v5_trip18_K4-all-calibrated-20260924T192850Z-predictions.jsonl",
+ "b": "runs/e4b_v5/20260924T184606Z/evaluations/pilot_v5_trip18_K4-all-calibrated-20260924T192353Z-predictions.jsonl",
+ "triplets": 150,
+ "bootstrap": {
+  "unit": "tr\u00edo",
+  "reps": 1000,
+  "seed": 0
+ },
+ "full_triplets": {
+  "a": 0.7133,
+  "b": 0.8,
+  "b_minus_a": 0.0867,
+  "ci95": [
+   0.02,
+   0.16
+  ]
+ },
+ "accuracy": {
+  "a": 0.8956,
+  "b": 0.9222,
+  "b_minus_a": 0.0267,
+  "ci95": [
+   0.0022,
+   0.0534
+  ]
+ },
+ "role_none": {
+  "a": 0.86,
+  "b": 0.9067,
+  "b_minus_a": 0.0467,
+  "ci95": [
+   0.0,
+   0.0933
+  ]
+ },
+ "role_other": {
+  "a": 0.8667,
+  "b": 0.9,
+  "b_minus_a": 0.0333,
+  "ci95": [
+   -0.0133,
+   0.08
+  ]
+ },
+ "role_real": {
+  "a": 0.96,
+  "b": 0.96,
+  "b_minus_a": 0.0,
+  "ci95": [
+   -0.0333,
+   0.04
+  ]
+ }
+}

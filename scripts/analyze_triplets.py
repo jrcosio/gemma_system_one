@@ -16,17 +16,27 @@ from collections import defaultdict
 import numpy as np
 
 REPS, SEED = 1000, 0
+ROLES = frozenset(("real", "other", "none"))
 
 
-def analyze(path: str) -> dict:
+def load_triplets(path: str) -> tuple[dict[str, dict[str, bool]], int]:
+    """Aciertos por trío y papel, validados; y el número de filas leídas."""
     with open(path, encoding="utf-8") as fh:
         rows = [json.loads(line) for line in fh if line.strip()]
     trip: dict[str, dict[str, bool]] = defaultdict(dict)
     for r in rows:
         tid, role = r["id"].rsplit("-", 1)
-        trip[tid][role] = bool(r["correct"])
-    if any(len(v) != 3 for v in trip.values()):
-        raise ValueError(f"{path}: tríos incompletos")
+        if role not in ROLES or role in trip[tid] or type(r["correct"]) is not bool:
+            raise ValueError(f"{path}: papel duplicado/desconocido o 'correct' no booleano: {r['id']}")
+        trip[tid][role] = r["correct"]
+    if not trip or any(set(v) != ROLES for v in trip.values()):
+        raise ValueError(f"{path}: tríos vacíos o incompletos")
+    return dict(trip), len(rows)
+
+
+def analyze(path: str) -> dict:
+    trip, n_rows = load_triplets(path)
+    rows = range(n_rows)
     ids = sorted(trip)
     full = np.array([all(trip[t].values()) for t in ids], float)
     acc = np.array([np.mean(list(trip[t].values())) for t in ids], float)

@@ -1,9 +1,17 @@
 # Fase 6e: tríos con la misma pregunta (control coherente del uso del estado y diagnóstico de K)
 
-Fecha: 2026-09-24. Mac M5 Pro con 48 GB, MPS/BF16 y cabezales CPU/FP32. Rama `main`, sobre `9edc183`. Sin commit: los cambios de esta fase y las correcciones de la revisión de la 6d.
+Fecha: 2026-09-24. Mac M5 Pro con 48 GB, MPS/BF16 y cabezales CPU/FP32. La fase 6e y la revisión de la 6d quedaron en el commit `0a958df` de `main`, sobre `9edc183`; la revisión independiente actual contiene correcciones sin commit.
 
 - **Protocolo predeclarado:** [phase6e-protocol.md](phase6e-protocol.md), sha256 `d33ede5a…` (en `reports/phase6e/protocol.sha256`). Se escribió antes de generar los datos y de evaluar.
 - **Evidencia bruta:** `reports/phase6e/`.
+
+## Revisión independiente
+
+Se comprobaron los 150 tríos de K4 y K8 contra los hechos regenerados: 450 grupos distintos por conjunto, cero etiquetas incoherentes y cero diferencias en el prompt que no sean el estado dentro de cada trío. Los seis archivos de predicciones tienen 450 filas cada uno y sus indicadores `correct` coinciden con el argmax de los logits y la etiqueta. Una recarga de A4v3 real en MPS/BF16, sin caché, reprodujo exactamente los cuatro logits archivados para una pregunta K4; esto verifica inferencia, no gradientes E4B nuevos. Pasaron 56 pruebas CPU focalizadas en máscaras, prompts, pérdida de grupo, LoRA y extracción diminuta, y una prueba de gradientes LoRA con E2B real en MPS (sin omisión).
+
+La comprobación de fuga externa de A4v3 informa cero solapes exactos y tres estados **casi duplicados** del entrenamiento (`data/pilot_v3`), todos en el papel `none` de tríos distintos. Al excluir esos tres tríos de K4, los tríos completos son A4v3 0,571, A4v4 0,497 y A2v4 0,211 (frente a 0,580/0,500/0,207); el hallazgo descriptivo de uso del estado no depende de ellos. No se reestima el IC predeclarado tras la exclusión ni se presenta la ausencia de solapes exactos como ausencia de toda similitud.
+
+`scripts/analyze_triplets.py` aceptaba silenciosamente una fila duplicada del mismo papel: con cuatro filas para un trío informaba `questions=4` pero calculaba accuracy sobre tres después de sobrescribir una. Se corrigió para rechazar papeles duplicados, desconocidos, incompletos, entradas vacías y `correct` no booleano. Los seis JSONL archivados son válidos y el resultado histórico no cambia. El diagnóstico causal de «ambigüedad» queda como hipótesis, según los recuentos del veredicto y la sección de límites.
 
 ## Veredicto
 
@@ -24,11 +32,11 @@ Fecha: 2026-09-24. Mac M5 Pro con 48 GB, MPS/BF16 y cabezales CPU/FP32. Rama `ma
    | A4v4 | −0,027 [−0,051; −0,002] | No demostrada, por 0,001 |
    | A2v4 | +0,013 [−0,024; +0,053] | **Tolera** |
 
-   Con un bootstrap por trío, más conservador, el resultado es casi igual: A4v3 [−0,058; +0,011], A4v4 [−0,049; −0,004], A2v4 [−0,022; +0,051]. Así, A4v4 cumpliría por 0,001, pero la lectura predeclarada es la del bootstrap por grupos.
-3. **La debilidad de `other` es sobre todo una ambigüedad de las categorías, no del número de opciones.**
-   - **El error:** el más frecuente con respuesta `other` es elegir la opción de aplicación (A4v3 en K8: 31 de 55 errores).
-   - **Qué estados fallan:** sobre todo los de rendimiento y de datos. Muchos estados de estas categorías se redactan como fallos de la aplicación («la aplicación va extremadamente lenta…»), y la opción «Error en una pantalla o función de la aplicación» no los excluye.
-   - **Siguiente paso:** es un fallo de la definición de la tarea en el generador, que se corregiría con definiciones mutuamente excluyentes en un v5.
+   El bootstrap por trío respeta la dependencia entre las tres preguntas que comparten opciones: A4v3 [−0,058; +0,011], A4v4 [−0,049; −0,004], A2v4 [−0,022; +0,051]. A4v4 cruza el margen por sólo 0,001 con esa unidad, mientras falla por 0,001 con el bootstrap por grupo predeclarado. Su clasificación es **sensible a la unidad de remuestreo**; no se debe presentar ninguna de las dos como conclusión estable. A2v4 cumple con ambas unidades.
+3. **`other` es difícil y hay una posible superposición entre categorías, aún sin causa demostrada.**
+   - En A4v3, los errores `other` → «aplicación» son 18/48 errores en K4 y 31/55 en K8; `other` → `none` son 26/48 y 11/55. La composición de errores cambia al añadir opciones, por lo que no se puede descartar un efecto de K.
+   - Muchos de los errores hacia «aplicación» corresponden a fallos de rendimiento o datos. Algunas redacciones del estado mencionan la aplicación, mientras la categoría «Error en una pantalla o función de la aplicación» no excluye explícitamente lentitud ni pérdida de datos. **Esto sugiere** superposición semántica; los recuentos de predicciones no demuestran que sea la causa principal.
+   - Un v5 con definiciones excluyentes es una hipótesis de mejora pendiente de protocolo, datos nuevos y evaluación; no se le atribuye una mejora medida.
 
 ## Diseño y datos
 
@@ -101,11 +109,11 @@ caffeinate -i .venv/bin/pytest tests/mps tests/e2e -q -rs # 14 passed, 0 omitido
 
 El bootstrap por trío y el análisis de errores se calcularon sin volver a usar los modelos, a partir de las predicciones, y están en `reports/phase6e/sensitivity_and_errors.txt`.
 
-**Código de las evaluaciones:** `c1ee7841…`. El actual, `a1e3f481…` (86 ficheros), sólo añade `scripts/analyze_triplets.py`. Ambos tienen copia en `artifacts/source/`.
+**Código de las evaluaciones:** `c1ee7841…` (85 ficheros). El cierre publicado fue `a1e3f481…` (86 ficheros; añadió `scripts/analyze_triplets.py`). La revisión actual, aún sin commit, es `72f55732…` (86 ficheros; valida la entrada del analizador). Las dos primeras huellas tienen copia en `artifacts/source/`; la revisión no se usó para generar los logits históricos.
 
 ## Límites
 
 - Una familia sintética; 150 tríos, con IC de unos ±0,03 en accuracy.
-- El bootstrap por grupos no tiene en cuenta que las preguntas de un trío comparten opciones; la sensibilidad por trío da casi lo mismo.
+- El bootstrap por grupos no tiene en cuenta que las preguntas de un trío comparten opciones. La lectura de A4v4 cambia en el margen entre ese bootstrap predeclarado y el bootstrap por trío, que respeta la unidad del diseño.
 - `trip15*` ya está usado.
-- La ambigüedad entre categorías afecta también a los datos de entrenamiento v3 y v4.
+- Las mismas redacciones potencialmente solapadas aparecen en los datos de entrenamiento v3 y v4; su efecto causal sobre los errores no se ha aislado.

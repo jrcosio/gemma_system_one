@@ -1,0 +1,8 @@
+Loading weights:   0%|          | 0/1951 [00:00<?, ?it/s]Loading weights:  60%|█████▉    | 1168/1951 [00:00<00:00, 11661.80it/s]Loading weights: 100%|██████████| 1951/1951 [00:00<00:00, 12766.07it/s]
+[train] run: runs/e2b_heads_v5/20260924T185841Z  época elegida: 18 (validation)
+  gemma_heads  train      nll_all=0.2311 | noul: nll=0.087 acc=0.965 (n=909) | choice: nll=0.362 acc=0.868 (n=635) | score: nll=0.318 acc=0.883 (n=556)
+  gemma_heads  validation nll_all=0.4642 | noul: nll=0.160 acc=0.919 (n=123) | choice: nll=0.624 acc=0.755 (n=102) | score: nll=0.746 acc=0.680 (n=75)
+  prior        train      nll_all=1.0076 | noul: nll=0.633 acc=0.672 (n=909) | choice: nll=1.425 acc=0.162 (n=635) | score: nll=1.143 acc=0.367 (n=556)
+  prior        validation nll_all=1.0622 | noul: nll=0.689 acc=0.593 (n=123) | choice: nll=1.445 acc=0.118 (n=102) | score: nll=1.153 acc=0.253 (n=75)
+  bow          train      nll_all=0.8460 | noul: nll=0.405 acc=0.812 (n=909) | choice: nll=1.236 acc=0.483 (n=635) | score: nll=1.122 acc=0.428 (n=556)
+  bow          validation nll_all=0.9582 | noul: nll=0.585 acc=0.683 (n=123) | choice: nll=1.297 acc=0.441 (n=102) | score: nll=1.110 acc=0.427 (n=75)

@@ -1,0 +1,12 @@
+a4v3 errores (papel→elegida): [(('none', 'other'), 16), (('other', 'none'), 16), (('real', 'other'), 6), (('none', 'data'), 5), (('other', 'data'), 2), (('other', 'application'), 1)]
+   'other' por categoría real no listada: {'application': '29/30', 'data': '31/40', 'network': '35/38', 'performance': '35/42'}
+a4v5 errores (papel→elegida): [(('none', 'other'), 12), (('other', 'none'), 12), (('real', 'other'), 3), (('other', 'application'), 3), (('real', 'data'), 2), (('none', 'data'), 1)]
+   'other' por categoría real no listada: {'application': '28/30', 'data': '33/40', 'network': '36/38', 'performance': '38/42'}
+a2v5 errores (papel→elegida): [(('none', 'other'), 41), (('other', 'none'), 15), (('real', 'other'), 14), (('none', 'application'), 10), (('none', 'data'), 10), (('other', 'application'), 7)]
+   'other' por categoría real no listada: {'application': '25/30', 'data': '33/40', 'network': '29/38', 'performance': '35/42'}
+a4v3 acierto por estado del fallo (papel, fault, correcto): [(('other', 'active', False), 6), (('other', 'active', True), 96), (('other', 'resolved', False), 14), (('other', 'resolved', True), 34), (('real', 'active', True), 94), (('real', 'resolved', False), 6), (('real', 'resolved', True), 50)]
+a4v5 acierto por estado del fallo (papel, fault, correcto): [(('other', 'active', False), 2), (('other', 'active', True), 100), (('other', 'resolved', False), 13), (('other', 'resolved', True), 35), (('real', 'active', False), 1), (('real', 'active', True), 93), (('real', 'resolved', False), 5), (('real', 'resolved', True), 51)]
+a2v5 acierto por estado del fallo (papel, fault, correcto): [(('other', 'active', False), 16), (('other', 'active', True), 86), (('other', 'resolved', False), 12), (('other', 'resolved', True), 36), (('real', 'active', False), 4), (('real', 'active', True), 90), (('real', 'resolved', False), 12), (('real', 'resolved', True), 44)]
+a4v3 papel none por estado de acceso (access, correcto): [(('absent', False), 10), (('absent', True), 64), (('locked', False), 5), (('locked', True), 45), (('ok', False), 6), (('ok', True), 20)]
+a4v5 papel none por estado de acceso (access, correcto): [(('absent', False), 8), (('absent', True), 66), (('locked', False), 3), (('locked', True), 47), (('ok', False), 3), (('ok', True), 23)]
+a2v5 papel none por estado de acceso (access, correcto): [(('absent', False), 27), (('absent', True), 47), (('locked', False), 26), (('locked', True), 24), (('ok', False), 9), (('ok', True), 17)]

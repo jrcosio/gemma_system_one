@@ -1,4 +1,229 @@
-# Estado vigente — fase 6e cerrada: tríos con la misma pregunta (2026-09-24, 17:36 UTC)
+# Estado vigente — fase 6f cerrada: generador v5 (2026-09-24, 19:35 UTC)
+
+Sustituye a las secciones siguientes (relevo y revisión de la fase 6e), que quedan como registro histórico. Resuelve su pendiente: el generador v5 con definiciones y datos nuevos predeclarados, el trío como unidad del IC y sin reutilizar `trip15*`. Incluye, sin cambios, las correcciones de esa revisión, que siguen sin commit:
+- `scripts/analyze_triplets.py` (validación de duplicados), refactorizado aquí para extraer `load_triplets` sin cambiar sus resultados (reproduce 0,58 / 0,8467 de la 6e);
+- `tests/unit/test_phase6e_triplets.py`;
+- `README.md`, `reports/phase6e-final.md` y `docs/decisions/0012-…md`.
+
+## 1. Fase, rama y veredicto
+
+| Campo | Estado |
+|---|---|
+| Fase | **6f cerrada.** No hay fases posteriores en la spec §10; es la corrección de fallos del piloto detectados en revisión. Informe: **`reports/phase6f-final.md`**. Decisión **0013**. Protocolo `reports/phase6f-protocol.md`, sha256 `7a995f7f…` (en `reports/phase6f/protocol.sha256`), escrito antes de generar los datos v5 y de entrenar |
+| Corrección | **`support-mixed-v5`**: «aplicación» excluye lentitud y pérdida de datos; cláusula de precedencia en la instrucción; opciones = `none` + `other` + K − 2 categorías sorteadas sin mirar los hechos. v1–v4 siguen idénticos byte a byte. Composición: 0,012 de información sobre la respuesta (v4: 0,050). `other` = 0,48 de las preguntas `fault_type` |
+| Regla H | **Se cumple:** tríos completos A4v5 − A4v3 = **+0,087 [+0,020; +0,160]** (150 tríos v5, bootstrap por trío) |
+| Regla S | **No se cumple (parte b):** `final17`, NLL calibrada A4v5 − A4v3 = −0,007 [−0,037; +0,025]; el límite superior supera +0,02. **El servicio sigue siendo A4v3**; A4v5 queda como alternativa |
+| Descriptivo | El error `other` → «aplicación» casi desaparece con v5: 1 (A4v3) y 3 (A4v5) en `trip18`, frente a 31 de 55 errores en `trip15`. **Residuo en E4B:** fallos **resueltos** con respuesta `other` (A4v5 falla 13/48, frente a 2/102 con fallo activo) → hipótesis para un v6. E2B confunde las cuentas bloqueadas con fallos técnicos |
+| Rama / commit | `main` = `fases-0-6` = **`0a958df`**, en local y en `origin`. **Sin commit:** la revisión de la 6e y esta fase (§4) |
+| Código | **`8d7c7d742c2e1fbef080e864516f0b7525c76b6e11c78364e04b29447ea7b9e1`** (90 ficheros), el de todas las ejecuciones; copia en `artifacts/source/` |
+| Pruebas | **301 CPU** (35,36 s) y **14 MPS/E2E reales** (129,26 s, 0 omitidos). Ruff y formato en verde (152 ficheros); `uv lock --check` y `git diff --check` correctos |
+
+## 2. Procesos activos
+
+`pgrep -fl 'gso|pytest|uvicorn'` terminó con código 1 y `lsof -nP -iTCP:8000 -sTCP:LISTEN` también: **ningún proceso del proyecto** y el puerto libre.
+
+## 3. Checkpoints
+
+| Ruta | Uso |
+|---|---|
+| `runs/e4b_experiment/20260923T204945Z/checkpoint` + `calibration/calibration-20260924T045005Z.json` | **A4v3, servicio vigente** (sin cambios) |
+| `runs/e4b_v5/20260924T184606Z/checkpoint` + su `calibration/` (`calib16`) | **A4v5**, E4B + cabezales con v5 (época 20) |
+| `runs/e2b_heads_v5/20260924T185841Z/checkpoint` + su `calibration/` | A2v5, E2B + cabezales con v5 (época 18) |
+| A4v3 + `calibration/` (`calib16`) | Calibración de A4v3 usada sólo en la evaluación de la 6f |
+| A4v4, A2v4, B2, A2, V2 y C2 | Sin cambios; rutas en la tabla histórica siguiente |
+
+**Datos nuevos:** `data/pilot_v5`, `pilot_v5_calib16`, `pilot_v5_final17` y `pilot_v5_trip18{,_K4}`. Están **ya usados** `final17` y `trip18*`; el test y la partición de calibración de `pilot_v5` siguen sin leer.
+
+**Conjuntos que no deben servir para decidir:** todos los de las fases 3–6e (el test de `pilot_v3`, los tests de `vision_pilot_v1/v2`, `holdout6*`, `final8`, `final13`, `kdiag11*`, `kdiag14*`, `final13_faultswap` y `trip15*`) más `final17` y `trip18*`.
+
+## 4. Archivos sin commit sobre `0a958df`
+
+**De la revisión de la 6e:** los de la introducción de esta sección.
+
+**Nuevos de esta fase:**
+- `tests/unit/test_phase6f_generator_v5.py`;
+- `scripts/derive_phase6f_data.py`, `scripts/compare_triplets.py`;
+- `configs/e4b_v5.yaml`, `configs/e2b_heads_v5.yaml`;
+- `docs/decisions/0013-generator-v5-exclusive-definitions.md`;
+- `reports/phase6f-protocol.md`, `reports/phase6f-final.md` y `reports/phase6f/` (logs, `pred_*.txt`, comparaciones, `triplets.json`, `errors_trip18.txt`, `option_cue_v5.txt`, `run_chain.sh`).
+
+**Modificados en esta fase:**
+- `src/gemma_system_one/data/generate_mixed.py`: v5, `FAULT_KIND_OPTIONS_V5`, `FAULT_TYPE_CLAUSE_V5`, `_choice_fault_kind_v5` y `fault_categories(version)`;
+- `src/gemma_system_one/data/derive.py`: `fault_kind_triplets(version)`;
+- `src/gemma_system_one/cli.py`: `--generator-version v5`;
+- `scripts/analyze_triplets.py`: `load_triplets`;
+- `tests/unit/test_phase6e_triplets.py`: un test;
+- `README.md` y este STATUS.
+
+## 5. Decisiones
+
+- **0013:** datos v5; el servicio no cambia por la regla S.
+- 0001–0012 siguen vigentes.
+
+## 6. Comandos exactos
+
+Lista completa en `reports/phase6f-final.md` («Comandos ejecutados»):
+- tests v5 y sonda sin modelos;
+- protocolo y su sha256;
+- `generate-data v5`, `gso split` y `derive_phase6f_data.py`;
+- `validate-data` de los 5 conjuntos;
+- `reports/phase6f/run_chain.sh`: 2 entrenamientos, 3 calibraciones y 6 evaluaciones;
+- `compare_triplets.py`, `analyze_triplets.py` y `gso compare`;
+- `pytest` CPU y MPS/E2E.
+
+## 7. Fallos reproducibles
+
+- **Corregido, como hipótesis confirmada descriptivamente:** la ambigüedad de «aplicación» en v3/v4. Comparar `reports/phase6e/sensitivity_and_errors.txt` con `reports/phase6f/errors_trip18.txt`.
+- **Abierto, de definición:** los fallos resueltos se leen como «sin fallo». Se reproduce con `reports/phase6f/errors_trip18.txt` (`other` con fallo activo frente a resuelto).
+- **Abierto:** en E2B, las cuentas bloqueadas se leen como fallo técnico (misma fuente, papel `none` por estado de acceso).
+- **Sin fallos de código nuevos.**
+
+## 8. Pendientes, en orden
+
+1. **Commit y push** de la revisión de la 6e y de esta fase, a decidir por el usuario.
+2. **Revisión independiente de la 6f:**
+   - `_choice_fault_kind_v5`, sobre todo que las opciones no dependan de los hechos (test con 6000 casos);
+   - la aplicación de las reglas H y S;
+   - el cambio de proporción de `other` a 0,48 y su efecto en `final17`.
+3. **Opcional, v6** (protocolo y datos nuevos antes de entrenar): aclarar si un fallo resuelto cuenta como fallo, en la opción `none` y en la instrucción, y reforzar la cláusula de acceso. Mantener A4v3 mientras no se supere su regla.
+4. **Clon limpio** con `uv sync`, sin probar.
+5. **Opcionales:** calibración de Choice, LoRA sobre E4B, E4B con imagen y abstención.
+6. **Riesgos que se mantienen:**
+   - el timeout no interrumpe un forward MPS y la cola no limita las conexiones;
+   - el RSS muestreado no es el pico de MPS;
+   - datos sintéticos de una familia;
+   - V2 sin calibrar.
+
+### Privacidad
+
+- **Contenido:** sin secretos ni datos personales.
+- **Rutas:** las de `reports/phase6f/` están enmascaradas con `~`.
+
+---
+
+# Registro histórico — relevo tras revisión independiente de fase 6e (2026-09-24, 17:50 UTC)
+
+**Instantánea de este relevo.** Fase 6e revisada; no se abre otra fase ni se cambia el alcance. Rama `main`, HEAD `0a958df7686570f448ab2e5171d765e673db3cdc`. `main`, `fases-0-6`, `origin/main` y `origin/fases-0-6` apuntan a ese mismo commit **según las referencias locales**; no se hizo fetch, merge, commit ni push en este relevo. Stash vacío. Seis archivos con cambios de la revisión anterior siguen **sin commit**: `README.md`, `docs/STATUS.md`, `docs/decisions/0012-generator-v4-without-k-cue.md`, `reports/phase6e-final.md`, `scripts/analyze_triplets.py` y `tests/unit/test_phase6e_triplets.py`. Este relevo modifica únicamente STATUS. No se alteran el servicio A4v3, los checkpoints, el modelo, el backend ni el contrato público.
+
+**Decisiones y fallos para el siguiente asistente.** El control por tríos de 6e se sostiene en esta familia sintética; los modelos usan información del estado y A2v4 cumple el margen K8 con los dos remuestreos. La lectura de A4v4 depende de la unidad de bootstrap por 0,001, así que queda inconclusa en el margen. El error `other` → «aplicación» es medido, pero atribuirlo principalmente a ambigüedad de categorías era una afirmación causal no demostrada: ahora figura como hipótesis para v5. El analizador aceptaba una fila duplicada y sobrescribía un papel; la corrección y un test están sin commit. Hay tres estados casi duplicados del entrenamiento, ningún solape exacto; excluir sus tríos apenas cambia la proporción descriptiva de tríos completos. Datos `trip15*` ya abiertos: no usarlos para escoger v5. Detalles, números y reproducciones están en el bloque de revisión inmediatamente siguiente y en `reports/phase6e-final.md`.
+
+**Resultados comprobados ahora y evidencia que no se repitió.** `git diff --check` y el hash del protocolo 6e pasan; la huella actual de fuentes es `72f5573241003a61d1dffe584abdb6ddfee3a5bfa64607d27636b02fe91d4a29` (86 archivos), distinta de `c1ee7841…`, usada al evaluar. En **este relevo** sólo se verificaron Git, huella, protocolo, procesos y presencia de checkpoints. Los 2 tests de fase 6e, 56 tests CPU focalizados, 1 test E2B/LoRA real en MPS y la recarga/forward A4v3/E4B real en MPS/BF16 se ejecutaron en la **revisión anterior**, con sus resultados abajo; no se repitieron aquí. Los 294 CPU y 14 MPS/E2E de la implementación son anteriores a la revisión.
+
+**Procesos y checkpoints ahora.** El filtro de procesos no mostró GSO, pytest ni uvicorn; sólo un `caffeinate -i` auxiliar. TCP 8000 no tiene listener. Se verificó la presencia del manifiesto en los siete checkpoints, sin recargarlos en este relevo: A4v3 `runs/e4b_experiment/20260923T204945Z/checkpoint` (servicio; calibración `runs/e4b_experiment/20260923T204945Z/calibration/calibration-20260924T045005Z.json`), A4v4 `runs/e4b_v4/20260924T140932Z/checkpoint`, A2v4 `runs/e2b_heads_v4/20260924T142144Z/checkpoint`, B2 `runs/pilot_lora_v3/20260923T012208Z/checkpoint`, A2 `runs/pilot_ce_v3/20260923T005721Z/checkpoint`, V2 `runs/vision2_heads/20260923T161024Z/checkpoint` y C2 `runs/vision2_text_only/20260923T162937Z/checkpoint`. Son rutas locales ignoradas por Git.
+
+**Comandos exactos de comprobación de este relevo**, desde la raíz; la comprobación Python de checkpoints se transcribe completa:
+
+```sh
+git branch --show-current
+git rev-parse HEAD
+git status --short
+git diff --stat
+git stash list
+git log -1 --format='%H%n%s%n%ad' --date=iso-strict
+git rev-parse main fases-0-6 origin/main origin/fases-0-6
+git diff --check
+shasum -a 256 -c reports/phase6e/protocol.sha256
+.venv/bin/python -c 'from gemma_system_one.env import source_fingerprint; x=source_fingerprint(); print(x["sha256"], x["files"])'
+ps -axo pid,ppid,stat,etime,command | rg '[g]so|[g]emma_system_one|[p]ytest|[u]vicorn|[c]affeinate|[t]rain' | head -25
+lsof -nP -iTCP:8000 -sTCP:LISTEN
+.venv/bin/python - <<'PY'
+from pathlib import Path
+for name,run in [('A4v3','runs/e4b_experiment/20260923T204945Z'),('A4v4','runs/e4b_v4/20260924T140932Z'),('A2v4','runs/e2b_heads_v4/20260924T142144Z'),('B2','runs/pilot_lora_v3/20260923T012208Z'),('A2','runs/pilot_ce_v3/20260923T005721Z'),('V2','runs/vision2_heads/20260923T161024Z'),('C2','runs/vision2_text_only/20260923T162937Z')]:
+ p=Path(run);print(name,p/'checkpoint',(p/'checkpoint/manifest.json').is_file(),[x.name for x in sorted((p/'calibration').glob('*.json'))])
+PY
+```
+
+`lsof` terminó con código 1 y sin salida; los siete manifiestos imprimieron `True`. No se incluyeron secretos, tokens, rutas personales ni contenido de estados. **Siguientes tareas:** revisar y decidir el destino de estos seis cambios sin commit; para v5, predeclarar definiciones y datos nuevos, usar el trío como unidad primaria del IC y no reutilizar `trip15*` para elegir; verificar un clon limpio con `uv sync` cuando corresponda. No iniciar dos entrenamientos pesados simultáneamente.
+
+---
+
+# Registro de la revisión independiente de fase 6e (2026-09-24, 17:45 UTC)
+
+## Dictamen y relevo actual
+
+**Fase, rama y código.** Fase 6e implementada y publicada en `main`, HEAD `0a958df7686570f448ab2e5171d765e673db3cdc` (también `fases-0-6` según el relevo anterior). Las seis evaluaciones usaron la huella de fuentes `c1ee7841a31e1ae63668c130bb014de658d4181ad21cd712ee1009ce105aca69` (85 archivos, copia en `artifacts/source/`). Tras esta revisión, la huella local es `72f5573241003a61d1dffe584abdb6ddfee3a5bfa64607d27636b02fe91d4a29` (86 archivos); **no** atribuirla a las evaluaciones. Esta revisión queda **sin commit**. Se conserva la edición previa de este STATUS hecha para el relevo del implementador.
+
+**Hallazgos por gravedad.**
+
+| Gravedad | Hallazgo | Corrección / límite |
+|---|---|---|
+| Media, conclusión causal | En A4v3, los errores del papel `other` hacia «aplicación» son 18/48 errores K4 y 31/55 K8; hacia `none`, 26/48 y 11/55. La confusión es real, pero los recuentos no demuestran que una ambigüedad de definiciones sea su causa principal ni descartan un efecto de K. | `README.md`, `reports/phase6e-final.md` y anexo 6e de la decisión 0012 lo presentan como hipótesis para un v5, sin prometer mejora. |
+| Media, unidad estadística | El bootstrap predeclarado de K8 − K4 remuestrea 450 grupos individuales, aunque las preguntas se agrupan en 150 tríos con la misma pregunta. Para A4v4, el límite inferior es −0,051 por grupo y −0,049 por trío: la lectura del margen −0,05 cambia por 0,001. | El informe explicita la sensibilidad; A4v4 queda **inconcluso en el margen**. A2v4 cumple con ambas unidades en este conjunto sintético; A4v3 no cumple con ninguna. No se reescribe el protocolo. |
+| Baja, integridad del analizador | `scripts/analyze_triplets.py` sobrescribía silenciosamente papeles duplicados. Reproducción con cuatro filas para un trío: informaba `questions=4`, pero accuracy calculada sobre tres, 0,6667. | Rechaza papeles duplicados/desconocidos, tríos vacíos/incompletos y `correct` no booleano. Los seis JSONL históricos son válidos y conservan sus métricas. Test de regresión añadido. |
+| Baja, similitud con entrenamiento | La comprobación externa encuentra 0 solapes exactos y 3 estados casi duplicados de `data/pilot_v3`; los tres son papeles `none` en tríos distintos. | Excluyendo esos 3 tríos, la proporción K4 de tríos completos es 0,571/0,497/0,211 para A4v3/A4v4/A2v4, frente a 0,580/0,500/0,207. No se reestima el IC; queda como límite del diagnóstico sintético. |
+
+**Resultado que sí se sostiene.** En los datos reales de `trip15_K4` y `_K8`: 150 tríos por K, 450 grupos únicos por conjunto, etiquetas derivadas correctamente de los hechos, sin diferencias en las filas serializadas dentro de cada trío salvo el estado. Un predictor que sólo recibe pregunta/opciones no puede completar un trío; los tres modelos superan el umbral predeclarado de tríos completos en este diagnóstico sintético. La comparación K8 − K4 añade las mismas cuatro distractoras a cada K4. No se demuestra generalización fuera de esta familia. La etiqueta semántica procede de reglas sintéticas, no de una validación humana independiente.
+
+**Archivos modificados sin commit:** `README.md`, `docs/STATUS.md`, `docs/decisions/0012-generator-v4-without-k-cue.md`, `reports/phase6e-final.md`, `scripts/analyze_triplets.py` y `tests/unit/test_phase6e_triplets.py`. No se cambian pesos, datasets, backend, modelo, contrato público, prompts de producción ni servicio A4v3. La decisión 0012 conserva el diseño y sólo matiza la atribución causal. No se abre una decisión técnica nueva.
+
+**Pruebas de esta revisión.** `tests/unit/test_phase6e_triplets.py` → **2 passed** (incluye duplicado rechazado). Se regeneraron los hechos de `generate_mixed(1000, 15, version='v4')` sin escribir datasets y se contrastaron los 900 ejemplos K4/K8: 0 etiquetas incoherentes, 0 diferencias en prompt fuera del estado, 0 grupos repetidos por conjunto. Los seis archivos de predicciones tienen 450 filas; 0 discrepancias entre `correct`, argmax de logits y etiqueta; los seis resultados completos del analizador corregido coinciden con `reports/phase6e/triplets.json`. Se comprobó `leakage_checks` frente al dataset de entrenamiento y la sensibilidad al excluir los tres tríos casi duplicados. Recarga **real** de A4v3/E4B desde checkpoint, una pregunta `trip15_K4` sin caché: `Gemma4Model` en MPS/BF16, eval, cero parámetros base entrenables, sin `lm_head`, cuatro logits finitos, diferencia máxima 0,0 frente a JSONL. Es inferencia MPS, no una nueva prueba de gradientes E4B. Pasaron **56 tests CPU focalizados** de máscaras, prompts, grupo, LoRA y extracción diminuta (1 warning del test), y **1 test E2B/LoRA real en MPS** con gradientes, sin omisión (11,10 s). Los **294 tests CPU** y **14 MPS/E2E** de la implementación son evidencia histórica y no se repitieron completos. Ruff, formato, `uv lock --check`, `git diff --check` y hash del protocolo: correctos. Memoria de la evaluación A4v3/K4 archivada: MPS asignada muestreada 15,89 GB, driver 16,04 GB, delta de swap 0; el muestreo no mide el pico exacto.
+
+**Procesos y checkpoints.** Al cierre de esta revisión no hay proceso GSO, pytest, entrenamiento, descarga ni servicio activo; sólo aparece un `caffeinate -i` auxiliar. TCP 8000 no tiene listener. Los manifiestos de los siete checkpoints existen; sólo A4v3 se recargó en esta revisión. Rutas relativas a la raíz:
+
+| Modelo | Checkpoint |
+|---|---|
+| A4v3, servicio | `runs/e4b_experiment/20260923T204945Z/checkpoint` (calibración de servicio: `runs/e4b_experiment/20260923T204945Z/calibration/calibration-20260924T045005Z.json`) |
+| A4v4 | `runs/e4b_v4/20260924T140932Z/checkpoint` |
+| A2v4 | `runs/e2b_heads_v4/20260924T142144Z/checkpoint` |
+| B2 | `runs/pilot_lora_v3/20260923T012208Z/checkpoint` |
+| A2 | `runs/pilot_ce_v3/20260923T005721Z/checkpoint` |
+| V2 / C2 | `runs/vision2_heads/20260923T161024Z/checkpoint` / `runs/vision2_text_only/20260923T162937Z/checkpoint` |
+
+**Comandos de comprobación ejecutados desde la raíz** (los bloques Python de contrastes de etiquetas/logits y de la recarga MPS se describen arriba; no se guardaron como script del proyecto):
+
+```sh
+git branch --show-current
+git rev-parse HEAD
+git status --short
+git diff --stat 9edc183..HEAD
+git diff --check
+git stash list
+shasum -a 256 -c reports/phase6e/protocol.sha256
+.venv/bin/pytest tests/unit/test_phase6e_triplets.py -q
+.venv/bin/pytest tests/unit/test_pooling.py tests/unit/test_serialization.py tests/unit/test_decisions.py tests/unit/test_lora.py tests/integration/test_tiny_backbone.py -q
+.venv/bin/pytest tests/mps/test_phase3_real.py::test_lora_on_real_e2b_mps -q -rs
+.venv/bin/ruff check .
+.venv/bin/ruff format --check .
+uv lock --check
+.venv/bin/python -c 'from gemma_system_one.env import source_fingerprint; x=source_fingerprint(); print(x["sha256"],x["files"])'
+ps -axo pid,ppid,stat,etime,command | rg '[g]so|[g]emma_system_one|[p]ytest|[u]vicorn|[c]affeinate|[t]rain' | head -20
+lsof -nP -iTCP:8000 -sTCP:LISTEN
+```
+
+**Tareas pendientes.** (1) Si se investiga v5, predeclarar cambios de definiciones y datos nuevos; medir si reducen la confusión, sin reutilizar `trip15*` ni otros tests ya abiertos para elegir. (2) Para un nuevo diagnóstico de K, usar el trío como unidad primaria del IC; el umbral de A4v4 está en el límite. (3) Conservar A4v3 como servicio hasta cumplir una regla de cambio predeclarada. (4) Clon limpio con `uv sync` sigue sin verificar. Persisten los límites del servicio (timeout MPS no interrumpe el forward), memoria muestreada y datos sintéticos. No se inició entrenamiento largo ni servidor para esta revisión.
+
+---
+
+# Registro anterior — fase 6e publicada; relevo del implementador (2026-09-24, 17:39 UTC)
+
+**Verificación del relevo** (sin cambiar código, datos ni alcance; sin lanzar trabajo pesado). Comandos exactos y resultados:
+
+```sh
+git branch --show-current; git fetch -q origin; git log --oneline -3
+# main; 0a958df → 9edc183 → daa27ce
+git rev-parse main fases-0-6 origin/main origin/fases-0-6; git status --short; git stash list
+# las cuatro: 0a958df7686570f448ab2e5171d765e673db3cdc; árbol limpio; stash vacío
+.venv/bin/python scripts/snapshot_source.py
+# a1e3f481609c6f830f88defd25cd5712f62012a20dcfbd602b2d80a4bb17f0a4, 86 ficheros
+pgrep -fl 'gso|pytest|uvicorn'; lsof -nP -iTCP:8000 -sTCP:LISTEN
+# ambos: código 1, sin salida. Ningún proceso del proyecto; puerto libre
+# existencia (no recarga) de los 7 checkpoints de la tabla histórica y de la calibración de servicio de A4v3: ok
+```
+
+**Publicación** (hecha a petición del usuario):
+- commit `0a958df` en `fases-0-6` (fase 6e y revisión de la 6d);
+- `git merge --ff-only fases-0-6` en `main` (9edc183 → 0a958df);
+- `git push origin main` y `git push origin fases-0-6`.
+
+Antes del push se buscó en lo añadido el usuario local, el dominio del correo, `/Users/` y tokens HF; la única coincidencia fue el texto «`/Users/`» de esta misma documentación. **Este relevo modifica sólo `docs/STATUS.md`**, que queda sin commit.
+
+**Para el otro asistente:**
+- Tarea natural: revisión independiente de la fase 6e, con el prompt 2 de `PROMPTS.md`.
+- Puntos que conviene comprobar:
+  - `derive.fault_kind_triplets` (pools por idioma y categoría, un estado por grupo, etiquetas por hechos);
+  - `scripts/analyze_triplets.py` (bootstrap por trío);
+  - el diagnóstico de la ambigüedad «aplicación» en `reports/phase6e/sensitivity_and_errors.txt`.
+- Siguiente trabajo técnico propuesto: el generador v5 (§8.3), con protocolo y datos nuevos antes de entrenar.
 
 Sustituye a las secciones siguientes (relevo y revisión de la fase 6d), que quedan como registro histórico. Resuelve su pendiente principal: un control semánticamente coherente del uso del estado, que sustituye al intercambio de estados, y un diagnóstico de K con más potencia. Incluye, sin cambios, las correcciones de esa revisión, que siguen sin commit:
 - `src/gemma_system_one/data/derive.py` (docstrings);
@@ -15,7 +240,7 @@ Sustituye a las secciones siguientes (relevo y revisión de la fase 6d), que que
 | Más opciones | Δaccuracy K8 − K4 (450 preguntas): A4v3 −0,024 [−0,060; +0,011] y A4v4 −0,027 [−0,051; −0,002], **no demostrada**; A2v4 +0,013 [−0,024; +0,053], **tolera**. El bootstrap por trío da casi lo mismo |
 | Hallazgo | **La debilidad de `other` es sobre todo una ambigüedad de las categorías.** Con E4B, el error dominante es elegir «aplicación» para fallos no listados de rendimiento o de datos (A4v3 K8: 31 de 55 errores; `other` con rendimiento no listado: 15/30). Queda pendiente un generador v5 con definiciones excluyentes |
 | Servicio | Sin cambios: A4v3 (`configs/serve_e4b_text.yaml`) |
-| Rama / commit | `main` = `fases-0-6` = **`9edc183`**, en local y en `origin`. **Sin commit:** la revisión de la 6d y esta fase (§4). No se ha hecho push de nada nuevo |
+| Rama / commit | **`main` = `fases-0-6` = `0a958df`**, en local y en `origin` (GitHub); historia `65d4250 → 1b5ad45 → daa27ce → 9edc183 → 0a958df`. `1b5ad45` está incompleto (le falta `src/gemma_system_one/data/`) |
 | Código | Evaluaciones con `c1ee7841…`; el actual es **`a1e3f481609c6f830f88defd25cd5712f62012a20dcfbd602b2d80a4bb17f0a4`** (86 ficheros; sólo añade `scripts/analyze_triplets.py`). Ambos con copia en `artifacts/source/` |
 | Pruebas | **294 CPU** (34,02 s) y **14 MPS/E2E reales** (130,74 s, 0 omitidos). Ruff y formato en verde (147 ficheros); `uv lock --check` y `git diff --check` correctos |
 
@@ -35,7 +260,7 @@ Sin cambios: la tabla de la sección histórica siguiente (A4v3 servicio, A4v4, 
 
 El test y la partición de calibración de `pilot_v4` siguen sin leer.
 
-## 4. Archivos sin commit sobre `9edc183`
+## 4. Archivos del commit `0a958df` (sobre `9edc183`)
 
 **De la revisión de la 6d:** los de la introducción de esta sección.
 
@@ -72,7 +297,7 @@ Lista completa en `reports/phase6e-final.md` («Comandos ejecutados»):
 
 ## 8. Pendientes, en orden
 
-1. **Commit y push** de la revisión de la 6d y de esta fase, a decidir por el usuario.
+1. **Commit y push:** hechos (`0a958df` en `main` y `origin`). Sólo queda sin commit esta actualización de STATUS.
 2. **Revisión independiente de la 6e:**
    - `fault_kind_triplets` (pools por idioma y categoría, un estado por grupo);
    - el análisis por trío;
