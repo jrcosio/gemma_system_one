@@ -1,6 +1,6 @@
 # Fase 6f: generador v5 (definiciones excluyentes y opciones independientes de los hechos)
 
-Fecha: 2026-09-24. Mac M5 Pro con 48 GB, MPS/BF16 y cabezales CPU/FP32. Rama `main`, sobre `0a958df`. Sin commit: los cambios de esta fase y las correcciones de la revisión de la 6e.
+Fecha: 2026-09-24. Mac M5 Pro con 48 GB, MPS/BF16 y cabezales CPU/FP32. Implementación publicada en `main`, commit `a556fd5` sobre `0a958df`. La revisión independiente posterior figura en `docs/STATUS.md` y tiene cambios sin commit.
 
 - **Protocolo predeclarado:** [phase6f-protocol.md](phase6f-protocol.md), sha256 `7a995f7f…` (en `reports/phase6f/protocol.sha256`). Se escribió antes de generar los datos v5 y de entrenar.
 - **Decisión:** [0013](../docs/decisions/0013-generator-v5-exclusive-definitions.md).
@@ -27,7 +27,7 @@ Fecha: 2026-09-24. Mac M5 Pro con 48 GB, MPS/BF16 y cabezales CPU/FP32. Rama `ma
   - opciones: siempre `none` y `other` más K − 2 categorías sorteadas sin mirar los hechos.
 
   v1–v4 siguen idénticos byte a byte.
-- **Prueba sin modelos** (`reports/phase6f/option_cue_v5.txt`, 20 000 casos): ganancia por composición de 0,012 en v5 (v4: 0,050); `other` pasa a 0,478 de las preguntas `fault_type` (v4: 0,148).
+- **Prueba sin modelos** (`reports/phase6f/option_cue_v5.txt`, 20 000 casos): diferencia de accuracy top-1 en muestra al usar composición de opciones, 0,012 en v5 (v4: 0,050); no es una medida de información mutua. `other` pasa a 0,478 de las preguntas `fault_type` (v4: 0,148).
 - **`derive.fault_kind_triplets(version="v5")`** y **`scripts/compare_triplets.py`** (emparejado por trío; reutiliza la validación de `analyze_triplets.load_triplets`).
 - **Tests:** `tests/unit/test_phase6f_generator_v5.py` y `tests/unit/test_phase6e_triplets.py::test_compare_triplets_pairs_by_triplet`.
 
@@ -51,6 +51,8 @@ Los conjuntos externos excluyen los grupos cuyo estado literal aparece en cualqu
 | A4v3 (servicio) | `runs/e4b_experiment/20260923T204945Z` | — | — | — | — | — | 1,88 / 1,27 / 0,93 |
 
 ## Resultados
+
+Las evaluaciones A4v3 de `final17` y `trip18_K4` reutilizaron estados de caché (`backbone_loaded=false`, `cache_hit=true`, cero forwards). Las de A4v5 y A2v5 hicieron extracción real en MPS (`backbone_loaded=true`, `cache_hit=false`; 2211 forwards en `final17` y 1800 en `trip18_K4`). La comparación de predicciones usa los mismos IDs, grupos, hashes de entrada e índices objetivo en los archivos publicados. No usar las evaluaciones cacheadas de A4v3 como prueba de una nueva carga E4B ni de memoria MPS.
 
 ### Tríos v5 (`trip18_K4`, 150 tríos; bootstrap por trío)
 
@@ -113,7 +115,7 @@ reports/phase6f/run_chain.sh     # train e4b_v5, e2b_heads_v5; 3 × calibrate --
 caffeinate -i .venv/bin/pytest tests/mps tests/e2e -q -rs # 14 passed, 0 omitidos
 ```
 
-**Código de todas las ejecuciones:** `8d7c7d74…` (90 ficheros), el actual, con copia en `artifacts/source/`.
+**Código de las ejecuciones originales:** `8d7c7d74…` (90 ficheros), con copia en `artifacts/source/`; la revisión posterior modificó el script comparador y la documentación.
 
 ## Límites
 

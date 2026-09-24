@@ -5,7 +5,7 @@ Fecha: 2026-09-24 · Fase 6f · Estado: aceptada (datos); el servicio no cambia
 ## Contexto
 
 - **Fase 6e:** con E4B, el error dominante en la respuesta `other` era elegir «aplicación» para fallos no listados de rendimiento o de datos. La revisión lo dejó como hipótesis: los estados de esas categorías mencionan funciones de la app, y la definición de «aplicación» no los excluía.
-- **Fase 6d:** la composición de las opciones del generador de entrenamiento v4 aportaba 0,050 de información sobre la respuesta.
+- **Fase 6d:** la sonda de opciones midió una diferencia de 0,050 en accuracy top-1 dentro de su muestra para v4; no midió información mutua.
 
 ## Decisión
 
@@ -20,7 +20,7 @@ Fecha: 2026-09-24 · Fase 6f · Estado: aceptada (datos); el servicio no cambia
 
 ## Evidencia (`reports/phase6f-final.md`)
 
-- **Sin modelos:** ganancia por composición de 0,012 en v5 (v4: 0,050). Consecuencia: `other` pasa a 0,48 de las preguntas `fault_type`.
+- **Sin modelos:** diferencia de accuracy top-1 en la muestra de la sonda al usar composición de opciones: 0,012 en v5 (v4: 0,050). `other` pasa a 0,48 de las preguntas `fault_type`.
 - **Regla H (se cumple):** tríos completos A4v5 − A4v3 = **+0,087 [+0,020; +0,160]**, con bootstrap por trío (150 tríos v5).
 - **Regla S b (no se cumple):** NLL calibrada A4v5 − A4v3 en `final17` = −0,007 [−0,037; +0,025]; el límite superior supera +0,02.
 - **Descriptivo:**

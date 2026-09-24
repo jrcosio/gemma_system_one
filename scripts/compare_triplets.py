@@ -3,7 +3,8 @@
 Uso: uv run python scripts/compare_triplets.py OUT.json A.jsonl B.jsonl
 
 Devuelve b − a de la proporción de tríos completos y de la accuracy (global y por papel), con
-IC95 % por bootstrap de tríos (1000 repeticiones, semilla 0). Exige los mismos tríos en ambos.
+IC95 % por bootstrap de tríos (1000 repeticiones, semilla 0). Exige las mismas preguntas,
+grupos y etiquetas en ambos ficheros.
 """
 
 from __future__ import annotations
@@ -18,11 +19,28 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from analyze_triplets import REPS, ROLES, SEED, load_triplets  # noqa: E402
 
 
+def _pairing_keys(path: str) -> dict[str, tuple[str, str, int]]:
+    keys = {}
+    with open(path, encoding="utf-8") as fh:
+        for line in fh:
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            try:
+                keys[row["id"]] = (row["group_id"], row["input_sha256"], row["target_index"])
+            except KeyError as exc:
+                raise ValueError(f"{path}: falta campo de emparejamiento {exc}") from exc
+    return keys
+
+
 def compare(path_a: str, path_b: str) -> dict:
     a, _ = load_triplets(path_a)
     b, _ = load_triplets(path_b)
     if set(a) != set(b):
         raise ValueError("Los ficheros no contienen los mismos tríos")
+    keys_a, keys_b = _pairing_keys(path_a), _pairing_keys(path_b)
+    if keys_a != keys_b:
+        raise ValueError("Los ficheros no contienen las mismas entradas, grupos y etiquetas por ID")
     ids = sorted(a)
     metrics = {
         "full_triplets": lambda t: float(all(t.values())),

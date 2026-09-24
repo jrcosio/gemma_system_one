@@ -1,0 +1,8 @@
+# Sólo en el clon de verificación (fase 6g): servicio del A2v5 reentrenado desde cero en el clon.
+kind: serve
+model_id: gemma-system-one-clone-check
+checkpoint: runs/e2b_heads_v5/20260924T200740Z/checkpoint
+host: 127.0.0.1
+port: 8000
+max_queue: 4
+request_timeout_s: 120

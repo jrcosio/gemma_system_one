@@ -1,4 +1,315 @@
-# Estado vigente — fase 6f cerrada: generador v5 (2026-09-24, 19:35 UTC)
+# Estado vigente — proyecto cerrado como prototipo completo (2026-09-24)
+
+**Decisión del usuario (2026-09-24):**
+- no hay datos reales disponibles, así que el proyecto se **cierra como prototipo completo con datos sintéticos**;
+- la generalización fuera de la familia sintética queda **no evaluada: sin datos reales**, y ya no figura como pendiente;
+- el `README.md` se reescribe como guía de uso (qué es, instalación, puesta en marcha, API, resultados, comandos y estructura), sin la historia del desarrollo.
+
+## Resumen para quien retome el repositorio
+
+| Campo | Estado |
+|---|---|
+| Fases | 0–6 de la spec §10 completas, más las verificaciones 6b–6g. Evidencia en `reports/`; decisiones 0001–0013 en `docs/decisions/` |
+| Servicio de texto | **A4v3**: Gemma 4 E4B congelado + cabezales, con la calibración de `calib7` (`configs/serve_e4b_text.yaml`). Test final independiente: NLL 0,201, frente a 0,347 (E2B + LoRA) y 0,942 (BoW). p50/p95 HTTP 910/1546 ms |
+| Servicio visual | V2 (E2B, una imagen; `configs/serve_vision.yaml`), sin calibrar |
+| Reproducibilidad | Clon limpio verificado (fase 6g): 301 CPU y 10 MPS; datos y entrenamiento de cabezales bit a bit; servicio HTTP real |
+| Generalización | **No evaluada: sin datos reales.** Procedimiento para hacerlo si aparecen datos: `reports/phase6g-reproducibility.md` (sección final) |
+| Rama / commit | `main` = `fases-0-6`; este cierre se publica en un commit nuevo encima de `a556fd5` |
+| Procesos | Ninguno del proyecto. El servidor de demostración usado para el ejemplo real del README se detuvo (puerto 8000 libre) |
+| Checkpoints | Los de la tabla histórica siguiente (A4v3, A4v5, A2v5, A4v4, A2v4, B2, A2, V2, C2), locales e ignorados por Git |
+
+**Cambios de este cierre:**
+- `README.md`, reescrito;
+- este STATUS;
+- las correcciones de la revisión de la 6f (`scripts/compare_triplets.py`, `tests/unit/test_phase6e_triplets.py`, `reports/phase6f-final.md` y `docs/decisions/0013-…md`);
+- la fase 6g (`reports/phase6g-reproducibility.md` y `reports/phase6g/`).
+
+**Mejoras opcionales**, si se retoma: un v6 del generador (fallos resueltos y cláusula de acceso), calibración de Choice, LoRA sobre E4B, E4B con imagen, abstención e instalación en una máquina sin caché.
+
+---
+
+# Registro histórico — fase 6g cerrada: reproducibilidad desde un clon limpio (2026-09-24, 20:18 UTC)
+
+Sustituye a las secciones siguientes (relevo y revisión de la fase 6f), que quedan como registro histórico. Resuelve sus pendientes verificables:
+- un clon limpio con `uv sync`;
+- gradientes y MPS reales desde el código publicado;
+- la sensibilidad de S a los casi duplicados.
+
+La generalización fuera de la familia sintética queda como **bloqueo externo**, con el procedimiento descrito en el informe.
+
+Incluye, sin cambios, las correcciones de la revisión de la 6f, que siguen sin commit:
+- `scripts/compare_triplets.py`, que exige la misma entrada, grupo y etiqueta por ID;
+- `tests/unit/test_phase6e_triplets.py`;
+- `reports/phase6f-final.md` y `docs/decisions/0013-…md`.
+
+## 1. Fase, rama y veredicto
+
+| Campo | Estado |
+|---|---|
+| Fase | **6g cerrada** (verificación; no hay fases posteriores en la spec §10). Informe: **`reports/phase6g-reproducibility.md`**. Sin código nuevo del proyecto |
+| Clon limpio | `git clone` desde `origin` → `a556fd5`; `uv sync --frozen`; **301 CPU passed**; ruff y formato correctos; `gso download` con acierto en la caché; **10 MPS reales passed** (E2B forward y backward, gradientes LoRA y recarga); 4 E2E omitidos con el motivo explícito (checkpoints no versionados) |
+| Reproducción | `generate-data v5 seed 0` da un `examples.jsonl` **idéntico byte a byte**; el split tiene las mismas particiones (sólo cambia `created_utc`). `gso train e2b_heads_v5` desde el clon: época 18 y NLL de validación 0,46420069…, **pesos y 300 logits de validación con |Δ| = 0,0** frente al original, con extracción real |
+| Servicio desde el clon | `gso benchmark`: 100 × 200 en MPS, p50/p95 606/1010 ms, ráfaga válida, 112 peticiones en el log del servidor, `same_code_as_server: true` |
+| Sensibilidad de S | Sin 11 grupos casi duplicados: A4v5 − A4v3 = −0,006 [−0,038; +0,028] (completo: −0,007 [−0,037; +0,025]). **S sigue sin cumplirse; servicio A4v3** |
+| Límites | Máquina no nueva: `uv sync` tardó 0,6 s porque la caché de uv estaba llena; los pesos venían de la caché de Hugging Face |
+| Bloqueo externo | Generalización a datos reales: no hay datos reales etiquetados; hacen falta de 100 a 300 incidencias anonimizadas y etiquetadas por personas en el esquema JSONL v1. Pasos en el informe |
+| Rama / commit | `main` = `fases-0-6` = `origin/*` = **`a556fd5`**. **Sin commit:** la revisión de la 6f y esta fase (§4) |
+| Código | `3d4b00b701efc33f228a710b2adc9eea5c438a21e51a85b34e0406238a0d7194` (90 ficheros) en el repositorio de trabajo, con la revisión de la 6f; el clon verificó `a556fd5` |
+| Pruebas | Repositorio de trabajo: 301 CPU, ruff, formato y `git diff --check` correctos |
+
+## 2. Procesos activos
+
+`pgrep -fl 'gso|pytest|uvicorn'` terminó con código 1 y `lsof -nP -iTCP:8000 -sTCP:LISTEN` también: **ningún proceso del proyecto** y el puerto libre. El servidor del benchmark del clon terminó por SIGTERM.
+
+El clon temporal está en el scratchpad de la sesión, fuera del repositorio: es desechable y no contiene nada que haya que conservar. Su evidencia está copiada en `reports/phase6g/clean_clone/`.
+
+## 3. Checkpoints
+
+Sin cambios respecto a la tabla de la sección histórica siguiente:
+- **A4v3:** `runs/e4b_experiment/20260923T204945Z/checkpoint`, el servicio, con `calibration/calibration-20260924T045005Z.json`;
+- A4v5, A2v5, A4v4, A2v4, B2, A2, V2 y C2.
+
+El checkpoint reentrenado en el clon sólo existe allí, porque es temporal; es idéntico al A2v5 original.
+
+## 4. Archivos sin commit sobre `a556fd5`
+
+- **De la revisión de la 6f:** los de la introducción de esta sección.
+- **Nuevos de esta fase:**
+  - `reports/phase6g-reproducibility.md`;
+  - `reports/phase6g/s_sensitivity_near_dups.{txt,json}`;
+  - `reports/phase6g/clean_clone/` (logs y JSON con rutas enmascaradas).
+- **Modificados en esta fase:** `README.md` y este STATUS.
+
+## 5. Decisiones
+
+Ninguna nueva; 0001–0013 siguen vigentes. El servicio sigue siendo A4v3.
+
+## 6. Comandos exactos
+
+Tabla completa en `reports/phase6g-reproducibility.md`:
+- `git clone`, `uv sync --frozen` y `pytest` CPU, MPS y E2E desde el clon;
+- ruff;
+- `gso download`, `generate-data`, `split`, `train` y `benchmark` desde el clon;
+- el script de sensibilidad de S sobre las predicciones de la 6f.
+
+## 7. Fallos reproducibles
+
+- **Sin fallos de código nuevos.**
+- **Límite documentado:** en un clon, los E2E se omiten (4) hasta que se entrenan los checkpoints que referencian.
+- **Abierto, de datos (6f):** los fallos resueltos se leen como «sin fallo»; en E2B, las cuentas bloqueadas se leen como fallo técnico.
+
+## 8. Pendientes, en orden
+
+1. **Commit y push** de la revisión de la 6f y de esta fase, a decidir por el usuario.
+2. **Revisión independiente de la 6g**, que es corta: el clon, la reproducción bit a bit y la sensibilidad.
+3. **Bloqueo externo:** datos reales etiquetados por personas para medir la generalización (procedimiento en el informe).
+4. **Opcionales, con protocolo y datos nuevos:**
+   - un v6 que aclare los fallos resueltos y la cláusula de acceso;
+   - calibración de Choice;
+   - LoRA sobre E4B;
+   - E4B con imagen;
+   - abstención;
+   - una instalación en una máquina sin caché.
+5. **Riesgos que se mantienen:**
+   - el timeout no interrumpe un forward MPS y la cola no limita las conexiones;
+   - el RSS muestreado no es el pico de MPS;
+   - V2 sin calibrar.
+
+### Privacidad
+
+- **Contenido:** sin secretos ni datos personales.
+- **Rutas:** las del clon y de la carpeta personal están enmascaradas (`<clon>`, `~`); el propietario del repositorio remoto aparece como `<owner>`.
+
+---
+
+# Registro histórico — relevo tras la revisión de la fase 6f (2026-09-24)
+
+**Punto de partida para el siguiente asistente.** Rama `main`, HEAD `a556fd54e3be0ffe53ac86023779a3dbc88cc026`. `main`, `fases-0-6`, `origin/main` y `origin/fases-0-6` apuntan a ese commit **según las referencias locales**; en este relevo no se hizo `fetch`, commit ni push. Stash vacío. La fase 6f está implementada, pero la regla S de cambio de servicio falla: mantener A4v3. La regla H sí se reproduce en 150 tríos sintéticos. No abrir v6 ni cambiar PyTorch/MPS, Gemma 4, el contrato Noul/Choice/Score o el servicio como parte de este relevo.
+
+**Cambios locales sin commit:** `docs/STATUS.md` (ya estaba modificado al comenzar la revisión), `docs/decisions/0013-generator-v5-exclusive-definitions.md`, `reports/phase6f-final.md`, `scripts/compare_triplets.py` y `tests/unit/test_phase6e_triplets.py`. La corrección exige la misma entrada, grupo y etiqueta por ID en la comparación emparejada; el test comprueba que un hash cambiado se rechaza. La documentación corrige «información» por diferencia de accuracy top-1 en muestra, y distingue evaluaciones reales de evaluaciones cacheadas. No se tocaron datasets, pesos, backend, modelo, API ni configuración del servicio. Decisión 0013 y protocolo 6f se mantienen; no se añadió decisión de arquitectura.
+
+**Fallo reproducible y resultado.** Antes de esta corrección, dos JSONL con los mismos IDs de trío y distinto `input_sha256` se aceptaban como emparejados. Ahora `tests/unit/test_phase6e_triplets.py::test_compare_triplets_pairs_by_triplet` exige `ValueError`. Las predicciones publicadas tienen 0 discrepancias de `group_id`, `input_sha256`, `target_index` y `type` entre A4v3/A4v5/A2v5. H recalculada: +0,0867, IC95 % [0,020; 0,160]. En los logs originales A4v3 usó caché (`backbone_forwards=0`); A4v5 y A2v5 hicieron forwards reales. Un smoke **nuevo** sin caché recargó A4v3 y A4v5 en MPS/BF16, con base congelada, cuatro forwards y logits finitos. S continúa sin cumplir el margen: NLL calibrada A4v5 − A4v3 = −0,007 [−0,037; +0,025], límite superior > +0,02. No interpretar el smoke como prueba de gradientes ni una prueba CPU como MPS.
+
+**Procesos activos ahora.** Sólo `caffeinate -i` auxiliar; ningún `gso`, `pytest`, `uvicorn` ni entrenamiento del proyecto. Sin listener TCP 8000. Son observaciones puntuales; comprobar de nuevo antes de ejecutar trabajo pesado.
+
+**Checkpoints locales comprobados** (`checkpoint/manifest.json` existe en los nueve; pesos y datasets ignorados por Git):
+
+| Modelo | Ruta del checkpoint | Calibraciones JSON presentes |
+|---|---|---:|
+| A4v3, servicio | `runs/e4b_experiment/20260923T204945Z/checkpoint` | 4; la del servicio es `calibration/calibration-20260924T045005Z.json` |
+| A4v5 | `runs/e4b_v5/20260924T184606Z/checkpoint` | 1 |
+| A2v5 | `runs/e2b_heads_v5/20260924T185841Z/checkpoint` | 1 |
+| A4v4 | `runs/e4b_v4/20260924T140932Z/checkpoint` | 1 |
+| A2v4 | `runs/e2b_heads_v4/20260924T142144Z/checkpoint` | 1 |
+| B2 | `runs/pilot_lora_v3/20260923T012208Z/checkpoint` | 2 |
+| A2 | `runs/pilot_ce_v3/20260923T005721Z/checkpoint` | 2 |
+| V2 | `runs/vision2_heads/20260923T161024Z/checkpoint` | 0 |
+| C2 | `runs/vision2_text_only/20260923T162937Z/checkpoint` | 0 |
+
+**Comandos exactos de esta verificación de relevo**, desde la raíz; los comandos y resultados de la revisión están inmediatamente debajo:
+
+```sh
+git branch --show-current
+git rev-parse HEAD main fases-0-6 origin/main origin/fases-0-6
+git status --short
+git diff --stat
+git stash list
+ps -axo pid,ppid,stat,etime,command | rg '[g]so|[g]emma_system_one|[p]ytest|[u]vicorn|[c]affeinate|[t]rain' | head -25
+lsof -nP -iTCP:8000 -sTCP:LISTEN
+.venv/bin/python - <<'PY'
+from pathlib import Path
+runs = {
+'A4v3':'runs/e4b_experiment/20260923T204945Z',
+'A4v5':'runs/e4b_v5/20260924T184606Z',
+'A2v5':'runs/e2b_heads_v5/20260924T185841Z',
+'A4v4':'runs/e4b_v4/20260924T140932Z',
+'A2v4':'runs/e2b_heads_v4/20260924T142144Z',
+'B2':'runs/pilot_lora_v3/20260923T012208Z',
+'A2':'runs/pilot_ce_v3/20260923T005721Z',
+'V2':'runs/vision2_heads/20260923T161024Z',
+'C2':'runs/vision2_text_only/20260923T162937Z',
+}
+for name, run in runs.items():
+    root=Path(run)
+    print(name, root/'checkpoint', (root/'checkpoint/manifest.json').is_file(), len(list((root/'calibration').glob('*.json'))))
+PY
+.venv/bin/python scripts/snapshot_source.py
+git diff --check
+```
+
+Resultados: rama y cinco referencias en `a556fd54…`; los cinco archivos listados arriba modificados; stash vacío; `lsof` sin salida (código 1); nueve manifiestos `True`; huella actual `3d4b00b701efc33f228a710b2adc9eea5c438a21e51a85b34e0406238a0d7194` (90 archivos); `git diff --check` correcto. La huella de las evaluaciones originales sigue siendo `8d7c7d74…`, no la actual.
+
+**Pendientes para el siguiente asistente:** conservar A4v3 y no reutilizar `final17`/`trip18*` para elegir un cambio de servicio; si se busca aprobación integral, comprobar gradientes y sensibilidad de S a los estados casi duplicados; validar generalización fuera de la familia sintética; verificar clon limpio con `uv sync` si se necesita reproducibilidad de instalación. No hay autorización ni necesidad de iniciar entrenamientos largos para este relevo. No se registraron secretos ni contenido privado.
+
+---
+
+# Registro de la revisión independiente de fase 6f (2026-09-24)
+
+La fase 6f está implementada en `main` (`a556fd54e3be0ffe53ac86023779a3dbc88cc026`), pero **no se aprueba todavía como validación integral del servicio**: H se reproduce en el conjunto sintético predeclarado y S falla. A4v3 sigue siendo el servicio. Esta revisión corrige un control del análisis y dos afirmaciones de la documentación; no cambia backend, modelo, datos, pesos ni contrato público. La prueba MPS real de A4v5 y A2v5 figura en los logs de implementación; la evaluación A4v3 de fase 6f usó caché de estados y **no** hizo forwards de Gemma en esas ejecuciones.
+
+## Hallazgos y decisiones de la revisión
+
+| Gravedad | Hallazgo | Resolución |
+|---|---|---|
+| Media, integridad estadística | `scripts/compare_triplets.py` emparejaba sólo por ID de trío. Dos predicciones con los mismos IDs y estados o etiquetas distintos podían producir una comparación «emparejada» falsa. | Exige igualdad por ID de `group_id`, `input_sha256` y `target_index`; test de regresión. Los archivos publicados A4v3/A4v5/A2v5 tienen los mismos 450 IDs y las mismas tres claves en `trip18_K4`; también coinciden los 837 IDs de `final17`. Por tanto, los resultados H/S publicados no cambian. |
+| Media, evidencia de backend | En `eval_final17_a4v3.log` y `eval_trip18_K4_a4v3.log`: `backbone_loaded=false`, `cache_hit=true`, `backbone_forwards=0`. | Son evaluaciones de cabezal sobre estados cacheados, no nuevos forwards MPS. A4v5 y A2v5 sí registran `backbone_loaded=true`, `cache_hit=false` y 2211/1800 forwards respectivamente en final/tríos. No atribuir memoria MPS de 6f a A4v3. |
+| Baja, afirmación no respaldada | «0,012 de información» era una descripción falsa de `composition_gain` del probe. | El valor es **diferencia de accuracy top-1 en la propia muestra** entre dos predictores que sólo ven opciones; no es información mutua ni garantía de independencia estadística. `other` ocupa 0,478 de `fault_type`, factor que afecta `final17`. |
+| Riesgo metodológico | Los diagnósticos de fuga no hallan coincidencias exactas, pero registran estados casi duplicados respecto a entrenamiento: 5 en `final17` y 4 en `trip18_K4` para A4v5; respecto a calibración: 2 y 1. | Mantener como límite de la evaluación sintética; no interpretar S como generalización a datos reales. |
+
+**Comandos exactos ejecutados en esta revisión** (desde la raíz):
+
+```sh
+git status --short
+sed -n '1,240p' scripts/compare_triplets.py
+uv run python - <<'PY'
+import json
+from pathlib import Path
+base=Path('reports/phase6f')
+for stem in ('trip18_K4','final17'):
+    paths={m:Path((base/f'pred_{stem}_{m}.txt').read_text().strip()) for m in ('a4v3','a4v5','a2v5')}
+    rows={m:{x['id']:x for x in map(json.loads,p.read_text().splitlines())} for m,p in paths.items()}
+    for m in ('a4v5','a2v5'):
+        a,b=rows['a4v3'],rows[m]
+        diffs={key:sum(a[i].get(key)!=b[i].get(key) for i in a.keys()&b.keys()) for key in ('group_id','input_sha256','target_index','type')}
+        print(stem,m,'counts',len(a),len(b),'same_ids',a.keys()==b.keys(),'diffs',diffs)
+PY
+uv run pytest tests/unit/test_phase6e_triplets.py tests/unit/test_phase6f_generator_v5.py tests/unit/test_phase6c_generator_v4.py -q
+uv run python - <<'PY'
+import sys
+from pathlib import Path
+sys.path.insert(0,'scripts')
+from compare_triplets import compare
+root=Path('reports/phase6f')
+a=(root/'pred_trip18_K4_a4v3.txt').read_text().strip()
+b=(root/'pred_trip18_K4_a4v5.txt').read_text().strip()
+print(compare(a,b)['full_triplets'])
+PY
+uv run pytest tests/unit/test_phase6e_triplets.py tests/unit/test_phase6f_generator_v5.py tests/unit/test_phase6c_generator_v4.py tests/unit/test_serialization.py tests/unit/test_decisions.py tests/unit/test_phase3_followups.py tests/unit/test_dataset_split.py -q
+uv run python - <<'PY'
+import subprocess, sys, types
+from gemma_system_one.data import generate_mixed as current
+old_source=subprocess.check_output(['git','show','0a958df:src/gemma_system_one/data/generate_mixed.py'],text=True)
+old=types.ModuleType('gemma_system_one.data.generate_mixed_old')
+old.__package__='gemma_system_one.data'
+sys.modules[old.__name__]=old
+exec(compile(old_source,'old_generate_mixed.py','exec'),old.__dict__)
+for version in ('v1','v2','v3','v4'):
+ a,_=old.generate_mixed(1000,seed=0,version=version)
+ b,_=current.generate_mixed(1000,seed=0,version=version)
+ x=[e.model_dump_json() for e in a]
+ y=[e.model_dump_json() for e in b]
+ print(version,len(x),x==y)
+PY
+uv run ruff format scripts/compare_triplets.py tests/unit/test_phase6e_triplets.py
+uv run ruff check scripts/compare_triplets.py tests/unit/test_phase6e_triplets.py && uv run ruff format --check scripts/compare_triplets.py tests/unit/test_phase6e_triplets.py && uv lock --check && git diff --check && shasum -a 256 -c reports/phase6f/protocol.sha256
+ps -axo pid,ppid,stat,etime,command | rg '[g]so|[g]emma_system_one|[p]ytest|[u]vicorn|[c]affeinate|[t]rain' | head -25
+lsof -nP -iTCP:8000 -sTCP:LISTEN
+```
+
+También se ejecutó este **smoke MPS real**, sin caché, entrenamiento ni servicio:
+
+```sh
+uv run python - <<'PY'
+from pathlib import Path
+import torch
+from gemma_system_one.training.decisions_pipeline import prepare_evaluation
+for name, checkpoint in [
+ ('A4v5', Path('runs/e4b_v5/20260924T184606Z/checkpoint')),
+ ('A4v3', Path('runs/e4b_experiment/20260923T204945Z/checkpoint')),
+]:
+ ctx = prepare_evaluation(checkpoint, use_cache=False)
+ item = next(x for x in ctx.items_for('all', dataset=Path('data/pilot_v5_trip18_K4')) if x.example.id.endswith('-real'))
+ with torch.inference_mode():
+  logits, stats = ctx.logits('smoke', [item])
+ b = ctx.encoder.backbone
+ print(name, 'class', type(b.model).__name__, 'device', str(b.device), 'dtype', str(b.dtype), 'eval', not b.model.training, 'trainable_base', sum(p.numel() for p in b.model.parameters() if p.requires_grad), 'has_lm_head', hasattr(b.model,'lm_head'), 'forwards', stats['backbone_forwards'], 'finite', bool(torch.isfinite(logits[0]).all()), 'shape', tuple(logits[0].shape), flush=True)
+ del ctx, b
+ if torch.backends.mps.is_available(): torch.mps.empty_cache()
+PY
+```
+
+Resultados: cuatro comparaciones con `same_ids=True` y cero diferencias en las cuatro claves; **11 tests focalizados y 54 tests CPU ampliados pasan**. Regla H recalculada de las predicciones: A4v3 0,7133, A4v5 0,8000, diferencia +0,0867, IC95 % [0,020; 0,160]. El smoke recargó A4v5 y A4v3: `Gemma4Model`, `mps`, `torch.bfloat16`, `eval=True`, cero parámetros base entrenables, sin `lm_head`, cuatro forwards y cuatro logits finitos cada uno. Ruff, formato, lock, diff y hash de protocolo pasan. Se comparó además la salida JSON de 1000 casos, semilla 0, para cada v1–v4 con el módulo del commit `0a958df`: 3000 preguntas por versión, todas idénticas. La primera invocación accidental de `python` falló porque no hay ejecutable con ese nombre en PATH; se usó `uv run python`. No hubo entrenamiento, descarga ni servicio externo en esta revisión. El smoke verifica inferencia y recarga, no los gradientes del entrenamiento ni toda la evaluación.
+
+**Archivos modificados por esta revisión, sin commit:** `scripts/compare_triplets.py`, `tests/unit/test_phase6e_triplets.py`, `docs/decisions/0013-generator-v5-exclusive-definitions.md`, `reports/phase6f-final.md`, `docs/STATUS.md` (este último ya estaba modificado en el relevo). Huella de fuente histórica de las evaluaciones: `8d7c7d742c2e1fbef080e864516f0b7525c76b6e11c78364e04b29447ea7b9e1`; huella del árbol actual tras la corrección: `3d4b00b701efc33f228a710b2adc9eea5c438a21e51a85b34e0406238a0d7194` (90 archivos; comando `.venv/bin/python scripts/snapshot_source.py`). No atribuir la huella actual a las evaluaciones originales.
+
+**Procesos y checkpoints al cierre:** sólo `caffeinate -i` auxiliar; sin GSO, pytest, entrenamiento ni uvicorn; puerto TCP 8000 sin listener. Manifiestos presentes en `runs/e4b_experiment/20260923T204945Z/checkpoint` (A4v3, servicio), `runs/e4b_v5/20260924T184606Z/checkpoint` (A4v5) y `runs/e2b_heads_v5/20260924T185841Z/checkpoint` (A2v5); calibraciones en los subdirectorios `calibration/` correspondientes. Rutas de los demás checkpoints en la sección 3 histórica.
+
+**Pendiente:** controles nuevos de gradientes/MPS de la fase completa si se exige una nueva aprobación independiente; sensibilidad de S a los casi duplicados y generalización fuera de datos sintéticos. Se preserva el servicio A4v3.
+
+---
+
+# Registro del relevo anterior — fase 6f cerrada, en `main` y publicada (2026-09-24, 19:50 UTC)
+
+**Verificación del relevo** (sin cambiar código, datos ni alcance; sin lanzar trabajo pesado). Comandos exactos y resultados:
+
+```sh
+git branch --show-current; git fetch -q origin; git log --oneline -3
+# main; a556fd5 → 0a958df → 9edc183
+git rev-parse main fases-0-6 origin/main origin/fases-0-6; git status --short; git stash list
+# las cuatro: a556fd54e3be0ffe53ac86023779a3dbc88cc026; árbol limpio; stash vacío
+.venv/bin/python scripts/snapshot_source.py
+# 8d7c7d742c2e1fbef080e864516f0b7525c76b6e11c78364e04b29447ea7b9e1, 90 ficheros (el de todas las ejecuciones de la 6f)
+pgrep -fl 'gso|pytest|uvicorn'; lsof -nP -iTCP:8000 -sTCP:LISTEN
+# ambos: código 1, sin salida. Ningún proceso del proyecto; puerto libre
+# existencia (no recarga) de 9 checkpoints (A4v3, A4v5, A2v5, A4v4, A2v4, B2, A2, V2, C2) y de la calibración de servicio de A4v3: ok
+```
+
+**Publicación** (hecha a petición del usuario):
+- commit `a556fd5` en `fases-0-6` (fase 6f y revisión de la 6e);
+- `git merge --ff-only fases-0-6` en `main` (0a958df → a556fd5);
+- `git push origin main` y `git push origin fases-0-6`.
+
+Antes del push se buscó en lo añadido el usuario local, el dominio del correo y tokens HF: sin coincidencias. **Este relevo modifica sólo `docs/STATUS.md`**, que queda sin commit.
+
+**Para el otro asistente:**
+- Tarea natural: revisión independiente de la fase 6f, con el prompt 2 de `PROMPTS.md`.
+- Puntos que conviene comprobar:
+  - `_choice_fault_kind_v5` en `data/generate_mixed.py` (opciones independientes de los hechos y etiqueta deducida);
+  - `FAULT_KIND_OPTIONS_V5` y la cláusula de precedencia;
+  - `scripts/compare_triplets.py`;
+  - la aplicación de H y S;
+  - el efecto de la proporción de `other` (0,48) en `final17`.
+- Siguiente trabajo técnico, opcional: v6 (§8.3).
 
 Sustituye a las secciones siguientes (relevo y revisión de la fase 6e), que quedan como registro histórico. Resuelve su pendiente: el generador v5 con definiciones y datos nuevos predeclarados, el trío como unidad del IC y sin reutilizar `trip15*`. Incluye, sin cambios, las correcciones de esa revisión, que siguen sin commit:
 - `scripts/analyze_triplets.py` (validación de duplicados), refactorizado aquí para extraer `load_triplets` sin cambiar sus resultados (reproduce 0,58 / 0,8467 de la 6e);
@@ -10,11 +321,11 @@ Sustituye a las secciones siguientes (relevo y revisión de la fase 6e), que que
 | Campo | Estado |
 |---|---|
 | Fase | **6f cerrada.** No hay fases posteriores en la spec §10; es la corrección de fallos del piloto detectados en revisión. Informe: **`reports/phase6f-final.md`**. Decisión **0013**. Protocolo `reports/phase6f-protocol.md`, sha256 `7a995f7f…` (en `reports/phase6f/protocol.sha256`), escrito antes de generar los datos v5 y de entrenar |
-| Corrección | **`support-mixed-v5`**: «aplicación» excluye lentitud y pérdida de datos; cláusula de precedencia en la instrucción; opciones = `none` + `other` + K − 2 categorías sorteadas sin mirar los hechos. v1–v4 siguen idénticos byte a byte. Composición: 0,012 de información sobre la respuesta (v4: 0,050). `other` = 0,48 de las preguntas `fault_type` |
+| Corrección | **`support-mixed-v5`**: «aplicación» excluye lentitud y pérdida de datos; cláusula de precedencia en la instrucción; opciones = `none` + `other` + K − 2 categorías sorteadas sin mirar los hechos. v1–v4 siguen idénticos byte a byte en la comparación de 1000 casos/versión, semilla 0. Composición: diferencia de accuracy top-1 en muestra 0,012 (v4: 0,050). `other` = 0,48 de las preguntas `fault_type` |
 | Regla H | **Se cumple:** tríos completos A4v5 − A4v3 = **+0,087 [+0,020; +0,160]** (150 tríos v5, bootstrap por trío) |
 | Regla S | **No se cumple (parte b):** `final17`, NLL calibrada A4v5 − A4v3 = −0,007 [−0,037; +0,025]; el límite superior supera +0,02. **El servicio sigue siendo A4v3**; A4v5 queda como alternativa |
 | Descriptivo | El error `other` → «aplicación» casi desaparece con v5: 1 (A4v3) y 3 (A4v5) en `trip18`, frente a 31 de 55 errores en `trip15`. **Residuo en E4B:** fallos **resueltos** con respuesta `other` (A4v5 falla 13/48, frente a 2/102 con fallo activo) → hipótesis para un v6. E2B confunde las cuentas bloqueadas con fallos técnicos |
-| Rama / commit | `main` = `fases-0-6` = **`0a958df`**, en local y en `origin`. **Sin commit:** la revisión de la 6e y esta fase (§4) |
+| Rama / commit | **`main` = `fases-0-6` = `a556fd5`**, en local y en `origin` (GitHub); historia `65d4250 → 1b5ad45 → daa27ce → 9edc183 → 0a958df → a556fd5`. `1b5ad45` está incompleto (le falta `src/gemma_system_one/data/`) |
 | Código | **`8d7c7d742c2e1fbef080e864516f0b7525c76b6e11c78364e04b29447ea7b9e1`** (90 ficheros), el de todas las ejecuciones; copia en `artifacts/source/` |
 | Pruebas | **301 CPU** (35,36 s) y **14 MPS/E2E reales** (129,26 s, 0 omitidos). Ruff y formato en verde (152 ficheros); `uv lock --check` y `git diff --check` correctos |
 
@@ -36,7 +347,7 @@ Sustituye a las secciones siguientes (relevo y revisión de la fase 6e), que que
 
 **Conjuntos que no deben servir para decidir:** todos los de las fases 3–6e (el test de `pilot_v3`, los tests de `vision_pilot_v1/v2`, `holdout6*`, `final8`, `final13`, `kdiag11*`, `kdiag14*`, `final13_faultswap` y `trip15*`) más `final17` y `trip18*`.
 
-## 4. Archivos sin commit sobre `0a958df`
+## 4. Archivos del commit `a556fd5` (sobre `0a958df`)
 
 **De la revisión de la 6e:** los de la introducción de esta sección.
 
@@ -80,7 +391,7 @@ Lista completa en `reports/phase6f-final.md` («Comandos ejecutados»):
 
 ## 8. Pendientes, en orden
 
-1. **Commit y push** de la revisión de la 6e y de esta fase, a decidir por el usuario.
+1. **Commit y push:** hechos (`a556fd5` en `main` y `origin`). Sólo queda sin commit esta actualización de STATUS.
 2. **Revisión independiente de la 6f:**
    - `_choice_fault_kind_v5`, sobre todo que las opciones no dependan de los hechos (test con 6000 casos);
    - la aplicación de las reglas H y S;
@@ -482,7 +793,7 @@ Incluye, sin cambios, las correcciones de esa revisión en `README.md`, `reports
 | Corrección | `derive.balanced_fault_kind_pairs`: K4 = `none` + `other` + 2 categorías reales; K8 = K4 + 4 distractoras fijas. Información de la composición sobre la respuesta: **0,000** (`scripts/probe_option_cue.py`, 20 000 casos), frente a 0,019 (6c) y 0,141 (fase 6). Control `derive.swap_states` con estados intercambiados |
 | Más opciones | Δaccuracy K8 − K4 (167 preguntas, 58 `other`): A4v3 −0,036 [−0,096; +0,024]; A4v4 −0,024 [−0,078; +0,030]; A2v4 −0,012 [−0,072; +0,054]. **Tolerancia a K = 8 no demostrada para ninguno** (criterio: límite inferior ≥ −0,05). `other` es el punto débil (A4v3: 0,64 → 0,50) |
 | Control sin estado | Accuracy con estados intercambiados 0,20–0,26, por debajo del prior del conjunto (0,347): **no se explota ninguna pista** |
-| Generador v4 | Deja 0,050 de información por composición (v3: 0,029). Los modelos no la aprovechan más allá del prior: `final13` con estados intercambiados da 0,38–0,41, frente a 0,427 de prior. **Pendiente: un generador v5 con composición equilibrada** |
+| Generador v4 | Deja una diferencia de accuracy top-1 en muestra de 0,050 por composición (v3: 0,029); no se midió información mutua. Los modelos no la aprovechan más allá del prior: `final13` con estados intercambiados da 0,38–0,41, frente a 0,427 de prior. **Pendiente histórico, resuelto en 6f: un generador v5 con composición equilibrada** |
 | Servicio | Sin cambios: A4v3 (`configs/serve_e4b_text.yaml`, calibración de `calib7`) |
 | Rama / commit | **`main` = `fases-0-6` = `9edc183`**, en local y en `origin` (GitHub); historia `65d4250 → 1b5ad45 → daa27ce → 9edc183`. `1b5ad45` está incompleto (le falta `src/gemma_system_one/data/`); usar `daa27ce` o posterior |
 | Código | **`fd340105be1c49de8e601bd57561318204d0058c3a67e756c9101a7940e378cc`** (83 ficheros), el de las evaluaciones; copia en `artifacts/source/` |

@@ -1,160 +1,177 @@
-# Gemma System One local
+# Gemma System One (local)
 
-Paquete de especificaciones corregidas para iniciar un proyecto de adaptación de Gemma 4 en un Mac M5 Pro con 48 GB, usando Claude Code con Fable 5.1 y Codex con GPT Astra.
+Evaluador local que responde **preguntas de decisión tipadas** sobre un mensaje o un estado JSON, usando Gemma 4 en un Mac con Apple Silicon (PyTorch/MPS). No genera texto: cada respuesta se calcula a partir de las representaciones del modelo y cabezales entrenados, y siempre respeta el esquema.
 
-**Recomendación:** empezar con Gemma 4 E2B, validar PyTorch/MPS y entrenar cabezales antes de LoRA. E4B es el siguiente candidato tras medir memoria y calidad. La salida serán decisiones Noul, Choice y Score sin generación de texto en inferencia.
+| Primitiva | Qué responde | Salida |
+|---|---|---|
+| **Noul** | Pregunta de sí o no | Probabilidad `noul` ∈ [0, 1] |
+| **Choice** | Elegir una opción entre 2 y 8 descritas en la propia pregunta | `choice`, probabilidades por opción y `confidence` |
+| **Score** | Nivel en una rúbrica ordenada de 2 a 5 niveles | `score` esperado, probabilidades por nivel, `legend` y `confidence` |
 
-El repositorio implementa la fase 0 (descarga, inspección y diagnóstico real de Gemma 4), la fase 1 (contratos, plantilla, datos por grupos, baselines y cabezal Noul), la fase 2 (Choice/Score con evaluadores compartidos y pérdida sobre el grupo completo, métricas por K/M, piloto de 1000 casos y conjunto de transferencia) la fase 3 (LoRA en la atención textual con autograd real, checkpoints de despliegue y de reanudación, calibración por temperatura y evaluación ciega en test) la fase 4 (una imagen por ejemplo con visión congelada, datos visuales verificables con estilos separados por partición, control sin imagen, ablaciones y límites de memoria) la fase 5 (API local con un worker, cola acotada, límites, E2E con checkpoints entrenados y benchmark) y la fase 6 (perfilado y adopción medida de E4B, más opciones en Choice, recomputación de activaciones para LoRA y agrupación de filas medida y descartada).
+Las opciones y las rúbricas son **dinámicas**: van en cada petición, no están fijadas en el modelo. Una misma llamada puede incluir hasta 8 preguntas. `confidence` mide la concentración de la distribución (entropía normalizada); no garantiza acierto.
 
-## Arranque en cinco pasos
+> **Alcance.** El modelo se ha entrenado y evaluado sólo con **datos sintéticos** de incidencias de soporte (facturación, acceso, fallos técnicos, alcance e impacto), en español e inglés. No se ha evaluado con datos reales, así que no debe darse por supuesta su generalización a otros dominios. En las preguntas sobre el tipo de fallo, los datos de entrenamiento del modelo de servicio tenían algunas regularidades estructurales en las opciones; los controles muestran que el modelo lee el mensaje, pero esas cifras de esa familia deben tomarse con cautela.
 
-1. Descomprime el paquete en una carpeta nueva que será la raíz del repositorio.
-2. Lee la auditoría para entender qué se ha corregido respecto a los seis originales.
-3. Abre la carpeta con Claude Code o Codex; ambos comparten `AGENTS.md`.
-4. Copia el prompt de arranque de `PROMPTS.md`: implementará y comprobará la fase 0.
-5. Usa el otro asistente para revisar la fase y continúa según sus criterios de aceptación.
+## Requisitos
 
-## Fase 0: cómo ejecutar
+- **Máquina:** Mac con Apple Silicon y MPS. Probado en un M5 Pro con 48 GB. El modelo de servicio (E4B) usa unos 17 GB de memoria MPS; la variante E2B, unos 11 GB.
+- **Software:** Python 3.11 y [uv](https://docs.astral.sh/uv/).
+- **Disco:** ~16 GB para los pesos de Gemma 4 E4B, ~10 GB para E2B (caché de Hugging Face) y unos pocos GB para datos y representaciones.
+- **Pesos:** `google/gemma-4-E2B-it` y `google/gemma-4-E4B-it` son públicos (apache-2.0) y se descargan con revisión fijada.
 
-Implementado: paquete `gemma_system_one` (CLI `gso`), configuración tipada, descarga fijada y comando doctor. Estado y evidencia en [docs/STATUS.md](docs/STATUS.md) y [reports/compatibility.md](reports/compatibility.md).
+## Instalación
 
 ```bash
-uv venv --python 3.11 && uv sync
-uv run gso download --config configs/e2b_text.yaml   # ~10,25 GB una sola vez; después usa la caché
-uv run gso doctor --config configs/e2b_text.yaml     # prueba real en MPS: carga, forward/backward, memoria, recarga
-uv run pytest tests/unit tests/integration -q        # contratos en CPU (sin pesos)
-uv run pytest tests/mps -rs                          # hardware real (skip con motivo si falta MPS o pesos)
+git clone <url-del-repositorio> gemma_system_one && cd gemma_system_one
+uv sync --frozen                                   # entorno exacto del lock (torch, transformers, peft, fastapi…)
+uv run pytest tests/unit tests/integration -q      # comprobación rápida en CPU, sin pesos
 ```
 
-## Fase 1: cómo ejecutar
+## Puesta en marcha
 
-Evidencia en [reports/phase1-noul.md](reports/phase1-noul.md). Fixture sintético de humo; no es un resultado de calidad.
+Los datos, los pesos y los checkpoints no están en Git: se generan en local. Estos pasos reproducen el **modelo de servicio recomendado**, Gemma 4 E4B congelado + cabezales, con calibración externa.
+
+**1. Pesos y diagnóstico del equipo** (descarga única, ~16 GB):
 
 ```bash
-uv run gso generate-data --out data/smoke_v1 --cases 40 --seed 0
-uv run gso validate-data --dataset data/smoke_v1
-uv run gso split --dataset data/smoke_v1 --seed 0            # manifiesto inmutable de 4 particiones por grupo
-uv run gso baselines --config configs/noul_smoke.yaml         # prior y bolsa de palabras (sin Gemma)
-uv run gso train --config configs/noul_overfit.yaml           # puerta: sobreajuste controlado de 32 ejemplos
-uv run gso train --config configs/noul_smoke.yaml             # cabezal Noul, época elegida en validación
-uv run gso evaluate --checkpoint runs/noul_smoke/<ts>/checkpoint --split validation --no-cache
+uv run gso download --config configs/e4b_text.yaml
+uv run gso doctor   --config configs/e4b_text.yaml    # carga real, forward/backward, memoria y recarga en MPS
 ```
 
-`evaluate` rechaza `--split test` sin `--final-test`; calibración y test no se usan en esta fase.
-
-## Fase 2: cómo ejecutar
-
-Evidencia en [reports/phase2-decisions.md](reports/phase2-decisions.md). Datos sintéticos por reglas; no es un resultado de calidad general.
+**2. Datos** (sintéticos y deterministas: los sha256 coinciden con los de los informes):
 
 ```bash
-uv run gso generate-data --kind mixed --generator-version v2 --out data/pilot_v2 --cases 1000 --seed 0
-uv run gso generate-data --kind mixed --generator-version v2 --variant transfer --out data/pilot_transfer_v2 --cases 200 --seed 0
-uv run gso split --dataset data/pilot_v2 --seed 0
-uv run gso train --config configs/mixed_overfit.yaml        # puerta: sobreajuste de 48 preguntas mixtas
-uv run gso train --config configs/pilot_ce.yaml             # piloto (CE); configs/pilot_rps.yaml para CE+RPS
-uv run gso evaluate --checkpoint runs/pilot_ce/<ts>/checkpoint --split validation --no-cache --robustness
-uv run gso evaluate --checkpoint runs/pilot_ce/<ts>/checkpoint --split all --dataset data/pilot_transfer_v2
-```
-
-## Fase 3: cómo ejecutar
-
-Evidencia en [reports/phase3-lora.md](reports/phase3-lora.md), protocolo del test en [reports/phase3-test-protocol.md](reports/phase3-test-protocol.md) y decisiones [0005](docs/decisions/0005-lora-stage.md) y [0006](docs/decisions/0006-generator-v3-access-policy.md). Datos sintéticos; no es un resultado de calidad general.
-
-```bash
-uv run gso generate-data --kind mixed --generator-version v3 --out data/pilot_v3 --cases 1000 --seed 0
+uv run gso generate-data --kind mixed --generator-version v3 --seed 0 --cases 1000 --out data/pilot_v3
 uv run gso split --dataset data/pilot_v3 --seed 0
-uv run gso train --config configs/pilot_ce_v3.yaml            # referencia: E2B congelado + cabezales
-uv run gso train --config configs/pilot_lora_v3.yaml          # LoRA + cabezales, arranca de la referencia
-uv run gso train --config configs/pilot_lora_v3.yaml --resume runs/pilot_lora_v3/<ts>   # tras una interrupción
-uv run gso calibrate --checkpoint runs/<run>/<ts>/checkpoint --split calibration
-uv run gso evaluate --checkpoint runs/<run>/<ts>/checkpoint --split test --final-test --no-cache \
-    --calibration runs/<run>/<ts>/calibration/calibration-<ts>.json --baselines   # una vez, artefacto congelado
-uv run gso compare --a <predicciones A> --b <predicciones B>                     # diferencia emparejada b − a
+# Conjunto de calibración externo (1200 preguntas), sin solapes con el entrenamiento:
+uv run gso generate-data --kind mixed --generator-version v3 --seed 6 --cases 300 --out data/pilot_v3_holdout6
+uv run gso generate-data --kind mixed --generator-version v3 --seed 7 --cases 400 --out data/pilot_v3_seed7
+uv run gso generate-data --kind mixed --generator-version v3 --seed 8 --cases 300 --out data/pilot_v3_seed8
+uv run python scripts/derive_phase6b_data.py          # → data/pilot_v3_calib7 y data/pilot_v3_final8
 ```
 
-`gso calibrate` sólo acepta la partición `calibration`; el artefacto queda vinculado por sha256 al checkpoint y `evaluate --calibration` lo rechaza con otro checkpoint. `--stop-after-steps N` interrumpe un entrenamiento LoRA de forma controlada y guarda el estado de reanudación.
-
-## Fase 4: cómo ejecutar
-
-Evidencia en [reports/phase4-vision.md](reports/phase4-vision.md), protocolo en [reports/phase4-test-protocol.md](reports/phase4-test-protocol.md) y decisión [0007](docs/decisions/0007-single-image-path.md). Paneles de barras sintéticos; no es comprensión visual general.
+**3. Entrenamiento y calibración** (~12 min de extracción con E4B; los cabezales tardan segundos):
 
 ```bash
-uv run gso doctor --config configs/e2b_vision.yaml                              # incluye el paso de imagen
-uv run gso generate-data --kind vision --vision-version v1 --out data/vision_pilot_v1 --cases 700 --seed 0   # piloto histórico
-uv run gso generate-data --kind vision --vision-version v2 --out data/vision_pilot_v2 --cases 700 --seed 0 --split-seed 0
-uv run gso split --dataset data/vision_pilot_v2 --seed 0        # comprueba el reparto planificado (estilos por partición)
-uv run gso train --config configs/vision_overfit.yaml                           # puerta con imagen
-uv run gso train --config configs/vision_heads.yaml                             # V: con imagen
-uv run gso train --config configs/vision_text_only.yaml                         # C: mismas filas sin imagen
-uv run gso evaluate --checkpoint runs/vision_heads/<ts>/checkpoint --split validation --no-cache --vision-ablation
-uv run gso compare --a <predicciones C> --b <predicciones V> --allow-different-inputs
+caffeinate -i uv run gso train --config configs/e4b_experiment.yaml     # imprime runs/e4b_experiment/<ts>
+uv run gso calibrate --checkpoint runs/e4b_experiment/<ts>/checkpoint --split all --dataset data/pilot_v3_calib7
+uv run gso evaluate  --checkpoint runs/e4b_experiment/<ts>/checkpoint --split all --dataset data/pilot_v3_final8 \
+  --calibration runs/e4b_experiment/<ts>/calibration/calibration-<fecha>.json --baselines
 ```
 
-Las imágenes de un dataset se nombran por su sha256 (`images/<sha256>.png`); con imagen, la extracción usa una fila por forward. `scripts/snapshot_source.py` guarda una copia de las fuentes bajo el hash que registran los manifiestos.
-
-## Fase 5: cómo ejecutar
-
-Evidencia en [reports/phase5-api.md](reports/phase5-api.md) y decisión [0009](docs/decisions/0009-local-api.md). Cierre de la fase 4 con estilos separados por partición: [reports/phase4b-styles.md](reports/phase4b-styles.md) y [0008](docs/decisions/0008-vision-styles-per-split-and-source-archives.md).
+**4. Servicio.** Copia `configs/serve_e4b_text.yaml` (por ejemplo, a `configs/serve_local.yaml`) y ajusta `checkpoint` y `calibration` a tus rutas. Después:
 
 ```bash
-uv run gso serve --config configs/serve_text.yaml      # API real en 127.0.0.1:8000 (un proceso, un worker)
-curl -s http://127.0.0.1:8000/health/ready             # 200 sólo tras cargar, verificar y hacer warmup
-uv run gso benchmark --config configs/serve_text.yaml --dataset data/pilot_v3 --split validation --requests 100 --warmup 5
-uv run pytest tests/e2e -v -rs                          # E2E con E2B real y checkpoints entrenados (MPS)
+uv run gso serve --config configs/serve_local.yaml     # API en http://127.0.0.1:8000 (sólo loopback)
+curl -s http://127.0.0.1:8000/health/ready             # 200 cuando el modelo está cargado, verificado y caliente
 ```
 
-`POST /v1/decide` recibe `model`, `state`, `questions` (1–8) e `image` opcional (PNG/JPEG en base64, sólo en checkpoints entrenados con imagen). Devuelve `answers`, `usage` (`generated_tokens = 0`) y `metadata`. Errores: 422, 413, 400, 404, 503 y 500 según la spec §9.
+**Variante ligera (E2B + cabezales, ~7 min).** Usa `configs/e2b_text.yaml` en el paso 1 y `configs/pilot_ce_v3.yaml` en el paso 3; calibra con `--split calibration` o con el conjunto externo, y crea la configuración de servicio igual que en el paso 4.
 
-## Fase 6: cómo ejecutar
+## Uso de la API
 
-Evidencia en [reports/phase6-e4b.md](reports/phase6-e4b.md), protocolo predeclarado en [reports/phase6-protocol.md](reports/phase6-protocol.md) y decisiones [0010](docs/decisions/0010-phase6-recompute-and-batching.md) y [0011](docs/decisions/0011-e4b-frozen-heads-text-service.md). En un holdout nuevo, E4B congelado + cabezales mejora a E2B + LoRA (NLL −0,18); es el servicio de texto recomendado, con ~1,6× de latencia.
+`POST /v1/decide` con `model` (el `model_id` de la configuración de servicio), `state` (texto o JSON), `questions` (de 1 a 8, cada una con su identificador) e `image` opcional (PNG o JPEG en base64, sólo para checkpoints entrenados con imagen).
 
 ```bash
-uv run gso download --config configs/e4b_text.yaml          # 16 GB, revisión fijada; una sola vez
-uv run gso doctor --config configs/e4b_text.yaml
-uv run gso train --config configs/e4b_experiment.yaml       # A4: mismos datos e hiperparámetros que pilot_ce_v3
-uv run gso calibrate --checkpoint runs/e4b_experiment/<ts>/checkpoint --split calibration
-uv run python scripts/derive_phase6_data.py                 # holdout sin solapes y variante con K = 8
-uv run gso serve --config configs/serve_e4b_text.yaml       # servicio de texto recomendado
-uv run python scripts/profile_lora_step.py configs/e4b_text.yaml data/pilot_v3 out.json 6 --recompute
+curl -s -X POST http://127.0.0.1:8000/v1/decide -H 'Content-Type: application/json' -d '{
+  "model": "gemma-system-one-e4b-heads-v0.1",
+  "state": "Hola, desde esta mañana la VPN se desconecta cada pocos minutos y además me han cobrado dos veces la cuota de junio. Solicito la devolución del cargo duplicado.",
+  "questions": {
+    "refund": {"type": "noul", "instructions": "¿El cliente pide una devolución?"},
+    "fault": {"type": "choice", "instructions": "¿Qué tipo de fallo técnico describe el mensaje?",
+              "criteria": {"net": "Red o conectividad (DNS, VPN, conexión)", "slow": "Lentitud o rendimiento",
+                           "none": "No se describe ningún fallo técnico", "other": "Otro tipo de fallo técnico"}},
+    "severity": {"type": "score", "instructions": "Evalúa la situación técnica descrita.",
+                 "criteria": ["No se describe ningún fallo técnico", "Hubo un fallo técnico, pero ya está resuelto",
+                              "Hay un fallo técnico activo"]}
+  }
+}'
 ```
 
-En el perfil de seis pasos de LoRA sobre E4B, la ejecución sin recomputación superó el presupuesto de 32 GiB y la ejecución con `train.recompute_layers: true` permaneció por debajo. No se ha medido un entrenamiento completo de E4B con LoRA.
+Respuesta real del modelo de servicio (abreviada):
 
-Fase 6b ([reports/phase6b-final.md](reports/phase6b-final.md)): en un test final nuevo que no se usó para ajustar pesos ni temperaturas, A4 − B2 = −0,146 [−0,186; −0,104]. La regla C predeclarada usa ese test para confirmar A4. Las calibraciones se ajustan con un conjunto externo de 1200 preguntas (`gso calibrate --split all --dataset data/pilot_v3_calib7`). La revisión posterior detectó una fuga estructural de etiqueta en la familia sintética `fault_type`; véanse los límites del informe.
+```json
+{
+  "model": "gemma-system-one-e4b-heads-v0.1",
+  "checkpoint_id": "decision_heads:97fbb4d1b9cc7609+cal:f42131010813",
+  "answers": {
+    "refund":   {"type": "noul", "noul": 0.987},
+    "fault":    {"type": "choice", "choice": "net",
+                 "probabilities": {"net": 0.954, "slow": 0.025, "other": 0.013, "none": 0.007}, "confidence": 0.833},
+    "severity": {"type": "score", "score": 1.70, "probabilities": [0.152, 0.000, 0.848],
+                 "legend": ["No se describe ningún fallo técnico", "Hubo un fallo técnico, pero ya está resuelto",
+                            "Hay un fallo técnico activo"], "confidence": 0.611}
+  },
+  "usage": {"questions": 3, "expanded_rows": 8, "backbone_forwards": 8, "processed_input_tokens": 1652,
+            "image_tokens": 0, "padding_tokens": 0, "generated_tokens": 0},
+  "metadata": {"confidence_method": "normalized_entropy_v1", "request_id": "…",
+               "timing_ms": {"forward_synchronized": 1016.2, "server_total": 1030.5}}
+}
+```
 
-Fase 6c ([reports/phase6c-final.md](reports/phase6c-final.md), decisión [0012](docs/decisions/0012-generator-v4-without-k-cue.md)): el generador `--generator-version v4` elimina la pista determinista del número K. A4v4 − A4v3 = −0,007 [−0,034; +0,024] de NLL calibrada en el test v4; el margen predeclarado no se cumple y se mantiene A4v3. La revisión posterior encontró una pista parcial en la composición de las opciones ampliadas a K8; ese diagnóstico no demuestra robustez sin fuga.
+- **Coste:** cada opción de Choice y cada nivel de Score es un forward del modelo. Una petición cuesta tantas filas como opciones y niveles tenga en total (aquí 1 + 4 + 3 = 8).
+- **Errores:**
 
-Fase 6d ([reports/phase6d-final.md](reports/phase6d-final.md)): diagnóstico emparejado K4/K8 con cuatro distractoras fijas. La tolerancia a K = 8 no queda demostrada para ningún modelo (IC anchos; la respuesta `other` es el punto débil). La revisión retiró la conclusión de que las opciones no aportan pistas: 0,000 es una ganancia de accuracy top-1, no información mutua cero, y el control con estados intercambiados conserva etiquetas que suelen contradecir el estado donante. El generador de entrenamiento v4 muestra 0,050 de ganancia top-1 por composición en el probe; investigar un v5 queda pendiente.
+  | Código | Causa |
+  |---|---|
+  | 422 | Esquema inválido o modalidad incorrecta |
+  | 413 | Cuerpo o imagen demasiado grandes |
+  | 400 | Imagen ilegible |
+  | 404 | Ruta desconocida |
+  | 503 | Cola llena, tiempo agotado o modelo aún sin cargar |
 
-Fase 6e ([reports/phase6e-final.md](reports/phase6e-final.md)): tríos con la misma pregunta y distinto estado (techo sin leer el estado: 1/3). Los tres modelos usan el estado en este diagnóstico sintético (tríos completos: A4v3 0,58; A2v4 0,21). La tolerancia a K = 8 sólo queda demostrada para A2v4 en este conjunto. Hay errores `other` hacia «aplicación» en fallos de rendimiento y datos; el posible solapamiento de categorías es una hipótesis para un v5, no una causa demostrada.
+- **Salud:** `/health/live` y `/health/ready`.
+- **Límites operativos:**
+  - un proceso con un worker y una cola acotada (`max_queue`);
+  - el timeout no interrumpe un forward ya iniciado en la GPU.
 
-Fase 6f ([reports/phase6f-final.md](reports/phase6f-final.md), decisión [0013](docs/decisions/0013-generator-v5-exclusive-definitions.md)): generador `--generator-version v5` con definiciones excluyentes («aplicación» no incluye lentitud ni pérdida de datos) y opciones sorteadas sin mirar los hechos. Entrenar con v5 mejora los tríos completos de E4B (+0,087 [+0,020; +0,160]) y casi elimina el error `other` → «aplicación», pero no se demuestra la no inferioridad en NLL (−0,007 [−0,037; +0,025]), así que se mantiene A4v3 como servicio. El error residual está en los fallos ya resueltos.
+## Resultados
 
-## Documentos
+Medidos en este Mac con datos sintéticos. El test final es un conjunto nuevo que no se usó para ajustar pesos ni temperaturas (888 preguntas, 296 grupos). NLL media por pregunta (menor es mejor) e IC95 % por bootstrap de grupos.
 
-| Archivo | Uso |
+| Modelo | NLL calibrada | Acc. Noul / Choice / Score | Latencia HTTP p50 / p95 |
+|---|---|---|---|
+| Prior (baseline) | 1,032 | — | — |
+| Bolsa de palabras (baseline) | 0,942 | — | — |
+| E2B + cabezales | 0,384 | 0,93 / 0,81 / 0,79 | — |
+| E2B + LoRA + cabezales (`configs/serve_text.yaml`) | 0,347 | 0,94 / 0,86 / 0,76 | 551 / 909 ms |
+| **E4B + cabezales (servicio recomendado)** | **0,201** | **0,96 / 0,90 / 0,89** | 910 / 1546 ms |
+
+- **E4B frente a E2B + LoRA:** E4B mejora la NLL en −0,146 [−0,186; −0,104], con ~1,6× de latencia y un arranque en frío de ~9,5 s. La latencia es por petición de 3 preguntas (~8 filas); rendimiento de ~1 petición/s con un worker.
+- **Robustez:**
+  - las respuestas no cambian al renombrar los IDs de las opciones ni al permutarlas;
+  - en controles donde sólo cambia el estado del mensaje, el modelo cambia su respuesta, es decir, lee el estado y no sólo las opciones.
+- **Imagen:** existe un servicio con una imagen por petición (`configs/serve_vision.yaml`, E2B) para paneles de barras sintéticos. Supera claramente al mismo modelo sin imagen en estilos visuales no vistos, pero no está calibrado.
+- **Reproducibilidad:** desde un clon limpio, los datos se regeneran idénticos y el entrenamiento de cabezales se reproduce bit a bit.
+
+## Comandos (`gso`)
+
+| Comando | Para qué |
 |---|---|
-| [docs/ESPECIFICACION.md](docs/ESPECIFICACION.md) | Diseño completo: entorno, arquitectura, datos, entrenamiento, calibración, API, fases y tests |
-| [docs/AUDITORIA.md](docs/AUDITORIA.md) | Revisión detallada de cada archivo original y correcciones |
-| [AGENTS.md](AGENTS.md) | Reglas comunes de desarrollo y validación |
-| [CLAUDE.md](CLAUDE.md) | Entrada de contexto de Claude Code |
-| [PROMPTS.md](PROMPTS.md) | Prompts de arranque, revisión, continuación y relevo |
-| [docs/FUENTES.md](docs/FUENTES.md) | Fuentes primarias, hechos contrastados y aspectos pendientes |
-| [docs/STATUS.md](docs/STATUS.md) | Estado del trabajo, comandos ejecutados, resultados y relevo |
+| `gso download --config …` | Descarga fijada de los pesos, con verificación sha256 |
+| `gso doctor --config …` | Compatibilidad y recursos del equipo con el modelo real |
+| `gso generate-data --kind mixed\|vision …` | Datasets sintéticos deterministas (`--generator-version`, `--seed`, `--cases`) |
+| `gso validate-data --dataset …` | Esquema, ficheros y grupos |
+| `gso split --dataset … --seed …` | Particiones train / validation / calibration / test por grupos, sin fugas |
+| `gso train --config …` | Cabezales sobre la base congelada, o LoRA + cabezales (`kind` de la configuración) |
+| `gso calibrate --checkpoint … --split calibration` o `--split all --dataset …` | Temperatura por primitiva |
+| `gso evaluate --checkpoint … --split … [--calibration …] [--baselines]` | Métricas y predicciones auditables; `--split test` exige `--final-test` |
+| `gso compare --a … --b …` | Diferencia emparejada entre dos ficheros de predicciones, con IC |
+| `gso serve --config …` | API local con el modelo real |
+| `gso benchmark --config … --dataset … --split validation` | Arranque, latencia y saturación de la API en un proceso aparte |
 
-## Cambios esenciales
+**Formato de los datos:** JSONL con `state`, `question` (`type`, `instructions`, `criteria`), `target` y `group_id` (esquema v1 en `docs/ESPECIFICACION.md` §5.1). Para evaluar el servicio con datos propios: `gso validate-data --dataset data/mis_datos` y después `gso evaluate --split all --dataset data/mis_datos`.
 
-- Gemma 4 real como base, en lugar de PaliGemma 2.
-- Adaptación supervisada y calibración posterior; no se presenta como reproducción de RLCD.
-- Opciones y rúbricas variables representadas semánticamente, con coste explícito por candidato.
-- Datos diversos y verificables; splits separados de entrenamiento, validación, calibración y test.
-- Inferencia real y probabilidades calculadas, eliminando constantes y métricas inventadas.
-- Perfilado de memoria en el equipo antes de aumentar contexto, candidatos o tamaño del modelo.
-- API propia; compatibilidad con TypeSafe sólo como ampliación demostrada con tests.
+## Estructura
 
-## Qué significa éxito
+```text
+src/gemma_system_one/   contratos, serialización, modelo, entrenamiento, calibración, API y CLI
+configs/                configuraciones de modelo, entrenamiento y servicio
+scripts/                derivación de datasets y análisis reproducibles
+tests/                  unit, integration (CPU), mps (hardware real) y e2e (servicio con checkpoints)
+docs/                   especificación y decisiones de diseño (docs/decisions/)
+reports/                evidencia de cada experimento (métricas, protocolos y comandos)
+```
 
-Un proyecto que pueda entrenar un evaluador, demostrar mejora frente a baselines, medir su calibración, recargar sus pesos y responder por HTTP con resultados reales. Que una salida respete el esquema no garantiza que sea correcta. La calidad, latencia y memoria deberán quedar respaldadas por reportes reproducibles.
-
-Fecha de revisión documental: 22 de septiembre de 2026.
+- **Tests:** `uv run pytest tests/mps -rs` necesita MPS y los pesos descargados. `tests/e2e` necesita checkpoints entrenados; si faltan, los tests se omiten avisando del motivo.
+- **Licencia:** propietaria (`pyproject.toml`). Los pesos de Gemma 4 se rigen por su propia licencia.

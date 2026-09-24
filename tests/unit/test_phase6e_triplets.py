@@ -93,7 +93,13 @@ def test_compare_triplets_pairs_by_triplet(tmp_path):
     def write(name, correct):
         p = tmp_path / name
         rows = [
-            {"id": f"trip0-{t:04d}-{r}", "correct": c}
+            {
+                "id": f"trip0-{t:04d}-{r}",
+                "correct": c,
+                "group_id": f"g-{t}-{r}",
+                "input_sha256": f"sha-{t}-{r}",
+                "target_index": t,
+            }
             for t, triple in enumerate(correct)
             for r, c in zip(("real", "other", "none"), triple, strict=True)
         ]
@@ -112,3 +118,13 @@ def test_compare_triplets_pairs_by_triplet(tmp_path):
         assert "mismos tríos" in str(exc)
     else:
         raise AssertionError("debía rechazar tríos distintos")
+    changed = tmp_path / "changed.jsonl"
+    rows = [json.loads(line) for line in Path(b).read_text().splitlines()]
+    rows[0]["input_sha256"] = "otra entrada"
+    changed.write_text("\n".join(json.dumps(x) for x in rows) + "\n")
+    try:
+        mod.compare(a, str(changed))
+    except ValueError as exc:
+        assert "mismas entradas" in str(exc)
+    else:
+        raise AssertionError("debía rechazar entradas distintas con los mismos IDs")

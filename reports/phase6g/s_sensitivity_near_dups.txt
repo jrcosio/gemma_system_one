@@ -1,0 +1,6 @@
+data/pilot_v3 pares casi duplicados 6 grupos de final17 6
+data/pilot_v5 pares casi duplicados 5 grupos de final17 5
+data/pilot_v5_calib16 pares casi duplicados 2 grupos de final17 2
+grupos excluidos (unión): 11 ['mix-s17-00009', 'mix-s17-00015', 'mix-s17-00051', 'mix-s17-00084', 'mix-s17-00094', 'mix-s17-00120', 'mix-s17-00175', 'mix-s17-00197', 'mix-s17-00239', 'mix-s17-00268', 'mix-s17-00271']
+completo 837 279 -0.0074 [-0.0373, 0.0251]
+sin casi duplicados 804 268 -0.0063 [-0.0377, 0.0281]
