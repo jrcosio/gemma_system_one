@@ -36,12 +36,21 @@ La revisión independiente de la fase 6b detectó dos pistas estructurales que r
   - La respuesta `other` es la más difícil en todos los modelos.
 - La ventaja observada de E4B frente a E2B persiste en el test v4: A4v4 − A2v4 = −0,149 [−0,195; −0,105]. Esta comparación no atribuye causalmente la ventaja a una única pista del generador.
 
-## Anexo 2026-09-24 (fase 6d): diagnóstico con composición equilibrada
+## Anexo 2026-09-24 (fase 6d): diagnóstico con composición equilibrada, revisado
 
 - **Diseño:** `derive.balanced_fault_kind_pairs` sustituye a `widen_fault_kind_by_facts` para medir K8: K4 = `none` + `other` + dos categorías reales, y K8 = K4 + cuatro distractoras fijas.
-- **Ganancia por composición:** 0,000 (`scripts/probe_option_cue.py`).
-- **Control sin estado** (`derive.swap_states`): la accuracy queda por debajo del prior, así que no se explota ninguna pista.
+- **Ganancia top-1 del probe:** 0,000 (`scripts/probe_option_cue.py`) entre un prior restringido a opciones y un predictor por firma ajustado en la misma muestra. No implica información mutua cero ni independencia: cada etiqueta real sólo puede ser respuesta si está en el par. K8 añade cuatro distractoras fijas al mismo K4; ésa es la comparación controlada.
+- **Control con estados intercambiados** (`derive.swap_states`): 125/167 etiquetas conservadas en K4/K8swap contradicen el estado donante. La accuracy frente a ellas no es una medida de uso exclusivo de opciones ni permite concluir que no se explota ninguna pista.
 - **Tolerancia a K = 8:** no demostrada para A4v3, A4v4 ni A2v4 (límite inferior del IC de Δaccuracy entre −0,072 y −0,096; 167 preguntas).
-- **Generador de entrenamiento v4:** conserva 0,050 de información por composición, que los modelos no aprovechan más allá del prior en `final13`. Corregirlo exige un v5 con composición equilibrada (pendiente).
+- **Generador de entrenamiento v4:** el probe muestra 0,050 de ganancia top-1 dentro de la muestra. El uso de esa señal por el modelo no queda resuelto con `final13_faultswap`. Investigar un v5 con datos nuevos queda pendiente.
 
 Detalle: `reports/phase6d-final.md`.
+
+## Anexo 2026-09-24 (fase 6e): tríos con la misma pregunta
+
+- **Diseño:** `derive.fault_kind_triplets` (protocolo `reports/phase6e-protocol.md`) da un control del uso del estado coherente con la semántica. Cada trío comparte exactamente las mismas opciones y sólo cambia el estado; sin leer el estado, el techo es 1/3 de accuracy y 0 tríos completos.
+- **Uso del estado:** los tres modelos lo usan. Tríos completos: A4v3 0,58, A4v4 0,50 y A2v4 0,21, todos con el límite inferior del IC > 0,10.
+- **Tolerancia a K = 8:** sólo A2v4 la cumple (Δaccuracy +0,013 [−0,024; +0,053]). En A4v3 (−0,024 [−0,060; +0,011]) y A4v4 (−0,027 [−0,051; −0,002]) no queda demostrada.
+- **`other`:** el error dominante en E4B es asignar los fallos de rendimiento y de datos a la opción «aplicación». Es una ambigüedad de las definiciones del generador; queda pendiente un v5 con categorías mutuamente excluyentes.
+
+Detalle: `reports/phase6e-final.md`.

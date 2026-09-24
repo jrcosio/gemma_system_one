@@ -125,7 +125,9 @@ Fase 6b ([reports/phase6b-final.md](reports/phase6b-final.md)): en un test final
 
 Fase 6c ([reports/phase6c-final.md](reports/phase6c-final.md), decisión [0012](docs/decisions/0012-generator-v4-without-k-cue.md)): el generador `--generator-version v4` elimina la pista determinista del número K. A4v4 − A4v3 = −0,007 [−0,034; +0,024] de NLL calibrada en el test v4; el margen predeclarado no se cumple y se mantiene A4v3. La revisión posterior encontró una pista parcial en la composición de las opciones ampliadas a K8; ese diagnóstico no demuestra robustez sin fuga.
 
-Fase 6d ([reports/phase6d-final.md](reports/phase6d-final.md)): diagnóstico de K con composición de opciones equilibrada (0,000 de información sobre la respuesta sin leer el estado) y control con estados intercambiados. La tolerancia a K = 8 no queda demostrada para ningún modelo (IC anchos; la respuesta `other` es el punto débil). El generador de entrenamiento v4 conserva 0,050 de información por composición: pendiente de un v5.
+Fase 6d ([reports/phase6d-final.md](reports/phase6d-final.md)): diagnóstico emparejado K4/K8 con cuatro distractoras fijas. La tolerancia a K = 8 no queda demostrada para ningún modelo (IC anchos; la respuesta `other` es el punto débil). La revisión retiró la conclusión de que las opciones no aportan pistas: 0,000 es una ganancia de accuracy top-1, no información mutua cero, y el control con estados intercambiados conserva etiquetas que suelen contradecir el estado donante. El generador de entrenamiento v4 muestra 0,050 de ganancia top-1 por composición en el probe; investigar un v5 queda pendiente.
+
+Fase 6e ([reports/phase6e-final.md](reports/phase6e-final.md)): tríos con la misma pregunta y distinto estado (techo sin leer el estado: 1/3). Los tres modelos usan el estado (tríos completos: A4v3 0,58; A2v4 0,21). La tolerancia a K = 8 sólo queda demostrada para A2v4. La debilidad de `other` se debe sobre todo a que la opción «aplicación» absorbe fallos de rendimiento y de datos: pendiente de un generador v5 con categorías excluyentes.
 
 ## Documentos
 

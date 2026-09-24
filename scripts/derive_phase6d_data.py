@@ -52,8 +52,8 @@ if __name__ == "__main__":
     for name, exs, note in (
         ("K4", k4, "Composición equilibrada: none, other y dos categorías reales."),
         ("K8", k8, "K4 más las cuatro distractoras."),
-        ("K4swap", swap_states(k4, seed=0), "K4 con estados intercambiados (control sin estado)."),
-        ("K8swap", swap_states(k8, seed=0), "K8 con estados intercambiados (control sin estado)."),
+        ("K4swap", swap_states(k4, seed=0), "K4 con estados intercambiados y etiquetas originales."),
+        ("K8swap", swap_states(k8, seed=0), "K8 con estados intercambiados y etiquetas originales."),
     ):
         out[name] = write_derived(Path(f"data/pilot_v4_kdiag14_{name}"), exs, {**src, "note": note})
     f13 = load_dataset("data/pilot_v4_final13")

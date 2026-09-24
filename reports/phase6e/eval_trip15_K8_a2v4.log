@@ -1,0 +1,102 @@
+Loading weights:   0%|          | 0/1951 [00:00<?, ?it/s]Loading weights: 100%|██████████| 1951/1951 [00:00<00:00, 79097.27it/s]
+{
+  "checkpoint": "runs/e2b_heads_v4/20260924T142144Z/checkpoint",
+  "stage": "phase2_decision_heads_frozen_backbone",
+  "split": "all",
+  "use_cache": true,
+  "code": {
+    "sha": "9edc18340ab13fce5d9fe68ce7c7a2b28ff7ea1e",
+    "dirty": true,
+    "source": {
+      "sha256": "a1e3f481609c6f830f88defd25cd5712f62012a20dcfbd602b2d80a4bb17f0a4",
+      "files": 86,
+      "globs": [
+        "src/**/*.py",
+        "configs/*.yaml",
+        "scripts/*.py",
+        "pyproject.toml",
+        "uv.lock"
+      ],
+      "archive": "artifacts/source/a1e3f481609c6f830f88defd25cd5712f62012a20dcfbd602b2d80a4bb17f0a4.tar"
+    }
+  },
+  "calibration": {
+    "file": "runs/e2b_heads_v4/20260924T142144Z/calibration/calibration-20260924T143725Z.json",
+    "temperatures": {
+      "noul": 2.015648011462083,
+      "choice": 1.2758655697443355,
+      "score": 1.3204828384146536
+    },
+    "calibrated": {
+      "noul": true,
+      "choice": true,
+      "score": true
+    }
+  },
+  "external_calibration_leakage": {
+    "errors": [],
+    "near_duplicate_states": 3
+  },
+  "external_dataset": {
+    "root": "data/pilot_v4_trip15_K8",
+    "sha256": "272314ae5006dbcd898fb8c04fe06d5f5916cee44d5962332f30b0b979484277"
+  },
+  "external_leakage": {
+    "errors": [],
+    "near_duplicate_states": 3
+  },
+  "diagnostic_only": true,
+  "backbone_loaded": true,
+  "extraction": {
+    "split": "all",
+    "questions": 450,
+    "rows": 3600,
+    "backbone_forwards": 3600,
+    "valid_tokens": 1156448,
+    "padding_tokens": 0,
+    "max_row_tokens": 383,
+    "seconds_synchronized": 285.4394,
+    "cache_hit": false,
+    "image_rows": 0,
+    "image_tokens": 0
+  },
+  "usage": {
+    "questions": 450,
+    "expanded_rows": 3600,
+    "backbone_forwards": 3600,
+    "processed_input_tokens": 1156448,
+    "generated_tokens": 0
+  },
+  "memory": {
+    "sampling": "instantáneas en puntos instrumentados; el pico real puede ser mayor",
+    "budget_bytes": 34359738368,
+    "peaks_sampled": {
+      "process_rss_bytes": 1564672000,
+      "mps_current_allocated_bytes": 10215276544,
+      "mps_driver_allocated_bytes": 11366449152,
+      "swap_used_bytes": 2754871296
+    },
+    "over_budget": [],
+    "swap_delta_bytes": 0
+  },
+  "report_path": "runs/e2b_heads_v4/20260924T142144Z/evaluations/pilot_v4_trip15_K8-all-calibrated-20260924T172953Z.json",
+  "predictions_path": "runs/e2b_heads_v4/20260924T142144Z/evaluations/pilot_v4_trip15_K8-all-calibrated-20260924T172953Z-predictions.jsonl",
+  "metrics_summary": {
+    "questions": 450,
+    "mean_nll_all": 0.8813605183190778,
+    "choice": {
+      "n": 450,
+      "nll": 0.8813605183190777,
+      "accuracy": 0.6977777777777778
+    }
+  },
+  "metrics_calibrated_summary": {
+    "questions": 450,
+    "mean_nll_all": 0.7912597954795595,
+    "choice": {
+      "n": 450,
+      "nll": 0.7912597954795595,
+      "accuracy": 0.6977777777777778
+    }
+  }
+}

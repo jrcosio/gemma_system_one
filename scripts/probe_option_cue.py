@@ -2,10 +2,11 @@
 
 Para una muestra grande de preguntas ``fault_type`` se calcula, sin modelos:
   - ``prior``: se elige, entre las opciones presentes, la categoría con mayor frecuencia global de
-    ser la respuesta (sólo el prior de la tarea, sin interacción con la composición);
+    ser la respuesta (prior global restringido a las opciones presentes);
   - ``bayes``: la respuesta más frecuente para cada composición exacta (conjunto de categorías), la
-    mejor accuracy posible mirando sólo las opciones (en la muestra; con n grande, sesgo pequeño).
-La diferencia ``bayes − prior`` es la información sobre la respuesta que aporta la composición.
+    mejor accuracy posible mirando sólo las opciones en esta misma muestra (cota sobreajustada).
+La diferencia ``bayes − prior`` mide mejora de accuracy top-1, no información mutua: puede ser cero
+aunque la composición cambie las probabilidades de las etiquetas.
 
 Uso: uv run python scripts/probe_option_cue.py OUT.json [casos]
 """
@@ -66,7 +67,7 @@ def main(out: str, cases: int = 20000) -> None:
     k4, k8 = balanced_fault_kind_pairs(ex4, au4, seed=0)
     report = {
         "cases": cases,
-        "note": "Accuracy máxima sin leer el estado; ver docstring.",
+        "note": "Accuracies top-1 sin leer el estado; Bayes se ajusta en la misma muestra. Ver docstring.",
         "v3_generator_K3_6": probe(ex3),
         "v4_generator_K3_6": probe(ex4),
         "v3_widen_by_label_K8_phase6": probe(widen_fault_kind(ex3, seed=0)),

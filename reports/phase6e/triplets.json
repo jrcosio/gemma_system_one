@@ -1,0 +1,147 @@
+{
+ "bootstrap": {
+  "unit": "tr\u00edo",
+  "reps": 1000,
+  "seed": 0
+ },
+ "results": {
+  "a4v3_K4": {
+   "triplets": 150,
+   "questions": 450,
+   "accuracy": 0.8467,
+   "accuracy_ci": [
+    0.8156,
+    0.8778
+   ],
+   "by_role": {
+    "real": 0.92,
+    "other": 0.68,
+    "none": 0.94
+   },
+   "full_triplets": 0.58,
+   "full_triplets_ci": [
+    0.5067,
+    0.66
+   ],
+   "ceiling_without_state": {
+    "accuracy": 0.3333,
+    "full_triplets": 0.0
+   }
+  },
+  "a4v3_K8": {
+   "triplets": 150,
+   "questions": 450,
+   "accuracy": 0.8222,
+   "accuracy_ci": [
+    0.7889,
+    0.8556
+   ],
+   "by_role": {
+    "real": 0.98,
+    "other": 0.6333,
+    "none": 0.8533
+   },
+   "full_triplets": 0.5267,
+   "full_triplets_ci": [
+    0.4467,
+    0.6068
+   ],
+   "ceiling_without_state": {
+    "accuracy": 0.3333,
+    "full_triplets": 0.0
+   }
+  },
+  "a4v4_K4": {
+   "triplets": 150,
+   "questions": 450,
+   "accuracy": 0.8222,
+   "accuracy_ci": [
+    0.7933,
+    0.8511
+   ],
+   "by_role": {
+    "real": 0.9467,
+    "other": 0.5667,
+    "none": 0.9533
+   },
+   "full_triplets": 0.5,
+   "full_triplets_ci": [
+    0.42,
+    0.58
+   ],
+   "ceiling_without_state": {
+    "accuracy": 0.3333,
+    "full_triplets": 0.0
+   }
+  },
+  "a4v4_K8": {
+   "triplets": 150,
+   "questions": 450,
+   "accuracy": 0.7956,
+   "accuracy_ci": [
+    0.76,
+    0.8267
+   ],
+   "by_role": {
+    "real": 0.96,
+    "other": 0.54,
+    "none": 0.8867
+   },
+   "full_triplets": 0.46,
+   "full_triplets_ci": [
+    0.3798,
+    0.54
+   ],
+   "ceiling_without_state": {
+    "accuracy": 0.3333,
+    "full_triplets": 0.0
+   }
+  },
+  "a2v4_K4": {
+   "triplets": 150,
+   "questions": 450,
+   "accuracy": 0.6844,
+   "accuracy_ci": [
+    0.6511,
+    0.7178
+   ],
+   "by_role": {
+    "real": 0.8733,
+    "other": 0.4067,
+    "none": 0.7733
+   },
+   "full_triplets": 0.2067,
+   "full_triplets_ci": [
+    0.14,
+    0.2733
+   ],
+   "ceiling_without_state": {
+    "accuracy": 0.3333,
+    "full_triplets": 0.0
+   }
+  },
+  "a2v4_K8": {
+   "triplets": 150,
+   "questions": 450,
+   "accuracy": 0.6978,
+   "accuracy_ci": [
+    0.66,
+    0.7378
+   ],
+   "by_role": {
+    "real": 0.8867,
+    "other": 0.4467,
+    "none": 0.76
+   },
+   "full_triplets": 0.2867,
+   "full_triplets_ci": [
+    0.2132,
+    0.3667
+   ],
+   "ceiling_without_state": {
+    "accuracy": 0.3333,
+    "full_triplets": 0.0
+   }
+  }
+ }
+}

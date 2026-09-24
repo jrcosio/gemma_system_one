@@ -1,38 +1,49 @@
-# Fase 6d: diagnóstico de más opciones con composición equilibrada y control sin estado
+# Fase 6d: diagnóstico de más opciones con composición equilibrada y estados intercambiados
 
-Fecha: 2026-09-24. Mac M5 Pro con 48 GB, MPS/BF16 y cabezales CPU/FP32. Rama `fases-0-6`, sobre `daa27ce`; los cambios de esta fase están sin commit.
+## Revisión independiente (2026-09-24)
+
+El resultado emparejado K8 − K4 sigue siendo válido como medición en estos 167 casos: K8 añade las mismas cuatro distractoras a cada K4 y el límite inferior de los tres IC no cumple el margen de −0,05. **No se demuestra tolerancia a K8.** Las afirmaciones originales de «información 0,000» y «no se explota ninguna pista» se retiran por los dos errores metodológicos siguientes. Los datos y logits históricos no se modifican.
+
+1. `composition_gain = 0,000` es la diferencia de **accuracy top-1** entre dos predictores que sólo ven las opciones, calculada sobre la propia muestra. El predictor llamado `prior` ya restringe su elección a las categorías presentes, por lo que también usa la composición. La ganancia cero no demuestra independencia entre conjunto y etiqueta: una categoría real sólo puede ser respuesta si figura entre las dos elegidas. En las 167 preguntas K4, la información mutua empírica entre firma de categorías y etiqueta completa es 0,422 bits (estimación en la misma muestra, con sesgo por tamaño). El par es uniforme para `other`, `none` y las etiquetas reales **agregadas**, pero no para cada etiqueta real concreta. Esta información incluye disponibilidad legítima de candidatos; no se interpreta automáticamente como fuga indebida. El diseño emparejado K4/K8 controla la **adición** de distractoras fijas, no toda dependencia entre opciones y respuesta.
+   El campo `note` del JSON archivado llama a la segunda cifra «accuracy máxima»; es una cifra ajustada en la propia muestra y se conserva sólo por trazabilidad. El script actual aclara la definición para futuros resultados.
+2. `swap_states` conserva la pregunta, opciones y etiqueta originales pero sustituye el estado por el de otro grupo. En K4/K8swap, 125/167 etiquetas conservadas (74,9 %) contradicen la respuesta semántica del estado donante; 92/167 intercambios (55,1 %) cambian el idioma. En `final13_faultswap`, las cifras son 99/138 y 70/138. Por tanto, la accuracy frente a las etiquetas conservadas mide una perturbación con estados contradictorios; **no** mide un predictor que sólo lee opciones. En K4swap, la accuracy de A4v3 frente a la etiqueta conservada es 0,210 y frente a la respuesta semántica del estado donante es 0,814 (A4v4: 0,204/0,784; A2v4: 0,222/0,665). En K8swap: A4v3 0,234/0,820, A4v4 0,234/0,743 y A2v4 0,263/0,635. No puede concluirse de este control que los modelos no explotan pistas de opciones.
+
+La comparación con el prior 0,347/0,427 en el control intercambiado queda retirada. Para aislar una pista de opciones haría falta un control que **mantuviera coherencia entre estado y etiqueta** o un predictor que recibiera sólo pregunta y opciones, entrenado y evaluado en grupos disjuntos. Es trabajo futuro con datos nuevos; los conjuntos de esta fase ya están abiertos.
+
+**Reproducción de la revisión:** `.venv/bin/python scripts/review_phase6d_controls.py` recalcula los conflictos, cambios de idioma, información mutua empírica y accuracy frente al estado donante desde los datasets y las predicciones archivadas. `.venv/bin/pytest tests/unit tests/integration -q` → 293 passed; `.venv/bin/pytest tests/mps/test_phase3_real.py::test_lora_on_real_e2b_mps -q -rs` → 1 passed, sin omisión. Una recarga de A4v3 desde `runs/e4b_experiment/20260923T204945Z/checkpoint` ejecutó una pregunta K4 sin caché: `Gemma4Model`, MPS/BF16, eval, cero parámetros base entrenables, sin `lm_head`, cuatro logits finitos y diferencia máxima 0,0 frente al JSONL guardado. Esta comprobación real de E4B es inferencia, no una nueva prueba de sus gradientes. `ruff check .`, `ruff format --check .`, `uv lock --check`, `git diff --check` y el sha256 del protocolo pasan. Las 14 pruebas MPS/E2E de la implementación se conservan como evidencia histórica; no se repitieron en esta revisión.
+
+Fecha: 2026-09-24. Mac M5 Pro con 48 GB, MPS/BF16 y cabezales CPU/FP32. La fase se implementó en `fases-0-6` sobre `daa27ce` y quedó en el commit `9edc183`; la revisión independiente se realiza en `main` con correcciones sin commit.
 
 - **Protocolo predeclarado:** [phase6d-protocol.md](phase6d-protocol.md), sha256 `474a32b4…` (en `reports/phase6d/protocol.sha256`). Se escribió antes de generar los datos y de evaluar.
 - **Evidencia bruta:** `reports/phase6d/`.
 
 ## Veredicto
 
-1. **La pista de composición del diagnóstico K8 está corregida.**
-   - Con `balanced_fault_kind_pairs`, la estructura de las opciones es la misma para cualquier etiqueta. La información sobre la respuesta que aporta la composición es **0,000** (sin modelos, 20 000 casos), frente a 0,019 en la fase 6c y 0,141 en la fase 6.
-   - El control sin estado lo confirma con los modelos: con estados intercambiados, la accuracy (0,20–0,26) queda **por debajo** del prior del conjunto (0,347). No se explota ninguna pista.
+1. **La adición de opciones en K8 está controlada, pero no se ha demostrado ausencia de pistas.**
+   - `balanced_fault_kind_pairs` usa el mismo par en K4 y K8 para cada pregunta; las cuatro distractoras añadidas son fijas. `composition_gain = 0,000` en 20 000 casos sólo mide una ganancia de accuracy top-1 en la misma muestra, no ausencia de información sobre la etiqueta.
+   - El control con estados intercambiados no sirve para concluir ausencia de pistas: en muchos casos la etiqueta guardada contradice el estado donante.
 2. **Tolerancia a K = 8: no demostrada para ningún modelo** (criterio: límite inferior del IC de Δaccuracy ≥ −0,05):
    - A4v3: −0,036 [−0,096; +0,024];
    - A4v4: −0,024 [−0,078; +0,030];
    - A2v4: −0,012 [−0,072; +0,054].
    Con 167 preguntas, los IC no descartan pérdidas de hasta 0,08–0,10. La respuesta `other` es el punto débil: con K8, su accuracy baja en todos los modelos.
 3. **Composición del generador de entrenamiento v4:**
-   - Sin modelos, deja 0,050 de información sobre la respuesta (v3: 0,029). Parte es inferencia legítima: si están todas las categorías reales, `other` es imposible.
-   - Los modelos no la aprovechan más allá del prior. En `final13` con estados intercambiados aciertan 0,38–0,41, por debajo del 0,427 alcanzable sólo con el prior.
-   - Aun así es una debilidad del generador, pendiente de corregir en una versión v5.
+   - En el probe, la ganancia de accuracy top-1 dentro de la muestra es 0,050 (v3: 0,029). Incluye inferencia legítima: si están todas las categorías reales, `other` es imposible.
+   - El resultado de `final13_faultswap` no determina si los modelos aprovechan esa composición. La construcción de un generador v5 y una prueba nueva queda pendiente.
 
 ## Diseño
 
 - **`derive.balanced_fault_kind_pairs`:**
   - K4: `none`, `other` y dos categorías reales. Si la respuesta es `other`, ninguna de las dos es la verdadera; si no, una sí.
   - K8: K4 más siempre las cuatro distractoras, que nunca son la respuesta: «hardware», «instalación», «notificaciones» y la nueva «accesibilidad», comprobada por palabras clave; «screen» se evitó porque aparece en los estados.
-  - `other` se sortea con probabilidad 0,5 si hay fallo. El par de categorías reales es uniforme con cualquier etiqueta.
+  - `other` se sortea con probabilidad 0,5 si hay fallo. El par de categorías reales es aproximadamente uniforme de forma marginal, no condicionado a cada etiqueta real.
 - **`derive.swap_states`:** cada pregunta recibe el estado de otro grupo (derangement), con las mismas opciones y la misma etiqueta.
 - **Tests** (`tests/unit/test_phase6d_balanced_k.py`):
-  - estructura independiente de la etiqueta, respuestas coherentes con los hechos, par uniforme y proporción de `other` ≈ 0,5, con 3000 casos;
+  - respuestas coherentes con los hechos, par marginal aproximadamente uniforme y proporción de `other` ≈ 0,5, con 3000 casos; esto no prueba independencia entre par y cada etiqueta concreta;
   - el intercambio de estados es un derangement determinista.
-- **`scripts/probe_option_cue.py`:** accuracy máxima alcanzable sin leer el estado, con el prior de la tarea y con cada composición exacta (`reports/phase6d/option_cue_probe.json`).
+- **`scripts/probe_option_cue.py`:** dos accuracies top-1 sin leer el estado; la segunda se ajusta y evalúa en la misma muestra y puede sobreajustar (`reports/phase6d/option_cue_probe.json`).
 
-| Diseño (20 000 casos) | Acc. sólo con el prior | Acc. máxima sólo con las opciones | Ganancia por composición |
+| Diseño (20 000 casos) | Acc. prior restringido a opciones | Acc. por firma en la misma muestra | Ganancia top-1 |
 |---|---|---|---|
 | Generador v3 (K 3–6) | 0,322 | 0,351 | 0,029 |
 | Generador v4 (K 3–6) | 0,427 | 0,477 | 0,050 |
@@ -40,7 +51,7 @@ Fecha: 2026-09-24. Mac M5 Pro con 48 GB, MPS/BF16 y cabezales CPU/FP32. Rama `fa
 | K8 de la fase 6c (con los hechos) | 0,275 | 0,294 | 0,019 |
 | **Equilibrado K4 / K8 (6d)** | 0,377 | 0,377 | **0,000** |
 
-En conjuntos pequeños, la «máxima» calculada dentro de la propia muestra sobreajusta: `reports/phase6d/option_cue_actual_sets.txt` da, por ejemplo, 0,93 en `final13`, con 120 composiciones para 138 preguntas. Por eso se usan las cifras poblacionales.
+En conjuntos pequeños, la «máxima» calculada dentro de la propia muestra sobreajusta: `reports/phase6d/option_cue_actual_sets.txt` da, por ejemplo, 0,93 en `final13`, con 120 composiciones para 138 preguntas. La muestra de 20 000 casos reduce ese sesgo, pero no convierte la ganancia top-1 en información mutua ni en una cota poblacional exacta.
 
 ## Datos
 
@@ -67,17 +78,16 @@ Modelos: A4v3 (servicio), A4v4 y A2v4, sin reentrenar, con sus temperaturas de `
 - **Aciertos:** son menores que en los diagnósticos anteriores; A4v3 en `other` tenía 0,71 en `kdiag11_K`. Aquí `none` y `other` están siempre presentes y la composición no ayuda.
 - **`other`:** decidir que ninguna opción listada aplica es lo más difícil, y empeora con más distractoras.
 
-### Control sin estado (mismas opciones y etiquetas, estado de otro grupo)
+### Control con estados intercambiados (mismas opciones y etiquetas, estado de otro grupo)
 
 | Modelo | `K4swap` | `K8swap` | `final13_faultswap` |
 |---|---|---|---|
 | A4v3 | 0,210 | 0,234 | 0,406 |
 | A4v4 | 0,204 | 0,234 | 0,384 |
 | A2v4 | 0,222 | 0,263 | 0,377 |
-| Cota sólo con las opciones | 0,347 (prior del conjunto; poblacional 0,377) | ídem | prior 0,427 / máxima 0,477 (v4, poblacional) |
+| Predictor por prior restringido a opciones | 0,347 en este conjunto; 0,377 en la muestra grande | ídem | 0,427 en la muestra grande v4 |
 
-- **Lectura predeclarada 2:** ninguna accuracy supera la cota + 0,10, así que no hay pistas no identificadas. Quedan incluso por debajo de la cota: con el estado cambiado, los modelos responden según el estado recibido.
-- **Lectura 3:** en `final13_faultswap`, los modelos no superan lo alcanzable sólo con el prior. En los casos `other` aciertan 0,78 con estados cambiados porque la categoría real del estado donante tampoco suele estar entre las opciones, así que `other` sigue siendo semánticamente correcto; no es una pista del generador.
+- **Lecturas predeclaradas 2 y 3, retiradas:** la comparación contra el prior de las etiquetas originales no aísla una pista. El modelo puede responder coherentemente al estado donante y fallar frente a la etiqueta original. La accuracy 0,78 en `other` tampoco identifica por sí sola la causa del acierto.
 
 ## Comandos ejecutados
 
@@ -104,5 +114,5 @@ caffeinate -i .venv/bin/pytest tests/mps tests/e2e -q -rs # 14 passed, 0 omitido
 
 - Sólo hay 167 preguntas (58 `other`), así que los IC son anchos.
 - Una familia sintética y cuatro distractoras fijas.
-- El generador de entrenamiento v4 conserva 0,050 de información por composición (pendiente de un v5).
+- El generador de entrenamiento v4 muestra 0,050 de ganancia top-1 en el probe; el uso de esa composición por el modelo queda sin determinar. Un v5 requiere datos y evaluación nuevos.
 - `kdiag14*` y `final13_faultswap` ya están usados.

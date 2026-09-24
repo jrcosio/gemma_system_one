@@ -1,0 +1,102 @@
+Loading weights:   0%|          | 0/2076 [00:00<?, ?it/s]Loading weights:  66%|██████▋   | 1377/2076 [00:00<00:00, 13746.64it/s]Loading weights: 100%|██████████| 2076/2076 [00:00<00:00, 14131.77it/s]
+{
+  "checkpoint": "runs/e4b_experiment/20260923T204945Z/checkpoint",
+  "stage": "phase2_decision_heads_frozen_backbone",
+  "split": "all",
+  "use_cache": true,
+  "code": {
+    "sha": "9edc18340ab13fce5d9fe68ce7c7a2b28ff7ea1e",
+    "dirty": true,
+    "source": {
+      "sha256": "c1ee7841a31e1ae63668c130bb014de658d4181ad21cd712ee1009ce105aca69",
+      "files": 85,
+      "globs": [
+        "src/**/*.py",
+        "configs/*.yaml",
+        "scripts/*.py",
+        "pyproject.toml",
+        "uv.lock"
+      ],
+      "archive": "artifacts/source/c1ee7841a31e1ae63668c130bb014de658d4181ad21cd712ee1009ce105aca69.tar"
+    }
+  },
+  "calibration": {
+    "file": "runs/e4b_experiment/20260923T204945Z/calibration/calibration-20260924T143729Z.json",
+    "temperatures": {
+      "noul": 1.3780951784481992,
+      "choice": 1.4627574321691008,
+      "score": 1.0021728696794798
+    },
+    "calibrated": {
+      "noul": true,
+      "choice": true,
+      "score": true
+    }
+  },
+  "external_calibration_leakage": {
+    "errors": [],
+    "near_duplicate_states": 3
+  },
+  "external_dataset": {
+    "root": "data/pilot_v4_trip15_K4",
+    "sha256": "aa5c9c78b29c9ee05b8ad615ab9542cad3b34b26f53fae5642a43520699651e1"
+  },
+  "external_leakage": {
+    "errors": [],
+    "near_duplicate_states": 3
+  },
+  "diagnostic_only": true,
+  "backbone_loaded": true,
+  "extraction": {
+    "split": "all",
+    "questions": 450,
+    "rows": 1800,
+    "backbone_forwards": 1800,
+    "valid_tokens": 445546,
+    "padding_tokens": 0,
+    "max_row_tokens": 295,
+    "seconds_synchronized": 210.9885,
+    "cache_hit": false,
+    "image_rows": 0,
+    "image_tokens": 0
+  },
+  "usage": {
+    "questions": 450,
+    "expanded_rows": 1800,
+    "backbone_forwards": 1800,
+    "processed_input_tokens": 445546,
+    "generated_tokens": 0
+  },
+  "memory": {
+    "sampling": "instantáneas en puntos instrumentados; el pico real puede ser mayor",
+    "budget_bytes": 34359738368,
+    "peaks_sampled": {
+      "process_rss_bytes": 1226735616,
+      "mps_current_allocated_bytes": 15890195712,
+      "mps_driver_allocated_bytes": 16044621824,
+      "swap_used_bytes": 2754871296
+    },
+    "over_budget": [],
+    "swap_delta_bytes": 0
+  },
+  "report_path": "runs/e4b_experiment/20260923T204945Z/evaluations/pilot_v4_trip15_K4-all-calibrated-20260924T171350Z.json",
+  "predictions_path": "runs/e4b_experiment/20260923T204945Z/evaluations/pilot_v4_trip15_K4-all-calibrated-20260924T171350Z-predictions.jsonl",
+  "metrics_summary": {
+    "questions": 450,
+    "mean_nll_all": 0.39150502872357895,
+    "choice": {
+      "n": 450,
+      "nll": 0.39150502872357895,
+      "accuracy": 0.8466666666666667
+    }
+  },
+  "metrics_calibrated_summary": {
+    "questions": 450,
+    "mean_nll_all": 0.42623911347937077,
+    "choice": {
+      "n": 450,
+      "nll": 0.42623911347937077,
+      "accuracy": 0.8466666666666667
+    }
+  }
+}

@@ -1,0 +1,20 @@
+a4v3 Δacc K8−K4, bootstrap por trío: -0.0244 [-0.058, 0.011]
+  errores K8 papel none 22
+  errores K8 papel other 55
+a4v4 Δacc K8−K4, bootstrap por trío: -0.0267 [-0.049, -0.004]
+  errores K8 papel none 17
+  errores K8 papel other 69
+a2v4 Δacc K8−K4, bootstrap por trío: 0.0133 [-0.022, 0.051]
+  errores K8 papel none 36
+  errores K8 papel other 83
+a4v3 errores K8 (papel, categoría elegida): [(('other', 'application'), 31), (('none', 'other'), 16), (('other', 'none'), 11), (('other', 'network'), 6), (('none', 'application'), 5), (('other', 'data'), 4), (('real', 'none'), 2), (('other', 'performance'), 2)]
+a4v4 errores K8 (papel, categoría elegida): [(('other', 'application'), 36), (('other', 'none'), 14), (('none', 'other'), 11), (('other', 'network'), 10), (('none', 'application'), 5), (('other', 'data'), 4), (('real', 'none'), 4), (('other', 'hardware'), 2)]
+a2v4 errores K8 (papel, categoría elegida): [(('other', 'none'), 53), (('none', 'other'), 26), (('other', 'application'), 20), (('real', 'none'), 10), (('real', 'other'), 7), (('none', 'application'), 6), (('other', 'data'), 4), (('other', 'network'), 4)]
+a4v3 K4 acc 'other' por categoría real no listada: {'application': '32/35', 'data': '25/43', 'network': '30/42', 'performance': '15/30'}
+a4v3 K8 acc 'other' por categoría real no listada: {'application': '28/35', 'data': '24/43', 'network': '31/42', 'performance': '12/30'}
+a4v4 K4 acc 'other' por categoría real no listada: {'application': '26/35', 'data': '19/43', 'network': '30/42', 'performance': '10/30'}
+a4v4 K8 acc 'other' por categoría real no listada: {'application': '26/35', 'data': '15/43', 'network': '30/42', 'performance': '10/30'}
+a2v4 K4 acc 'other' por categoría real no listada: {'application': '20/35', 'data': '17/43', 'network': '15/42', 'performance': '9/30'}
+a2v4 K8 acc 'other' por categoría real no listada: {'application': '19/35', 'data': '19/43', 'network': '21/42', 'performance': '8/30'}
+ejemplo estado (performance, respuesta other): "Hola, la aplicación va extremadamente lenta al abrir la agenda compartida. El año pasado ya me hicieron una devolución por otro pedido. Afecta a 0 de los 82 usuarios de la empresa. Me rechaza la contraseña y no consigo acceder. Me han cobrado dos veces la renovación de mayo. Un saludo."
+ opciones: ['Problema de conexión o de red', 'No se describe ningún fallo técnico', 'Datos desaparecidos o dañados', 'Un fallo técnico distinto de los anteriores']

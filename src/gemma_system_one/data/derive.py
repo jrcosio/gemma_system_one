@@ -184,7 +184,7 @@ REAL_KINDS = ("network", "performance", "data", "application")
 def balanced_fault_kind_pairs(
     examples: list[Example], audit: list[dict[str, Any]], seed: int, other_rate: float = 0.5
 ) -> tuple[list[Example], list[Example]]:
-    """Revisión de la fase 6c: diagnóstico de K cuya composición no depende de la etiqueta.
+    """Revisión de la fase 6c: diagnóstico emparejado K4/K8 con distractoras fijas.
 
     Con ``widen_fault_kind_by_facts`` (8 de 9 categorías), los casos «other» eran justo los que
     omitían una categoría real. Aquí, para toda pregunta ``fault_type``:
@@ -192,8 +192,10 @@ def balanced_fault_kind_pairs(
         ``other_rate`` si hay fallo) ninguna es la verdadera; si no, una es la verdadera y la otra
         al azar. En ambos casos el par de categorías es uniforme sobre los 6 pares posibles.
       - K = 8: el mismo conjunto más las **cuatro** distractoras (siempre las mismas).
-    Así la estructura de las opciones es idéntica para cualquier etiqueta; los textos, IDs y el
-    orden son aleatorios. Devuelve (K4, K8) con las mismas preguntas, IDs y etiquetas semánticas."""
+    El par es uniforme para ``other``, ``none`` y las cuatro etiquetas reales tomadas en conjunto.
+    Para una etiqueta real concreta, su categoría debe estar en el par: las opciones siguen
+    aportando información sobre esa etiqueta. K8 añade las mismas cuatro distractoras a cada K4.
+    Devuelve (K4, K8) con las mismas preguntas, IDs y etiquetas semánticas."""
     from .generate_mixed import FAULT_DISTRACTOR_OPTIONS, FAULT_KIND_OPTIONS, true_fault_category
 
     facts = {a["group_id"]: a["facts"] for a in audit}
@@ -232,10 +234,11 @@ def balanced_fault_kind_pairs(
 
 
 def swap_states(examples: list[Example], seed: int) -> list[Example]:
-    """Control «sin leer el estado»: cada pregunta recibe el estado de otro grupo (derangement).
+    """Intercambia estados entre grupos sin cambiar opciones ni etiquetas (derangement).
 
-    Opciones y etiquetas no cambian, así que la accuracy que queda mide lo que se acierta sólo con
-    la pregunta y las opciones. Nunca se usa para entrenar ni calibrar."""
+    Las etiquetas conservadas pueden contradecir el estado donante y el idioma puede cambiar.
+    La accuracy contra esas etiquetas mide el efecto de la perturbación; no aísla el uso de
+    opciones por el modelo. Nunca se usa para entrenar ni calibrar."""
     groups = sorted({e.group_id for e in examples})
     if len(groups) < 2:
         raise ValueError("Hacen falta al menos dos grupos")
@@ -246,3 +249,91 @@ def swap_states(examples: list[Example], seed: int) -> list[Example]:
     donor = dict(zip(groups, perm, strict=True))
     state_of = {e.group_id: e.state for e in examples}
     return [e.model_copy(update={"state": state_of[donor[e.group_id]]}) for e in examples]
+
+
+TRIPLET_ROLES = ("real", "other", "none")
+
+
+def fault_kind_triplets(
+    examples: list[Example], audit: list[dict[str, Any]], seed: int, n_triplets: int
+) -> tuple[list[Example], list[Example]]:
+    """Revisión de la fase 6d: control semánticamente coherente del uso del estado.
+
+    Cada trío comparte **exactamente** la misma pregunta (instrucción, textos, IDs y orden de las
+    opciones: ``none``, ``other`` y dos categorías reales) y difiere sólo en el estado, tomado de
+    tres grupos distintos del mismo idioma:
+      - ``real``: fallo de una de las dos categorías listadas (respuesta: esa categoría);
+      - ``other``: fallo de una categoría real no listada (respuesta: ``other``);
+      - ``none``: sin fallo (respuesta: ``none``).
+    Cada etiqueta sale de los hechos de su propio estado. Un predictor que no lea el estado da la
+    misma respuesta a los tres: su accuracy máxima es 1/3 y nunca acierta un trío completo.
+    Devuelve (K4, K8); K8 añade a cada pregunta las mismas cuatro distractoras (mismos IDs y textos
+    dentro del trío)."""
+    from .generate_mixed import (
+        ACCESS_POLICY_CLAUSE,
+        FAULT_DISTRACTOR_OPTIONS,
+        FAULT_KIND_INSTR,
+        FAULT_KIND_OPTIONS,
+        true_fault_category,
+    )
+
+    rng = random.Random(f"triplets:{seed}")
+    facts = {a["group_id"]: a["facts"] for a in audit}
+    first = {}
+    for e in examples:
+        first.setdefault(e.group_id, e)
+    pools: dict[tuple[str, str], list[str]] = {}
+    for gid, e in first.items():
+        pools.setdefault((e.language, true_fault_category(facts[gid])), []).append(gid)
+    for v in pools.values():
+        rng.shuffle(v)
+
+    def take(lang: str, cat: str) -> str | None:
+        pool = pools.get((lang, cat), [])
+        return pool.pop() if pool else None
+
+    small: list[Example] = []
+    large: list[Example] = []
+    t = 0
+    attempts = 0
+    while t < n_triplets:
+        attempts += 1
+        if attempts > 50 * n_triplets:
+            raise ValueError(f"Sólo se pudieron formar {t} tríos: faltan estados")
+        lang = rng.choice(["es", "en"])
+        pair = rng.sample(list(REAL_KINDS), 2)
+        real_kind = rng.choice(pair)
+        other_kind = rng.choice([k for k in REAL_KINDS if k not in pair])
+        needed = {"real": real_kind, "other": other_kind, "none": "none"}
+        got = {role: take(lang, cat) for role, cat in needed.items()}
+        if any(g is None for g in got.values()):
+            for role, g in got.items():  # devolver lo tomado
+                if g is not None:
+                    pools[(lang, needed[role])].append(g)
+            continue
+        cats = {**FAULT_KIND_OPTIONS[lang], **FAULT_DISTRACTOR_OPTIONS[lang], **DIAG_DISTRACTOR_OPTIONS[lang]}
+        base = ["none", "other", *pair]
+        extra = [*FAULT_DISTRACTOR_OPTIONS[lang], *DIAG_DISTRACTOR_OPTIONS[lang]]
+        ids: list[str] = []
+        while len(ids) < len(base) + len(extra):
+            cand = "o" + "".join(rng.choice("0123456789abcdef") for _ in range(6))
+            if cand not in ids:
+                ids.append(cand)
+        text = {c: rng.choice(cats[c][:-1]) for c in [*base, *extra]}  # redacciones de main
+        k4 = {i: text[c] for i, c in zip(ids, base, strict=False)}
+        k8 = {**k4, **{i: text[c] for i, c in zip(ids[len(base) :], extra, strict=True)}}
+        instr = f"{rng.choice(FAULT_KIND_INSTR[lang][:-1])} {ACCESS_POLICY_CLAUSE[lang]}"
+        answer = {"real": real_kind, "other": "other", "none": "none"}
+        for role in TRIPLET_ROLES:
+            src = first[got[role]]
+            label_id = ids[base.index(answer[role])]
+            for crit, out in ((k4, small), (k8, large)):
+                raw = src.model_dump(mode="json")
+                raw["id"] = f"trip{seed}-{t:04d}-{role}"
+                raw["task_family"] = "fault_type"
+                raw["question"] = {"type": "choice", "instructions": instr, "criteria": crit}
+                raw["target"] = {"class_id": label_id}
+                raw["provenance"]["label_method"] = f"fault_kind_triplet_v1:{role}"
+                out.append(Example.model_validate(raw))
+        t += 1
+    return small, large
