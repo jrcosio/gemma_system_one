@@ -1,6 +1,6 @@
-# Fase 6c: generador v4 sin la pista de K, reentrenamiento de cabezales y prueba válida de más opciones
+# Fase 6c: generador v4 sin la pista de K, reentrenamiento de cabezales y diagnóstico de más opciones
 
-Fecha: 2026-09-24. Mac M5 Pro con 48 GB, MPS/BF16 y cabezales CPU/FP32. Rama `fases-0-6`, sobre el commit `1b5ad45`; los cambios de esta fase están sin commit.
+Fecha: 2026-09-24. Mac M5 Pro con 48 GB, MPS/BF16 y cabezales CPU/FP32. Rama `fases-0-6`; la implementación quedó en `daa27ce` sobre `1b5ad45`.
 
 - **Protocolo predeclarado:** [phase6c-protocol.md](phase6c-protocol.md), sha256 `02d3ae6c…` (en `reports/phase6c/protocol.sha256`). Se escribió antes de generar los datos v4 y de entrenar.
 - **Decisión:** [0012](../docs/decisions/0012-generator-v4-without-k-cue.md).
@@ -8,16 +8,12 @@ Fecha: 2026-09-24. Mac M5 Pro con 48 GB, MPS/BF16 y cabezales CPU/FP32. Rama `fa
 
 ## Veredicto
 
-1. **Fallo del piloto corregido.** El generador v4 elimina la pista de K en `fault_type`: `other` aparece con la misma frecuencia para cualquier K, también con K = 6. La ampliación a K = 8 ya no depende de la etiqueta. v1–v3 siguen idénticos byte a byte.
+1. **Pista determinista de K del piloto corregida.** El generador v4 sortea `other` con la misma probabilidad condicional para K = 3–6 y permite K = 6 con esa etiqueta. v1–v3 siguen idénticos byte a byte. La revisión posterior encontró otra pista en la composición de las opciones ampliadas a K = 8; véase más abajo.
 2. **Regla S: se mantiene A4v3 como servicio.**
    - Resultado: en el test final `pilot_v4_final13` (882 preguntas, 294 grupos), A4v4 − A4v3 = **−0,007 [−0,034; +0,024]** de NLL calibrada.
    - El límite superior supera el margen de no inferioridad (+0,02), así que por la regla no hay sustitución.
-   - En la práctica son equivalentes: sin calibrar, −0,007 [−0,040; +0,030].
-3. **Más opciones, con la prueba válida** (lectura predeclarada: límite inferior del IC de Δaccuracy ≥ −0,05):
-   - A4v3 **tolera** K = 8: 0,000 [−0,040; +0,033];
-   - A4v4 **no, por poco**: −0,020 [−0,060; +0,020];
-   - A2v4 **se degrada**: −0,147 [−0,207; −0,087].
-   - La NLL empeora en los tres. La respuesta `other` es la más difícil.
+   - Sin calibrar, la diferencia observada es −0,007 [−0,040; +0,030]. Los intervalos no demuestran equivalencia ni no inferioridad con el margen declarado.
+3. **Más opciones: resultados observados, con diagnóstico de robustez no concluyente tras la revisión.** Δaccuracy K8 − K: A4v3 0,000 [−0,040; +0,033], A4v4 −0,020 [−0,060; +0,020], A2v4 −0,147 [−0,207; −0,087]. La NLL empeora en los tres. La composición de K8 da una pista parcial sobre `other`, por lo que se retira la afirmación de que A4v3 tolera K8 en una prueba sin fuga.
 4. **La ventaja de E4B se mantiene sin la pista:** A4v4 − A2v4 = −0,149 [−0,195; −0,105].
 
 ## Datos (generador v4, `main`)
@@ -72,7 +68,7 @@ Los conjuntos externos excluyen los grupos cuyo estado literal aparece en `pilot
 | **A4v4 − A4v3 (regla S)** | **−0,007 [−0,034; +0,024]** | −0,014 [−0,032; +0,003] | −0,028 [−0,065; +0,006] | −0,011 [−0,059; +0,042] | +0,034 [−0,044; +0,109] |
 | A4v4 − A2v4 | −0,149 [−0,195; −0,105] | +0,060 [+0,035; +0,085] | −0,085 [−0,127; −0,044] | −0,235 [−0,321; −0,150] | −0,158 [−0,290; −0,021] |
 
-Sin calibrar, A4v4 − A4v3 = −0,007 [−0,040; +0,030]. A4v3 se entrenó con datos v3, con la pista y sin las categorías distractoras, y aun así rinde igual en v4: con E4B, la pista no parece haberse aprovechado de forma apreciable.
+Sin calibrar, A4v4 − A4v3 = −0,007 [−0,040; +0,030]. A4v3 se entrenó con datos v3, con la pista y sin las categorías distractoras. En este test v4 no se detecta una pérdida material de A4v3, pero el IC calibrado admite que A4v4 sea hasta 0,024 peor y supera el margen de +0,02. No se puede atribuir causalmente la diferencia observada al uso o desuso de la pista.
 
 ## Más opciones: K original (3–6) frente a K = 8, emparejado
 
@@ -93,9 +89,13 @@ Las 150 preguntas son las mismas y la etiqueta semántica también (`gso compare
 | A4v3 | 0,95 → 0,95 | 0,96 → 0,96 | 0,93 → 0,93 | 0,92 → 0,92 |
 
 **Lectura:**
-- Con E4B, el evaluador compartido mantiene la accuracy con K = 8, pero la NLL empeora: la masa se reparte entre más candidatos.
+- Las cifras describen estas 150 preguntas emparejadas. La NLL aumenta con K8; la comparación no aísla el efecto del número de candidatos de la composición de las opciones.
 - Con E2B, más opciones cuesta decisiones, sobre todo en `other`, que exige descartar todas las opciones listadas.
 - Son 17 casos `other` en total: IC anchos.
+
+### Revisión posterior: pista en la composición de K8 (2026-09-24)
+
+`widen_fault_kind_by_facts` excluye la categoría verdadera y amplía hasta 8 opciones de un universo de 9. Para los 17 ejemplos con etiqueta `other`, llegar a K8 exige incluir las **tres** categorías distractoras que nunca son respuesta. En los 133 ejemplos restantes, 41 tienen sólo dos de esas distractoras. La tabla observada es: dos distractoras → 41 no `other`, 0 `other`; tres distractoras → 92 no `other`, 17 `other`. Además, si falta `none` en K8, la respuesta tampoco puede ser `other` (7 casos más con `other` presente). Así, parte de la etiqueta se infiere de las opciones sin leer el estado. El número K ya no la revela, pero la prueba K8 no está libre de pistas estructurales. Se conservan los datasets y predicciones históricos; una nueva prueba requiere otro protocolo y un universo de distractoras más amplio o un diseño que iguale la composición condicional.
 
 ## Comandos ejecutados
 
@@ -115,6 +115,8 @@ caffeinate -i .venv/bin/pytest tests/mps tests/e2e -q -rs # 14 passed, 0 omitido
 ```
 
 Código de todas las ejecuciones: `dca04dbd…` (81 ficheros), con copia en `artifacts/source/`.
+
+**Comprobación posterior del commit:** `ruff check . --statistics` devuelve 123 `E501` y `ruff format --check .` identifica cuatro archivos sin formato tras incorporar `src/gemma_system_one/data/` al seguimiento de Git. La afirmación previa de que Ruff pasó correspondía al árbol anterior, cuando `.gitignore` excluía esos módulos. No afecta a los números anteriores, pero el gate de estilo del commit no está superado.
 
 ## Límites
 

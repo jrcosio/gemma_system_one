@@ -1,0 +1,4 @@
+pilot_v4_kdiag14_K4 {'questions': 167, 'signatures': 6, 'other_rate': 0.3473, 'acc_prior_only': 0.3473, 'acc_options_bayes': 0.3952, 'composition_gain': 0.0479}
+pilot_v4_kdiag14_K8 {'questions': 167, 'signatures': 6, 'other_rate': 0.3473, 'acc_prior_only': 0.3473, 'acc_options_bayes': 0.3952, 'composition_gain': 0.0479}
+pilot_v4_final13_faultswap {'questions': 138, 'signatures': 120, 'other_rate': 0.1667, 'acc_prior_only': 0.4058, 'acc_options_bayes': 0.9275, 'composition_gain': 0.5217}
+pilot_v4_kdiag11_K8 {'questions': 150, 'signatures': 9, 'other_rate': 0.1133, 'acc_prior_only': 0.2933, 'acc_options_bayes': 0.34, 'composition_gain': 0.0467}

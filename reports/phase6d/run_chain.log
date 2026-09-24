@@ -1,0 +1,31 @@
+== eval a4v3 kdiag14_K4 16:00:56
+EXIT eval_kdiag14_K4_a4v3 0
+== eval a4v3 kdiag14_K8 16:02:26
+EXIT eval_kdiag14_K8_a4v3 0
+== eval a4v3 kdiag14_K4swap 16:05:56
+EXIT eval_kdiag14_K4swap_a4v3 0
+== eval a4v3 kdiag14_K8swap 16:07:24
+EXIT eval_kdiag14_K8swap_a4v3 0
+== eval a4v3 final13_faultswap 16:10:53
+EXIT eval_final13_faultswap_a4v3 0
+== eval a4v4 kdiag14_K4 16:12:22
+EXIT eval_kdiag14_K4_a4v4 0
+== eval a4v4 kdiag14_K8 16:12:25
+EXIT eval_kdiag14_K8_a4v4 0
+== eval a4v4 kdiag14_K4swap 16:12:28
+EXIT eval_kdiag14_K4swap_a4v4 0
+== eval a4v4 kdiag14_K8swap 16:12:31
+EXIT eval_kdiag14_K8swap_a4v4 0
+== eval a4v4 final13_faultswap 16:12:33
+EXIT eval_final13_faultswap_a4v4 0
+== eval a2v4 kdiag14_K4 16:12:36
+EXIT eval_kdiag14_K4_a2v4 0
+== eval a2v4 kdiag14_K8 16:13:26
+EXIT eval_kdiag14_K8_a2v4 0
+== eval a2v4 kdiag14_K4swap 16:15:18
+EXIT eval_kdiag14_K4swap_a2v4 0
+== eval a2v4 kdiag14_K8swap 16:16:07
+EXIT eval_kdiag14_K8swap_a2v4 0
+== eval a2v4 final13_faultswap 16:17:59
+EXIT eval_final13_faultswap_a2v4 0
+ALL DONE 16:18:48

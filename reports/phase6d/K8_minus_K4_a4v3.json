@@ -1,0 +1,55 @@
+{
+  "a": "runs/e4b_experiment/20260923T204945Z/evaluations/pilot_v4_kdiag14_K4-all-calibrated-20260924T160225Z-predictions.jsonl",
+  "b": "runs/e4b_experiment/20260923T204945Z/evaluations/pilot_v4_kdiag14_K8-all-calibrated-20260924T160556Z-predictions.jsonl",
+  "questions": 167,
+  "same_inputs": false,
+  "point": {
+    "a.nll_all": 0.4890884293416654,
+    "b.nll_all": 0.5160345863841572,
+    "b_minus_a.nll_all": 0.02694615704249168,
+    "b_minus_a.accuracy_all": -0.03592814371257485,
+    "b_minus_a.choice.nll": 0.02694615704249168,
+    "b_minus_a.choice.accuracy": -0.03592814371257485
+  },
+  "bootstrap": {
+    "method": "bootstrap percentil por grupo",
+    "reps": 1000,
+    "seed": 0,
+    "groups": 167,
+    "level": 0.95,
+    "intervals": {
+      "a.nll_all": [
+        0.404809598691367,
+        0.5811398900288018
+      ],
+      "b.nll_all": [
+        0.405905105106644,
+        0.6418776567361429
+      ],
+      "b_minus_a.nll_all": [
+        -0.03953812929566971,
+        0.10436935920016852
+      ],
+      "b_minus_a.accuracy_all": [
+        -0.09580838323353294,
+        0.023952095808383235
+      ],
+      "b_minus_a.choice.nll": [
+        -0.03953812929566971,
+        0.10436935920016852
+      ],
+      "b_minus_a.choice.accuracy": [
+        -0.09580838323353294,
+        0.023952095808383235
+      ]
+    },
+    "defined_reps": {
+      "a.nll_all": 1000,
+      "b.nll_all": 1000,
+      "b_minus_a.nll_all": 1000,
+      "b_minus_a.accuracy_all": 1000,
+      "b_minus_a.choice.nll": 1000,
+      "b_minus_a.choice.accuracy": 1000
+    }
+  }
+}

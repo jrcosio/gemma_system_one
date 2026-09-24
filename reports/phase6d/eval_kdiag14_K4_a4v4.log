@@ -1,0 +1,96 @@
+{
+  "checkpoint": "runs/e4b_v4/20260924T140932Z/checkpoint",
+  "stage": "phase2_decision_heads_frozen_backbone",
+  "split": "all",
+  "use_cache": true,
+  "code": {
+    "sha": "daa27cee01481d3fd07991e7d0ed5486c8740076",
+    "dirty": true,
+    "source": {
+      "sha256": "fd340105be1c49de8e601bd57561318204d0058c3a67e756c9101a7940e378cc",
+      "files": 83,
+      "globs": [
+        "src/**/*.py",
+        "configs/*.yaml",
+        "scripts/*.py",
+        "pyproject.toml",
+        "uv.lock"
+      ],
+      "archive": "artifacts/source/fd340105be1c49de8e601bd57561318204d0058c3a67e756c9101a7940e378cc.tar"
+    }
+  },
+  "calibration": {
+    "file": "runs/e4b_v4/20260924T140932Z/calibration/calibration-20260924T143416Z.json",
+    "temperatures": {
+      "noul": 1.1497129541602924,
+      "choice": 1.1585110792029414,
+      "score": 1.2014047897443232
+    },
+    "calibrated": {
+      "noul": true,
+      "choice": true,
+      "score": true
+    }
+  },
+  "external_calibration_leakage": {
+    "errors": [],
+    "near_duplicate_states": 0
+  },
+  "external_dataset": {
+    "root": "data/pilot_v4_kdiag14_K4",
+    "sha256": "e1a9cd92f015652dce60caa3313c998033c0d00f725e1d4c9d0aa07335646d60"
+  },
+  "external_leakage": {
+    "errors": [],
+    "near_duplicate_states": 3
+  },
+  "diagnostic_only": true,
+  "backbone_loaded": false,
+  "extraction": {
+    "split": "all",
+    "questions": 167,
+    "rows": 668,
+    "backbone_forwards": 0,
+    "valid_tokens": 0,
+    "padding_tokens": 0,
+    "max_row_tokens": 0,
+    "seconds_synchronized": 0.0,
+    "cache_hit": true,
+    "image_rows": 0,
+    "image_tokens": 0
+  },
+  "usage": {
+    "questions": 167,
+    "expanded_rows": 668,
+    "backbone_forwards": 0,
+    "processed_input_tokens": 0,
+    "generated_tokens": 0
+  },
+  "memory": {
+    "sampling": "instantáneas en puntos instrumentados; el pico real puede ser mayor",
+    "budget_bytes": 34359738368,
+    "peaks_sampled": {},
+    "over_budget": [],
+    "swap_delta_bytes": null
+  },
+  "report_path": "runs/e4b_v4/20260924T140932Z/evaluations/pilot_v4_kdiag14_K4-all-calibrated-20260924T161225Z.json",
+  "predictions_path": "runs/e4b_v4/20260924T140932Z/evaluations/pilot_v4_kdiag14_K4-all-calibrated-20260924T161225Z-predictions.jsonl",
+  "metrics_summary": {
+    "questions": 167,
+    "mean_nll_all": 0.718749205990875,
+    "choice": {
+      "n": 167,
+      "nll": 0.718749205990875,
+      "accuracy": 0.7664670658682635
+    }
+  },
+  "metrics_calibrated_summary": {
+    "questions": 167,
+    "mean_nll_all": 0.6664337614154731,
+    "choice": {
+      "n": 167,
+      "nll": 0.6664337614154731,
+      "accuracy": 0.7664670658682635
+    }
+  }
+}

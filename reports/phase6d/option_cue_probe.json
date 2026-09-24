@@ -1,0 +1,52 @@
+{
+ "cases": 20000,
+ "note": "Accuracy m\u00e1xima sin leer el estado; ver docstring.",
+ "v3_generator_K3_6": {
+  "questions": 9343,
+  "signatures": 42,
+  "other_rate": 0.1406,
+  "acc_prior_only": 0.3221,
+  "acc_options_bayes": 0.3505,
+  "composition_gain": 0.0285
+ },
+ "v4_generator_K3_6": {
+  "questions": 9326,
+  "signatures": 418,
+  "other_rate": 0.148,
+  "acc_prior_only": 0.4271,
+  "acc_options_bayes": 0.4774,
+  "composition_gain": 0.0503
+ },
+ "v3_widen_by_label_K8_phase6": {
+  "questions": 9343,
+  "signatures": 25,
+  "other_rate": 0.1406,
+  "acc_prior_only": 0.2604,
+  "acc_options_bayes": 0.401,
+  "composition_gain": 0.1406
+ },
+ "v4_widen_by_facts_K8_phase6c": {
+  "questions": 9326,
+  "signatures": 9,
+  "other_rate": 0.148,
+  "acc_prior_only": 0.2745,
+  "acc_options_bayes": 0.2937,
+  "composition_gain": 0.0192
+ },
+ "balanced_K4_phase6d": {
+  "questions": 9326,
+  "signatures": 6,
+  "other_rate": 0.377,
+  "acc_prior_only": 0.377,
+  "acc_options_bayes": 0.377,
+  "composition_gain": 0.0
+ },
+ "balanced_K8_phase6d": {
+  "questions": 9326,
+  "signatures": 6,
+  "other_rate": 0.377,
+  "acc_prior_only": 0.377,
+  "acc_options_bayes": 0.377,
+  "composition_gain": 0.0
+ }
+}

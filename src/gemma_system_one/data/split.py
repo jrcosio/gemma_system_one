@@ -265,6 +265,7 @@ def check_planned_split(dataset_root: Path, manifest: dict[str, Any]) -> None:
     if plan.get("seed") != manifest["seed"]:
         raise SplitError("La semilla no coincide con el split planificado por el generador")
     assignment = {g: s for s in SPLITS for g in manifest["splits"][s]["groups"]}
-    digest = hashlib.sha256("\n".join(f"{g}:{assignment[g]}" for g in sorted(assignment)).encode()).hexdigest()
+    listing = "\n".join(f"{g}:{assignment[g]}" for g in sorted(assignment))
+    digest = hashlib.sha256(listing.encode()).hexdigest()
     if digest != plan["assignment_sha256"]:
         raise SplitError("El split no coincide con el planificado por el generador (estilos por partición)")

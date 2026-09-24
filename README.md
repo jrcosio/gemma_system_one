@@ -123,7 +123,9 @@ En el perfil de seis pasos de LoRA sobre E4B, la ejecución sin recomputación s
 
 Fase 6b ([reports/phase6b-final.md](reports/phase6b-final.md)): en un test final nuevo que no se usó para ajustar pesos ni temperaturas, A4 − B2 = −0,146 [−0,186; −0,104]. La regla C predeclarada usa ese test para confirmar A4. Las calibraciones se ajustan con un conjunto externo de 1200 preguntas (`gso calibrate --split all --dataset data/pilot_v3_calib7`). La revisión posterior detectó una fuga estructural de etiqueta en la familia sintética `fault_type`; véanse los límites del informe.
 
-Fase 6c ([reports/phase6c-final.md](reports/phase6c-final.md), decisión [0012](docs/decisions/0012-generator-v4-without-k-cue.md)): el generador `--generator-version v4` elimina esa pista (la respuesta `other` es igual de probable con cualquier K). Con datos v4, E4B + cabezales reentrenado equivale al servicio actual (−0,007 [−0,034; +0,024]; se mantiene A4v3 por la regla S) y mantiene la accuracy con K = 8 en la prueba emparejada sin fuga; E2B + cabezales no.
+Fase 6c ([reports/phase6c-final.md](reports/phase6c-final.md), decisión [0012](docs/decisions/0012-generator-v4-without-k-cue.md)): el generador `--generator-version v4` elimina la pista determinista del número K. A4v4 − A4v3 = −0,007 [−0,034; +0,024] de NLL calibrada en el test v4; el margen predeclarado no se cumple y se mantiene A4v3. La revisión posterior encontró una pista parcial en la composición de las opciones ampliadas a K8; ese diagnóstico no demuestra robustez sin fuga.
+
+Fase 6d ([reports/phase6d-final.md](reports/phase6d-final.md)): diagnóstico de K con composición de opciones equilibrada (0,000 de información sobre la respuesta sin leer el estado) y control con estados intercambiados. La tolerancia a K = 8 no queda demostrada para ningún modelo (IC anchos; la respuesta `other` es el punto débil). El generador de entrenamiento v4 conserva 0,050 de información por composición: pendiente de un v5.
 
 ## Documentos
 
