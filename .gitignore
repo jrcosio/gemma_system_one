@@ -19,3 +19,5 @@ build/
 *.ckpt
 # Salidas brutas del doctor (el resumen vive en reports/compatibility.md)
 reports/doctor/
+# Metadatos del Finder de macOS (en cualquier carpeta)
+.DS_Store
