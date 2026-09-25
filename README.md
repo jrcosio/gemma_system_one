@@ -14,7 +14,7 @@
   <img alt="Licencia Apache 2.0" src="https://img.shields.io/badge/licencia-Apache%202.0-D22128?logo=apache&logoColor=white">
 </p>
 
-**[Inicio rápido](#-inicio-rápido)** · **[API](#-api)** · **[Resultados](#-resultados)** · **[Comandos](#-cli-gso)** · **[Estructura](#-estructura)**
+**[Inicio rápido](#-inicio-rápido)** · **[API](#-api)** · **[Resultados](#-resultados)** · **[Comandos](#-cli-gso)** · **[Estructura](#-estructura)** · **[Explicación sencilla](docs/explicacion.md)**
 
 </div>
 
@@ -266,7 +266,7 @@ gemma_system_one/
 │   ├── unit/ integration/  # CPU, sin pesos
 │   ├── mps/                # hardware real (MPS + pesos)
 │   └── e2e/                # servicio con checkpoints entrenados (se omiten si faltan)
-├── docs/                   # especificación y decisiones de diseño
+├── docs/                   # explicación sencilla (explicacion.md), especificación y decisiones de diseño
 └── reports/                # evidencia de cada experimento: métricas, protocolos y comandos
 ```
 
