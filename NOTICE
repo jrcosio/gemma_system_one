@@ -1,0 +1,27 @@
+Gemma System One
+Copyright 2026 J. Ramón Blanco
+
+Este proyecto se distribuye bajo la Licencia Apache, versión 2.0 (ver el fichero LICENSE).
+
+-------------------------------------------------------------------------------
+Modelo de terceros: Gemma 4 (Google)
+-------------------------------------------------------------------------------
+
+- Este repositorio NO incluye los pesos de Gemma 4. Se descargan en local desde
+  Hugging Face, con revisión fijada, mediante `gso download`:
+    google/gemma-4-E2B-it  (revisión 3e22461f65e89153144f8adb70e3b8c2cc9845a7)
+    google/gemma-4-E4B-it  (revisión ee0ef6023621cff504d758262d4e04895a5af4a2)
+
+- Gemma 4 lo publica Google bajo la Licencia Apache, versión 2.0:
+    https://ai.google.dev/gemma/docs/gemma_4_license
+
+- El uso de Gemma 4 debe respetar además la política de usos prohibidos de Gemma:
+    https://ai.google.dev/gemma/prohibited_use_policy
+
+- Los checkpoints que genera este proyecto (cabezales de decisión y adaptadores
+  LoRA en runs/) se entrenan sobre Gemma 4 y no se versionan. Si se distribuyen,
+  deben acompañarse de la licencia de Gemma 4 y de este aviso, indicando que
+  derivan de Gemma 4.
+
+- Este proyecto no está afiliado a Google ni cuenta con su respaldo. La Licencia
+  Apache 2.0 no concede derechos sobre marcas comerciales (sección 6).

@@ -4,7 +4,7 @@ version = "0.0.1"
 description = "Evaluador local Noul/Choice/Score sobre Gemma 4 con cabezales aprendidos (PyTorch/MPS)"
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
-license = { text = "Proprietary" }
+license = { text = "Apache-2.0" }
 dependencies = [
     "torch>=2.14",
     "transformers>=5.17",

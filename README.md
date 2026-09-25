@@ -11,7 +11,7 @@
   <img alt="FastAPI" src="https://img.shields.io/badge/API-FastAPI-009688?logo=fastapi&logoColor=white">
   <img alt="Apple Silicon" src="https://img.shields.io/badge/Apple%20Silicon-M--series-000000?logo=apple&logoColor=white">
   <img alt="uv" src="https://img.shields.io/badge/deps-uv-DE5FE9">
-  <img alt="Licencia" src="https://img.shields.io/badge/licencia-propietaria-lightgrey">
+  <img alt="Licencia Apache 2.0" src="https://img.shields.io/badge/licencia-Apache%202.0-D22128?logo=apache&logoColor=white">
 </p>
 
 **[Inicio rápido](#-inicio-rápido)** · **[API](#-api)** · **[Resultados](#-resultados)** · **[Comandos](#-cli-gso)** · **[Estructura](#-estructura)**
@@ -272,6 +272,6 @@ gemma_system_one/
 
 <div align="center">
 
-**Licencia:** propietaria (ver `pyproject.toml`) · Los pesos de Gemma 4 se rigen por su propia licencia (apache-2.0)
+**Licencia:** [Apache 2.0](LICENSE) · Atribución de Gemma 4 y condiciones de uso en [NOTICE](NOTICE). Los pesos de Gemma 4 no se incluyen: los publica Google bajo Apache 2.0 y deben usarse respetando su [política de usos prohibidos](https://ai.google.dev/gemma/prohibited_use_policy).
 
 </div>
